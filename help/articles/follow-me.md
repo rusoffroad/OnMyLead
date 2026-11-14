@@ -108,6 +108,10 @@ In [Full Map](/help/full-map), **Follow Me** stays on the map as a round arrow b
 ## On Each Device
 
 - **iPhone and Android phones:** **Follow Me** and **Center on Me** sit on the right, just above the bottom panel. If the panel fills the screen, fold it to see them.
+
+:::release 3.1
+- On a very narrow phone with the Tilt tile on, **Follow Me** shows just its arrow, so it fits beside the Tilt tile. It still turns blue while it's following and gets a blue outline when it's paused.
+:::
 - **iPad and Android tablets:** both sit at the bottom of the map, just left of the buttons panel in Ride Mode, and in the bottom corner in Navigate.
 - **Website:** Navigate has **Follow Me** too, and shows your arrow when your browser reports your direction (most phones do while you move; computers usually don't). Ride Mode on the website shows the route instead of a live map, so it has no Follow Me button.
 

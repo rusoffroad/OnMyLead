@@ -53,6 +53,10 @@
       },
       {
         "kind": "improved",
+        "text": "The buttons over the Ride Mode map line up in even rows on a phone, all the same size: Directions and Add Waypoint side by side above the panel, the Tilt tile beside Follow Me and Center on Me, and Music above them. With the panel folded, Buttons, Mechanical Issue and EMERGENCY are the same width."
+      },
+      {
+        "kind": "improved",
         "text": "Create a Ride is one short screen that opens already filled in: today, the next quarter hour, where you are (when location is allowed), and a ride for the friends you invite. A ride from here, right now, is two taps: Start a Ride, then Create. Nothing is required but a meeting point."
       },
       {

@@ -4,7 +4,7 @@ summary: See your vehicle's roll and pitch, get warned before a steep lean, and 
 category: safety-privacy
 order: 52
 release: "2.0"
-updated: 2026-11-06
+updated: 2026-11-14
 sources:
   - app/src/app/tilt.tsx
   - app/src/components/tilt-gauge.tsx
@@ -28,6 +28,10 @@ The **Tilt** tile shows your roll and pitch over the map:
 
 - In **Map Mode**, under your speed and the dash.
 - In **Ride Mode**, on the left side of the map above the panel. On a tablet it sits in the map's bottom-left corner. It hides in Full Map and when there isn't room.
+
+:::release 3.1
+- From 3.1, on a phone the tile sits level with **Follow Me** and **Center on Me**, just above **Directions** and **Add Waypoint**.
+:::
 
 The numbers turn amber as you get close to your limit and red at it. Tap the tile to open the full **Tilt** screen, with an axle seen from behind that leans with your roll, two wheels seen from the side that tip with your pitch, and the biggest lean each way under each one. Tap **Reset Max** to clear those (it shows once the meter is calibrated).
 
