@@ -19,7 +19,7 @@ import MapboxMaps
 ///   "Follow <trail>" (or "Head to the Start") with the distance and time left.
 ///
 /// On Free (CarPlay is Pro) the root is a list with the Pro notice instead.
-final class CarMapScreen: NSObject, CPMapTemplateDelegate {
+final class CarMapScreen: NSObject, CPMapTemplateDelegate, CPInterfaceControllerDelegate {
   /// The map is built only when plugins/with-carplay.js switched it on (OMLCarPlayMaps), which it
   /// does only alongside the entitlement.
   static var available: Bool {
@@ -56,11 +56,19 @@ final class CarMapScreen: NSObject, CPMapTemplateDelegate {
     self.window = window
     super.init()
     window.rootViewController = mapView
+    interface.delegate = self
+  }
+
+  // The map is on screen again (first show, or back from Messages, Layers or Ride): put the bar's
+  // buttons on again in case CarPlay dropped them.
+  func templateDidAppear(_ aTemplate: CPTemplate, animated: Bool) {
+    if aTemplate === mapTemplate { reapplyBar() }
   }
 
   func tearDown() {
     finishGuide()
     mapTemplate?.mapDelegate = nil
+    if interface.delegate === self { interface.delegate = nil }
     mapTemplate = nil
     window.rootViewController = nil
   }
@@ -126,8 +134,24 @@ final class CarMapScreen: NSObject, CPMapTemplateDelegate {
     mapTemplate = t
     proList = nil
     barKey = ""
-    interface.setRootTemplate(t, animated: false, completion: nil)
+    // The bar's buttons go on before the template is shown, and again once CarPlay says it is on
+    // screen: on the 3.1 (17) truck test the map buttons showed but the bar stayed empty when the
+    // buttons were only set after setRootTemplate.
+    if let bridge { updateBar(t, bridge: bridge, labels: bridge.labels) }
+    interface.setRootTemplate(t, animated: false) { [weak self] done, error in
+      if let error { NSLog("OnMyLead car map: root template not set: \(error)") }
+      NSLog("OnMyLead car map: root template set \(done)")
+      self?.reapplyBar()
+    }
     return t
+  }
+
+  /// Sets the bar's buttons again from scratch (CarPlay can drop buttons set while the template
+  /// was still appearing).
+  func reapplyBar() {
+    guard let bridge, let t = mapTemplate else { return }
+    barKey = ""
+    updateBar(t, bridge: bridge, labels: bridge.labels)
   }
 
   private func mapButton(_ symbol: String, _ action: @escaping () -> Void) -> CPMapButton {
@@ -147,6 +171,7 @@ final class CarMapScreen: NSObject, CPMapTemplateDelegate {
     ].joined(separator: "|")
     guard key != barKey else { return }
     barKey = key
+    NSLog("OnMyLead car map: bar \(key)")
     if panning {
       t.leadingNavigationBarButtons = [CPBarButton(title: labels.ok) { [weak self] _ in
         self?.mapTemplate?.dismissPanningInterface(animated: true)
@@ -558,8 +583,12 @@ final class CarMapViewController: UIViewController {
   /// Moves the map's content by `d` points (positive x: the map slides right).
   private func move(by d: CGPoint, animated: Bool) {
     guard let mapView else { return }
-    let mid = CGPoint(x: mapView.bounds.midX, y: mapView.bounds.midY)
-    let center = mapView.mapboxMap.coordinate(for: CGPoint(x: mid.x - d.x, y: mid.y - d.y))
+    // The camera's center sits in the middle of its padding (follow() pads by the car's safe
+    // area, which survives into panning), not the middle of the view. Starting from the view's
+    // middle threw the map off by that padding on every drag update (3.1 build 17, Chris's truck).
+    let map = mapView.mapboxMap
+    let mid = map.point(for: map.cameraState.center)
+    let center = map.coordinate(for: CGPoint(x: mid.x - d.x, y: mid.y - d.y))
     let to = CameraOptions(center: center)
     if animated {
       mapView.camera.ease(to: to, duration: 0.3)
