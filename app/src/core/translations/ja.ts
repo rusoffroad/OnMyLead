@@ -3521,6 +3521,16 @@ const dict: Record<string, string> = {
   "Nobody else has joined yet, so leaving cancels the ride.": "まだ誰も参加していないため、離脱するとライドは中止になります。",
   "You stay on {rideName}. Come back any time from Home or the ride page.": "{rideName} には参加したままです。ホームやライドのページからいつでも戻れます。",
   "Done with this ride? Leaving takes you off it for good.": "このライドはもう終わりですか？離脱すると完全に外れます。",
+  "Events and Group Rides": "イベントとグループライド",
+  "Events and Group Rides | OnMyLead": "イベントとグループライド | OnMyLead",
+  "Rallies and rides": "ラリーとライド",
+  "Group Rides Near You": "近くのグループライド",
+  "Public Group Rides": "公開グループライド",
+  "One ride on one day. Join one and ride together in Ride Mode.": "1日1回のライド。参加してライドモードで一緒に走りましょう。",
+  "Every public ride coming up. Allow location to see the ones near you first.": "これからの公開ライドすべて。位置情報を許可すると近いものから表示されます。",
+  "No Public Rides Coming Up": "予定されている公開ライドはありません",
+  "See Them on the Map": "地図で見る",
+  "Map Mode, Join a Ride, Start a Ride and Events and Group Rides always show first.": "マップモード、ライドに参加、ライドを開始、イベントとグループライドは常に先頭に表示されます。",
 };
 
 export default dict;

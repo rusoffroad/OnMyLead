@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   agendaByDay, agendaKindLabel, agendaKindTone, agendaTime, cardPlace, dateBlock, eventDates, eventDays, eventLink, eventPayload,
   eventPhase, eventPhotoPath, eventPhotoUrl, fitWithin, friendlyEventError, isRusOffroad, nextRsvp, pickablePeople, presenterLabel, rsvpLine, sortCards,
+  eventsViews, pickEventsView, EVENTS_AND_RIDES_TITLE,
   EVENT_OR_RIDE, EVENTS_NOT_SWITCHED_ON, type AgendaItem, type EventCard, type EventForm,
 } from '../events';
 
@@ -169,5 +170,25 @@ describe('presented by', () => {
     expect(isRusOffroad('RUS Off Road')).toBe(true);
     expect(isRusOffroad('Rusty Offroad')).toBe(false);
     expect(isRusOffroad(null)).toBe(false);
+  });
+});
+
+describe('Events and Group Rides switch (3.1)', () => {
+  it('offers Events, Group Rides and Yours when signed in', () => {
+    expect(eventsViews({ signedIn: true, ridesOn: true })).toEqual(['events', 'rides', 'mine']);
+  });
+  it('drops Yours when signed out and Group Rides when Find a Ride is off', () => {
+    expect(eventsViews({ signedIn: false, ridesOn: true })).toEqual(['events', 'rides']);
+    expect(eventsViews({ signedIn: true, ridesOn: false })).toEqual(['events', 'mine']);
+  });
+  it('opens the view a link asks for, if it is offered', () => {
+    expect(pickEventsView('rides', ['events', 'rides'])).toBe('rides');
+    expect(pickEventsView(['mine'], ['events', 'rides', 'mine'])).toBe('mine');
+    expect(pickEventsView('mine', ['events', 'rides'])).toBe('events');
+    expect(pickEventsView('nope', ['events'])).toBe('events');
+    expect(pickEventsView(undefined, ['events'])).toBe('events');
+  });
+  it('has the full name', () => {
+    expect(EVENTS_AND_RIDES_TITLE).toBe('Events and Group Rides');
   });
 });

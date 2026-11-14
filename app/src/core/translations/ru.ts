@@ -3521,6 +3521,16 @@ const dict: Record<string, string> = {
   "Nobody else has joined yet, so leaving cancels the ride.": "Больше никто не присоединился, поэтому выход отменит поездку.",
   "You stay on {rideName}. Come back any time from Home or the ride page.": "Вы остаётесь в {rideName}. Вернитесь в любой момент с Главной или страницы поездки.",
   "Done with this ride? Leaving takes you off it for good.": "Поездка больше не нужна? Выход уберёт вас из неё насовсем.",
+  "Events and Group Rides": "События и групповые поездки",
+  "Events and Group Rides | OnMyLead": "События и групповые поездки | OnMyLead",
+  "Rallies and rides": "Слёты и поездки",
+  "Group Rides Near You": "Групповые поездки рядом",
+  "Public Group Rides": "Публичные групповые поездки",
+  "One ride on one day. Join one and ride together in Ride Mode.": "Одна поездка в один день. Присоединяйтесь и едьте вместе в режиме поездки.",
+  "Every public ride coming up. Allow location to see the ones near you first.": "Все предстоящие публичные поездки. Разрешите геолокацию, чтобы сначала видеть ближайшие.",
+  "No Public Rides Coming Up": "Нет предстоящих публичных поездок",
+  "See Them on the Map": "Смотреть на карте",
+  "Map Mode, Join a Ride, Start a Ride and Events and Group Rides always show first.": "Режим карты, Присоединиться, Начать поездку и События и групповые поездки всегда идут первыми.",
 };
 
 export default dict;

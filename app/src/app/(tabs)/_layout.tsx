@@ -37,7 +37,7 @@ export default function TabsLayout() {
       }}>
       <Tabs.Screen name="index" options={{ title: 'OnMyLead', headerShown: false }} />
       <Tabs.Screen name="find" options={{ title: t('Rides Near You') }} />
-      <Tabs.Screen name="events-tab" options={{ title: t('Events') }} />
+      <Tabs.Screen name="events-tab" options={{ title: t('Events and Group Rides') }} />
       <Tabs.Screen name="social-tab" options={{ title: t('Social') }} />
       <Tabs.Screen name="groups" options={{ title: t('Riding Groups') }} />
       <Tabs.Screen name="profile" options={{ title: t('You') }} />

@@ -8,7 +8,7 @@ import { Colors, font, themedStyles } from '@/constants/theme';
 import { Icon, type IconName } from './icon';
 import { t as tr } from '@/lib/i18n';
 
-export type TabSpec = { name: string; title: string; icon: IconName; needsAccount?: boolean; railOnly?: boolean; hidden?: boolean };
+export type TabSpec = { name: string; title: string; a11y?: string; icon: IconName; needsAccount?: boolean; railOnly?: boolean; hidden?: boolean };
 
 /**
  * The places in the app (3.0): Home, Rides, Events and Social, with Map Mode's key in the middle.
@@ -18,7 +18,8 @@ export type TabSpec = { name: string; title: string; icon: IconName; needsAccoun
 export const TABS: TabSpec[] = [
   { name: 'index', title: 'Home', icon: 'home' },
   { name: 'find', title: 'Rides', icon: 'flag' },
-  { name: 'events-tab', title: 'Events', icon: 'calendar' },
+  // 3.1: the area is "Events and Group Rides"; the bar keeps the short name so it fits beside Rides.
+  { name: 'events-tab', title: 'Events', a11y: 'Events and Group Rides', icon: 'calendar' },
   { name: 'social-tab', title: 'Social', icon: 'people', needsAccount: true },
   { name: 'groups', title: 'Groups', icon: 'people', needsAccount: true, hidden: true },
   { name: 'profile', title: 'You', icon: 'person', railOnly: true },
@@ -93,7 +94,7 @@ export function TabBar({
             key={route.key}
             accessibilityRole="tab"
             accessibilityState={{ selected: focused }}
-            accessibilityLabel={tr(spec.title)}
+            accessibilityLabel={tr(spec.a11y ?? spec.title)}
             onPress={onPress}
             onLongPress={() => navigation.emit({ type: 'tabLongPress', target: route.key })}
             style={rail ? styles.railItem : styles.item}>

@@ -3521,6 +3521,16 @@ const dict: Record<string, string> = {
   "Nobody else has joined yet, so leaving cancels the ride.": "Ninguém mais entrou ainda, então sair cancela o passeio.",
   "You stay on {rideName}. Come back any time from Home or the ride page.": "Você continua em {rideName}. Volte quando quiser pelo Início ou pela página do passeio.",
   "Done with this ride? Leaving takes you off it for good.": "Terminou este passeio? Sair tira você dele de vez.",
+  "Events and Group Rides": "Eventos e passeios em grupo",
+  "Events and Group Rides | OnMyLead": "Eventos e passeios em grupo | OnMyLead",
+  "Rallies and rides": "Encontros e passeios",
+  "Group Rides Near You": "Passeios em grupo perto de você",
+  "Public Group Rides": "Passeios em grupo públicos",
+  "One ride on one day. Join one and ride together in Ride Mode.": "Um passeio em um dia. Entre e rodem juntos no Modo Passeio.",
+  "Every public ride coming up. Allow location to see the ones near you first.": "Todos os passeios públicos que vêm aí. Permita a localização para ver primeiro os mais perto.",
+  "No Public Rides Coming Up": "Nenhum passeio público por vir",
+  "See Them on the Map": "Ver no mapa",
+  "Map Mode, Join a Ride, Start a Ride and Events and Group Rides always show first.": "Modo Mapa, Entrar em um passeio, Iniciar um passeio e Eventos e passeios em grupo sempre aparecem primeiro.",
 };
 
 export default dict;

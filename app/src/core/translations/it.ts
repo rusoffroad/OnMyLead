@@ -3521,6 +3521,16 @@ const dict: Record<string, string> = {
   "Nobody else has joined yet, so leaving cancels the ride.": "Nessun altro si è ancora unito, quindi lasciare annulla il giro.",
   "You stay on {rideName}. Come back any time from Home or the ride page.": "Resti in {rideName}. Torna quando vuoi da Home o dalla pagina del giro.",
   "Done with this ride? Leaving takes you off it for good.": "Hai finito con questo giro? Lasciarlo ti toglie definitivamente.",
+  "Events and Group Rides": "Eventi e uscite di gruppo",
+  "Events and Group Rides | OnMyLead": "Eventi e uscite di gruppo | OnMyLead",
+  "Rallies and rides": "Raduni e uscite",
+  "Group Rides Near You": "Uscite di gruppo vicino a te",
+  "Public Group Rides": "Uscite di gruppo pubbliche",
+  "One ride on one day. Join one and ride together in Ride Mode.": "Un’uscita in un giorno. Unisciti e guidate insieme in Modalità Uscita.",
+  "Every public ride coming up. Allow location to see the ones near you first.": "Tutte le uscite pubbliche in arrivo. Consenti la posizione per vedere prima quelle vicine.",
+  "No Public Rides Coming Up": "Nessuna uscita pubblica in arrivo",
+  "See Them on the Map": "Vedile sulla mappa",
+  "Map Mode, Join a Ride, Start a Ride and Events and Group Rides always show first.": "Modalità Mappa, Unisciti a un’uscita, Inizia un’uscita ed Eventi e uscite di gruppo appaiono sempre per primi.",
 };
 
 export default dict;

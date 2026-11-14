@@ -4,7 +4,7 @@ summary: What's on your home screen. Map Mode, joining and starting rides, event
 category: getting-started
 order: 15
 release: "2.0"
-updated: 2026-11-10
+updated: 2026-11-14
 sources:
   - app/src/components/found-us-card.tsx
   - app/src/lib/found-us.ts
@@ -57,6 +57,10 @@ Two tiles side by side:
 - **Start a Ride** creates a new ride. On Free it says how many you have left this month (**1 Left This Month**, or **None Left This Month**, which opens Pro). On Pro and during the trial it says **Lead your group**. See [Create a Ride](/help/create-a-ride) and [Free and Pro](/help/free-vs-pro).
 - **Events** opens rallies, poker runs and ride weekends. See [Events](/help/events).
 
+:::release 3.1
+From 3.1 the second tile is **Events and Group Rides**: it opens rallies, poker runs and ride weekends, and public group rides near you, with a switch between them. See [Events](/help/events).
+:::
+
 When one of your rides is live, a card under them says **Your ride is live. Tap to open Ride Mode**.
 
 ## Starlink
@@ -89,7 +93,7 @@ Swipe a ride left to delete it (if you organize it) or leave it. On onmylead.com
 3. Use the up and down arrows to move a section higher or lower.
 4. Tap **Done**.
 
-Map Mode, Join a Ride, Start a Ride and Events always show first, your badges stay at the top and Your Toolkit stays at the bottom. **Reset to Default** puts everything back. Your layout is saved to your account, so it's the same on your phone, tablet and the website.
+Map Mode, Join a Ride, Start a Ride and Events (**Events and Group Rides** from 3.1) always show first, your badges stay at the top and Your Toolkit stays at the bottom. **Reset to Default** puts everything back. Your layout is saved to your account, so it's the same on your phone, tablet and the website.
 
 ## Public Rides Near You
 
