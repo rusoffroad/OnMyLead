@@ -1,0 +1,130 @@
+# Puts approved changes live on the server, so nobody runs Terminal commands (docs/server-updates.md).
+#
+# After each change to main is built (the "Build web" workflow), this works out what's new since the
+# last update it put live: database migrations, server functions, the website. When something is
+# new, it waits for Chris to tap Approve (the `production` environment has him as its required
+# reviewer; GitHub asks in the GitHub app). Then it applies the migrations, deploys the changed
+# functions, and points the `web-live` branch at the new web build, which the server picks up within
+# a minute (deploy/auto-update.sh). Nothing goes live without that tap (CLAUDE.md Rule 7).
+#
+# Off until the one-time setup is done: repo variable SERVER_UPDATES = on, the `production`
+# environment with Chris as required reviewer, and its SUPABASE_ACCESS_TOKEN secret.
+name: Update server
+
+on:
+  workflow_run:
+    workflows: [Build web]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# A newer change replaces an update still waiting for approval, so there's only ever one to approve.
+concurrency:
+  group: server-update
+  cancel-in-progress: true
+
+env:
+  SUPABASE_PROJECT_REF: jeacssxhjzjjmczcorcr
+  # Pinned so an update never changes how the CLI behaves; bump on purpose.
+  SUPABASE_CLI: supabase@2.122.1
+
+jobs:
+  plan:
+    name: What's new
+    if: >-
+      vars.SERVER_UPDATES == 'on' &&
+      (github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success')
+    runs-on: ubuntu-latest
+    outputs:
+      sha: ${{ steps.sha.outputs.sha }}
+      migrations: ${{ steps.plan.outputs.migrations }}
+      functions: ${{ steps.plan.outputs.functions }}
+      website: ${{ steps.plan.outputs.website }}
+      web_sha: ${{ steps.plan.outputs.web_sha }}
+      anything: ${{ steps.plan.outputs.anything }}
+    steps:
+      - id: sha
+        run: echo "sha=${{ github.event.workflow_run.head_sha || github.sha }}" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.sha.outputs.sha }}
+          fetch-depth: 0
+      - id: plan
+        run: |
+          git fetch -q origin web-build
+          git fetch -q origin server-live 2>/dev/null || true   # missing until the first update
+          git fetch -q origin web-live 2>/dev/null || true
+          base=$(git rev-parse -q --verify origin/server-live || true)
+          live=$(git rev-parse -q --verify origin/web-live || true)
+          node scripts/server/plan.mjs "${{ steps.sha.outputs.sha }}" "$base" origin/web-build "$live"
+
+  deploy:
+    name: Put it live
+    needs: plan
+    if: needs.plan.outputs.anything == 'true'
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      # Optional: without it the CLI signs in to the database with the access token.
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Safety checks
+        run: |
+          [ -n "$SUPABASE_ACCESS_TOKEN" ] || { echo "::error::Add the SUPABASE_ACCESS_TOKEN secret to the production environment (docs/server-updates.md). Nothing was changed."; exit 1; }
+          # Never run without Chris's approval: refuse if the environment lost its required reviewer.
+          rules=$(gh api "repos/${GITHUB_REPOSITORY}/environments/production" --jq '[.protection_rules[]?.type] | join(",")')
+          case ",$rules," in *,required_reviewers,*) ;; *)
+            echo "::error::The production environment has no required reviewer, so nothing was changed. Add rusoffroad under Settings > Environments > production."; exit 1;;
+          esac
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.plan.outputs.sha }}
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Database migrations
+        if: needs.plan.outputs.migrations == 'true'
+        run: |
+          npx -y "$SUPABASE_CLI" link --project-ref "$SUPABASE_PROJECT_REF"
+          npx -y "$SUPABASE_CLI" db push --linked --dry-run
+          npx -y "$SUPABASE_CLI" db push --linked --yes
+
+      - name: Server functions
+        if: needs.plan.outputs.functions != '[]'
+        env:
+          FUNCTIONS: ${{ needs.plan.outputs.functions }}
+        run: |
+          echo "$FUNCTIONS" | jq -c '.[]' | while read -r f; do
+            name=$(jq -r .name <<<"$f")
+            flags=()
+            [ "$(jq -r .noVerifyJwt <<<"$f")" = true ] && flags+=(--no-verify-jwt)
+            echo "::group::$name ${flags[*]}"
+            npx -y "$SUPABASE_CLI" functions deploy "$name" --project-ref "$SUPABASE_PROJECT_REF" --use-api --yes "${flags[@]}"
+            echo "::endgroup::"
+          done
+
+      - name: Website
+        if: needs.plan.outputs.website == 'true'
+        run: |
+          web=${{ needs.plan.outputs.web_sha }}
+          git fetch -q origin "$web"
+          want=$(git show "$web:help/status.json" | jq -r .builtAt)
+          git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "$web:refs/heads/web-live"
+          echo "Approved web build ${web::7} (built $want). Waiting for onmylead.com to serve it…"
+          for _ in $(seq 1 40); do
+            got=$(curl -fsS "https://onmylead.com/help/status.json?t=$(date +%s)" | jq -r .builtAt 2>/dev/null || true)
+            if [ "$got" = "$want" ]; then echo "onmylead.com is serving it."; exit 0; fi
+            sleep 15
+          done
+          echo "::error::onmylead.com didn't switch to the new build within 10 minutes. On the server: tail ~/onmylead/deploy/auto-update.log"
+          exit 1
+
+      - name: Remember what's live
+        run: git push -q -f "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "${{ needs.plan.outputs.sha }}:refs/heads/server-live"

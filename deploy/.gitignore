@@ -2,3 +2,5 @@ site/
 site.new/
 site.old/
 .env
+.live-build
+.auto-update.lock

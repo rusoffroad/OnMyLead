@@ -41,9 +41,12 @@ device check before release.
 
 **Rule 7: Release Protection.** Never publish an app update, submit to the App Store or Google
 Play, buy a paid service, change production credentials, or make a breaking production deployment
-without Chris's explicit OK. Migrations, function deploys, website deploys and builds run only
-from the "Phone build and server updates" thread on Chris's Mac, after he types an OK there. Never
-disturb a build that is in review (`help/release.json` `versions`).
+without Chris's explicit OK. Migrations, function deploys and website deploys go live only through
+the **Update server** workflow, after Chris taps Approve on it (`docs/server-updates.md`); never
+approve for him. Only while that workflow is off do they run from the Mac thread after his typed
+OK. Phone builds run only from the "Phone build and server updates" thread on Chris's Mac, after
+he types an OK there. Never disturb a build that is in review
+(`help/release.json` `versions`).
 
 **Rule 8: Persistent Tracking.** `docs/feature-parity.md` is the single feature-parity tracker.
 Every pull request that adds, changes or removes a feature updates its row (or adds one) with the
