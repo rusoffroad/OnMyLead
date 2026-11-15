@@ -4,12 +4,12 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Platform } from 'react-native';
 
 import {
-  bluetoothReceipts, broadcastNotSwitchedOn, CANCELLED_SHOWN_MS, mergeReceipts, sentShownFor, toAcknowledge,
+  bluetoothReceipts, broadcastNotSwitchedOn, CANCELLED_SHOWN_MS, cancelErrorText, mergeReceipts, sentShownFor, toAcknowledge,
   type Broadcast, type Receipt,
 } from '@/core/broadcast';
-import { ackRideItems, cancelRideItem, myReceipts } from '@/lib/api';
+import { ackRideItems, myReceipts } from '@/lib/api';
 import { nearbySeen, useNearby } from '@/lib/nearby';
-import { flushOutbox, pendingIds, removeFromOutbox } from '@/lib/outbox';
+import { cancelReliably, flushOutbox, pendingIds, removeFromOutbox } from '@/lib/outbox';
 import { newChannel, supabase } from '@/lib/supabase';
 
 const buzz = (style: 'tap' | 'done' | 'warn') => {
@@ -49,21 +49,30 @@ export function useBroadcast(rideId: string, me: string | null | undefined, fall
     setCard((c) => (c && c.id === id ? { ...c, ...patch } : c));
   }, []);
 
-  const doCancel = useCallback(async (b: Broadcast) => {
+  /**
+   * Takes back a tap that went out. With no service it still counts as cancelled: nearby riders
+   * hear it over Bluetooth and the server gets it with the next signal (lib/outbox). True when the
+   * server has it now. A refusal is thrown as text a rider can read, never the raw error.
+   */
+  const doCancel = useCallback(async (b: Broadcast): Promise<boolean> => {
     update(b.id, { state: 'cancelling' });
+    let now = true;
     try {
-      await cancelRideItem(b.id);
+      now = await cancelReliably(rideId, b.id);
     } catch (e) {
       const message = e instanceof Error ? e.message : String(e);
-      if (!broadcastNotSwitchedOn(message)) {
+      try {
+        if (!broadcastNotSwitchedOn(message)) throw e;
+        await fallbackRef.current(b);
+      } catch (failed) {
         update(b.id, { state: 'sent' });
-        throw e;
+        throw new Error(cancelErrorText(failed instanceof Error ? failed.message : String(failed)));
       }
-      await fallbackRef.current(b);
     }
     buzz('done');
     update(b.id, { state: 'cancelled' });
-  }, [update]);
+    return now;
+  }, [rideId, update]);
 
   /** Shows the tap as Sending, runs the send, then Sent or Waiting for Signal. */
   const send = useCallback(
@@ -88,8 +97,12 @@ export function useBroadcast(rideId: string, me: string | null | undefined, fall
     [doCancel, update],
   );
 
-  /** Takes the tap back: from the outbox if it never left, else from the group. */
-  const cancel = useCallback(async () => {
+  /**
+   * Takes the tap back: from the outbox if it never left, else from the group. Says whether the
+   * server has the change now ('now'), or will with the next signal ('later'); nothing when there
+   * was nothing to take back yet.
+   */
+  const cancel = useCallback(async (): Promise<'now' | 'later' | undefined> => {
     const b = cardRef.current;
     if (!b || b.state === 'cancelling' || b.state === 'cancelled') return;
     if (b.state === 'sending') {
@@ -100,9 +113,9 @@ export function useBroadcast(rideId: string, me: string | null | undefined, fall
     if (b.state === 'queued' && (await removeFromOutbox(b.id))) {
       buzz('done');
       update(b.id, { state: 'cancelled' });
-      return;
+      return 'later';
     }
-    await doCancel(b);
+    return (await doCancel(b)) ? 'now' : 'later';
   }, [doCancel, update]);
 
   /** Waiting for Signal: try everything in the outbox again now. */

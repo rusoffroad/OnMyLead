@@ -37,6 +37,10 @@
       },
       {
         "kind": "fixed",
+        "text": "Cancel on a status or quick reply now works with no service. Riders close by drop it over Bluetooth right away, and it's taken back for everyone else as soon as a phone gets signal, instead of showing an error."
+      },
+      {
+        "kind": "fixed",
         "text": "Fixed Ride Mode closing by itself during a ride when the phone couldn't save part of your ride track: it no longer retries over and over."
       },
       {

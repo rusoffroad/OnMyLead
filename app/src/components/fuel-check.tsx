@@ -5,6 +5,7 @@ import { View } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { Button, Card, Choice, ErrorText } from '@/components/ui';
 import { RideColors, Spacing } from '@/constants/theme';
+import { rideActionError } from '@/core/errors';
 import { RANGE_LABEL, rideFuelAdvice, type RangeCheck } from '@/core/fuel';
 import { rideVehicle, vehicleRange, vehicleTitle } from '@/core/garage';
 import { myVehicles, setMyVehicle, type VehicleWithCost } from '@/lib/api';
@@ -42,7 +43,7 @@ export function FuelCheck({ ride, mine, onChanged }: { ride: Ride; mine: RideMem
       await setMyVehicle(ride.id, id, mine.riders);
       onChanged();
     } catch (e) {
-      setError(e instanceof Error ? e.message : t('Could not change your machine.'));
+      setError(e instanceof Error ? rideActionError(e.message) : t('Could not change your machine.'));
     } finally {
       setBusy(false);
     }

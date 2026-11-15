@@ -3,6 +3,7 @@ import { ActivityIndicator, Keyboard, Pressable, Text, TextInput, View } from 'r
 import Svg, { Path } from 'react-native-svg';
 
 import { Colors, font, Radius, themedStyles } from '@/constants/theme';
+import { rideActionError } from '@/core/errors';
 import { inches, parseWidth, rigFit, shownWidth, NO_RIDER_WIDTHS, type FitVehicle } from '@/core/trail-width';
 import type { TrailInfo } from '@/core/trails';
 import { useGarageWidths, useRiderWidths } from '@/lib/trail-width';
@@ -64,7 +65,7 @@ export function TrailWidthRow({ info }: { info: TrailInfo }) {
       Keyboard.dismiss();
       setEditing(false);
     } catch (e) {
-      setError(e instanceof Error ? e.message : t('Couldn’t save the width.'));
+      setError(e instanceof Error ? rideActionError(e.message) : t('Couldn’t save the width.'));
     } finally {
       setBusy(false);
     }

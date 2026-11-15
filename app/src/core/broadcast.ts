@@ -1,3 +1,4 @@
+import { isTransientError } from './errors';
 import { tc } from './i18n';
 
 /**
@@ -165,6 +166,20 @@ export function toAcknowledge(
 export function broadcastNotSwitchedOn(message: string): boolean {
   return /cancel_ride_item|ack_ride_items|ride_receipts|cancelled_at/i.test(message)
     && /function|column|relation|schema cache|does not exist|could not find/i.test(message);
+}
+
+/**
+ * What Cancel says when the tap couldn't be taken back: never the raw error ("fetch failed:
+ * UnexpectedException: The Internet connection appears to be offline..."). No signal normally
+ * doesn't get here (the cancel waits for signal instead), but says so if it does.
+ */
+export function cancelErrorText(message: string): string {
+  return isTransientError(message) ? tc('No service. Try again when you have signal.') : tc('Something went wrong. Try again.');
+}
+
+/** Ride Mode's statuses without the taps their riders took back (by id). */
+export function withoutCancelled<T extends { id?: string | null }>(statuses: Record<string, T>, cancelled: Set<string>): Record<string, T> {
+  return Object.fromEntries(Object.entries(statuses).filter(([, s]) => !(s.id && (cancelled.has(s.id) || cancelled.has(s.id.toLowerCase())))));
 }
 
 /** A retry of a send whose first try actually landed. */

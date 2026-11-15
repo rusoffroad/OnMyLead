@@ -11,6 +11,7 @@ import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Field } from '@/components/ui';
 import { StopSign, WaypointBlaze, WaypointGlyph } from '@/components/waypoint-blaze';
 import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
+import { rideActionError } from '@/core/errors';
 import type { LatLng } from '@/core/geo';
 import {
   canEditWaypoint, canRemoveWaypoint, moveStop, parseStopTime, plannedStops, PLANNED_STOPS_NOT_SWITCHED_ON, stopNumber,
@@ -124,7 +125,7 @@ export function WaypointSheet({
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       onClose();
     } catch (e) {
-      setError(e instanceof Error ? e.message : tr('Couldn’t save the waypoint. Try again.'));
+      setError(e instanceof Error ? rideActionError(e.message) : tr('Couldn’t save the waypoint. Try again.'));
     } finally {
       setBusy(null);
     }
@@ -141,7 +142,7 @@ export function WaypointSheet({
       await reorderPlannedStops(rideId, ids);
       onChanged({ stopOrder: ids });
     } catch (e) {
-      setError(e instanceof Error ? e.message : tr('Couldn’t move the stop. Try again.'));
+      setError(e instanceof Error ? rideActionError(e.message) : tr('Couldn’t move the stop. Try again.'));
     } finally {
       setBusy(null);
     }
@@ -157,7 +158,7 @@ export function WaypointSheet({
       onChanged({ removedId: w.id });
       onClose();
     } catch (e) {
-      setError(e instanceof Error ? e.message : tr('Couldn’t remove the waypoint. Try again.'));
+      setError(e instanceof Error ? rideActionError(e.message) : tr('Couldn’t remove the waypoint. Try again.'));
     } finally {
       setBusy(null);
     }

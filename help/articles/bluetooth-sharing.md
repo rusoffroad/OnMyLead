@@ -36,6 +36,9 @@ Seeing nearby riders, sharing your spot, and sending messages over Bluetooth are
 - **The Emergency Siren over Bluetooth.** An EMERGENCY from a nearby rider sounds the siren on your phone with no service, and a notification with the siren if OnMyLead is in the background. See [Hear the Emergency Siren](/help/emergency-siren).
 :::
 - **Quick replies and messages.** Your quick replies and the messages you type in Ride Mode reach nearby riders too. Their phones read them out loud, and they show in Ride Chat marked **Via Bluetooth**. Every Ride Mode message goes over Bluetooth whole, in any language.
+:::release 3.1
+- **Cancel.** Tap **Cancel** on your tap's card with no service and nearby riders drop it over Bluetooth right away. The first phone with signal, yours or theirs, takes it back for everyone else. Nearby phones on a version before 3.1 keep showing it until they get service.
+:::
 - **Got it, seen it.** The card under your tap says who has it: **Reached (name) over Bluetooth** when their phone got it, and **Seen by (name)** once it showed on their screen. While your tap is **Waiting for Signal**, the card still names the nearby riders who got it over Bluetooth.
 - **Passed along.** Each phone passes on what it hears, up to six phones down the line, so a strung-out group can still hear each other when the riders in between are in range.
 - **A phone with service helps the rest.** Any phone on the ride that has signal puts what OnMyLead knows about the group, the other riders' spots, status taps and messages, on the air for the riders near it with none.

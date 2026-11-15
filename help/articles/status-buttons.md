@@ -15,6 +15,7 @@ sources:
   - app/src/core/breakdown.ts
   - app/src/core/chat.ts
   - app/src/lib/outbox.ts
+  - app/src/lib/nearby.ts
   - app/src/components/ride-message-sheet.tsx
   - app/src/core/ride-message.ts
   - app/src/hooks/use-saved-replies.ts
@@ -151,6 +152,10 @@ A blue ring also means a nearby rider's phone got it over Bluetooth, and the lin
 ## Take It Back
 
 Tapped the wrong button? Tap **Cancel** on the card. The status or quick reply is taken back for everyone, the group is told to ignore it, and the notification they got is replaced with one saying you cancelled it.
+
+:::release 3.1
+**Cancel** works with no service too. Riders close by on the same ride drop it right away over Bluetooth, and everyone else's copy is taken back as soon as your phone, or one of theirs, gets signal. You don't need to tap it again.
+:::
 
 ## With No Signal
 
