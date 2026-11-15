@@ -62,6 +62,7 @@ import {
 import { clearCarPlayMap, onCarPlayAction, showMapOnCarPlay } from '@/lib/carplay';
 import { requirePro, showProGate, useCan } from '@/lib/pro';
 import { useMapModeTime } from '@/lib/map-mode-time';
+import { useScreenUsage } from '@/lib/usage';
 import { mapTimeLeftText } from '@/core/map-mode-time';
 import { useTiltSettings } from '@/lib/tilt';
 import { TiltTile } from '@/components/tilt-tile';
@@ -106,6 +107,8 @@ export default function NavMode() {
     return () => setFocused(false);
   }, []));
   const mapTime = useMapModeTime(focused);
+  // Map Mode sessions and time for the owner's dashboard, on every plan (lib/usage).
+  useScreenUsage('map_mode');
   const mapTimeText = mapTime.onGroupRide ? null : mapTimeLeftText(mapTime.left);
   useEffect(() => {
     if (!mapTime.usedUp) return;

@@ -234,6 +234,10 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
 - Before You Ride (2.0): every rider agrees to the Rider Safety and Liability Agreement on first launch (all devices) and again when it changes; Admin > Rider Agreements lists and exports the permanent records.
 
 ### Admin Dashboard (onmylead.com/admin)
+- Usage (3.2 app update; migration 20261115100000_rider_usage): real riders, sign-ups, rides created,
+  rides that happened (started with 2+ riders sharing), app opens and time, Map Mode and Ride Mode
+  sessions and time for every plan, per-rider list; test, admin and App Review accounts left out.
+  The Overview's Real Use panel shows the same numbers. Counts and seconds only, never a location.
 - Overview, Signups and Downloads (real riders without test and admin accounts, marking test
   accounts, App Store and Google Play downloads), Store Reviews (both stores' ratings and reviews,
   replies posted to the store), Users (comp Pro, extend trial, revoke, suspend, delete), Rides (remove), Trials,

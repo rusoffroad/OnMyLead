@@ -32,6 +32,7 @@ import { startAdTracking } from '@/lib/ad-tracking';
 import { startFoundUs } from '@/lib/found-us';
 import { startAppSettings } from '@/lib/app-settings';
 import { startEntitlements } from '@/lib/entitlements';
+import { startUsageCounts } from '@/lib/usage';
 import { currentEntitlements, useCan } from '@/lib/pro';
 import { can } from '@/core/entitlements';
 import { startOrientationRule } from '@/lib/orientation';
@@ -115,6 +116,8 @@ function RootLayout() {
   }, [screen]);
   // The rider's plan (Free, Pro Trial, Pro, Admin), kept fresh for every screen.
   useEffect(() => startEntitlements(), []);
+  // App opens and time in front, for the owner's dashboard (lib/usage); counts only, never a location.
+  useEffect(() => startUsageCounts(), []);
   // The owner's announcement, maintenance notice, feature flags and release controls.
   useEffect(() => startAppSettings(), []);
   // Phones stay upright, tablets turn (Android; the Apple app does this in its Info.plist).

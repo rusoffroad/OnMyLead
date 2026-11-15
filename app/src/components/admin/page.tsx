@@ -11,7 +11,7 @@ export function AdminPage({ title, subtitle, actions, children }: { title: strin
   return (
     <View style={[styles.page, size === 'phone' && styles.pagePhone]}>
       <View style={[styles.head, size === 'phone' && { flexDirection: 'column', alignItems: 'flex-start' }]}>
-        <View style={{ flexShrink: 1, gap: 4 }}>
+        <View style={{ flexShrink: 1, flexGrow: 1, flexBasis: 360, gap: 4 }}>
           <Text accessibilityRole="header" style={[styles.title, size === 'phone' && { fontSize: 34, lineHeight: 36 }]}>{title}</Text>
           {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
         </View>
@@ -105,7 +105,7 @@ export function ComingSoon({ title }: { title: string }) {
 const styles = themedStyles(() => ({
   page: { padding: 32, gap: 20, width: '100%', maxWidth: 1360, alignSelf: 'center' },
   pagePhone: { padding: 16, gap: 16 },
-  head: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', gap: 16, marginBottom: 4 },
+  head: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'flex-end', justifyContent: 'space-between', gap: 16, marginBottom: 4 },
   title: { fontFamily: font(800, 'display'), fontSize: 44, lineHeight: 46, color: AdminColors.text, letterSpacing: -0.4 },
   subtitle: { fontFamily: font(500), fontSize: 15, lineHeight: 21, color: AdminColors.dim, maxWidth: 640 },
   actions: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, alignItems: 'center' },

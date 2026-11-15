@@ -6,7 +6,7 @@ export default function Privacy() {
   return (
     <LegalPage
       title="Privacy Policy"
-      updated="November 10, 2026"
+      updated="November 15, 2026"
       intro={`OnMyLead is made by ${COMPANY}. This page explains what the app and onmylead.com collect, why, and the choices you have. The short version: your location is never public, you choose who sees it, and sharing always ends.`}
       footer={<AdCookieChoice />}
       sections={[
@@ -25,6 +25,7 @@ export default function Privacy() {
             'Account: your email address and password (stored securely by our sign-in provider), and the ride name you pick. If you sign in with Apple, Google or Facebook, that service tells us your email address and, except for Apple, the name and profile photo on your account. We never get your password for those services or anything you post there.',
             'What you add: rides, routes, waypoints, Garage machines and photos, trip checklists, Starlink setup, riding groups, ride chat messages and poll votes. Waypoints you drop are only yours unless the ride’s leader shares them with the riders on that ride.',
             'Device and app: a push notification token and your notification settings, crash reports (through Sentry) and basic usage events, such as a ride being created, so we can fix problems and improve the app. Crash reports never include your location.',
+            'App use: daily totals of how often you open the app and how long you use it, Map Mode and Ride Mode, and on which kind of device (iPhone, iPad, Android or the website). They never include your location or what you tapped. Only the OnMyLead team sees them, to learn which parts of the app riders use, and they are deleted with your account.',
             'Purchases: if you buy Pro, Apple sends us the subscription’s status and transaction details. We never see your card or payment details.',
             'Safety agreement: when you agree to the Rider Safety and Liability Agreement, we save a record of it: your account, email address and ride name, which version you agreed to and a fingerprint of its exact text, the time, the app version, the kind of device and its system version, language, IP address and browser. It is never shown to other riders.',
             'Leaderboard: if you pick where you ride from, we save your country and, in some countries, your state or province (just those, never a place). If you tap Use My Location to fill it in, your phone works out the country and state itself and only those two are sent.',
