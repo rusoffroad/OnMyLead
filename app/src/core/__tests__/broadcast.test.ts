@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  ACK_WINDOW_MS, bluetoothReceipts, broadcastNotSwitchedOn, headline, isDuplicateSend, mergeReceipts, queuedLine, stateDetail, tally,
+  ACK_WINDOW_MS, bluetoothReceipts, BROADCAST_SHOWN_MS, SENT_SHOWN_MS, sentShownFor, broadcastNotSwitchedOn, headline, isDuplicateSend, mergeReceipts, queuedLine, stateDetail, tally,
   tallyLine, toAcknowledge,
   type Receipt,
 } from '../broadcast';
@@ -99,5 +99,18 @@ describe('mergeReceipts', () => {
     const merged = mergeReceipts([r('a', false, true)], [r('a', true, false), r('b', true)]);
     expect(merged).toHaveLength(2);
     expect(merged.find((x) => x.user_id === 'a')).toMatchObject({ seen_at: expect.any(String), pushed_at: expect.any(String) });
+  });
+});
+
+describe('sentShownFor', () => {
+  const at = '2026-11-15T12:00:00.000Z';
+  const t0 = Date.parse(at);
+  it('clears an everyday tap 15 seconds after it is out, even one that waited for signal', () => {
+    expect(sentShownFor({ at, urgent: false }, t0 + 1000)).toBe(SENT_SHOWN_MS);
+    expect(sentShownFor({ at }, t0 + 20 * 60_000)).toBe(15_000);
+  });
+  it('keeps Need Help and EMERGENCY up for ten minutes from the tap', () => {
+    expect(sentShownFor({ at, urgent: true }, t0 + 60_000)).toBe(BROADCAST_SHOWN_MS - 60_000);
+    expect(sentShownFor({ at, urgent: true }, t0 + 11 * 60_000)).toBe(0);
   });
 });

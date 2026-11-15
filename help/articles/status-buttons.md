@@ -134,7 +134,15 @@ Tap **Controls**, or swipe the bar up, to bring the rest back.
    - A blue ring means a notification went to their phone, but their app hasn't shown it yet.
    - An empty light means it hasn't reached them yet.
 
-Under the headline, the card spells it out, for example "Seen by Sam and Alex. 2 notified by push." or "All 5 riders got it." Tap **✕** to hide the card. It also goes away on its own after 10 minutes.
+Under the headline, the card spells it out, for example "Seen by Sam and Alex. 2 notified by push." or "All 5 riders got it." Tap **✕** to hide the card.
+
+:::until 3.1
+It also goes away on its own after 10 minutes.
+:::
+
+:::release 3.1
+It also goes away on its own 15 seconds after it's sent, so it doesn't sit over the map. **Need Help**, **EMERGENCY** and a Crash Alert stay up for 10 minutes. A tap that's **Waiting for Signal** stays until it sends.
+:::
 
 :::release 2.1
 A blue ring also means a nearby rider's phone got it over Bluetooth, and the line says **Reached Sam over Bluetooth** until it shows on their screen. See [Share With Nearby Riders With No Service](/help/bluetooth-sharing).

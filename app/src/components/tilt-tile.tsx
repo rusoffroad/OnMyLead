@@ -23,7 +23,8 @@ export function TiltTile({ reading, limits, bar, style }: { reading: TiltReading
   const level = on ? overallLevel(t!, limits) : 'ok';
   const ink = on ? LEVEL_INK[level] : Colors.textSecondary;
   const short = (side: string) => (side === 'Left' ? 'L' : side === 'Right' ? 'R' : side);
-  // Never calibrated: the meter is off, and the tile asks for a calibration instead.
+  // Never calibrated: the meter is off. Over the map (Ride Mode) that is a small round button, not a
+  // wide "Calibrate Tilt" pill, so it doesn't crowd the map; the Map Mode bar still spells it out.
   if (!reading.zeroed) {
     return (
       <Pressable
@@ -32,9 +33,9 @@ export function TiltTile({ reading, limits, bar, style }: { reading: TiltReading
         accessibilityLabel={tr('Calibrate Tilt')}
         accessibilityHint={tr('Opens the tilt meter so you can calibrate it')}
         hitSlop={6}
-        style={({ pressed }) => [bar ? styles.bar : styles.pill, pressed && { opacity: 0.8 }, style]}>
-        <Icon name="tilt" size={bar ? 22 : 20} color={Colors.textSecondary} strokeWidth={2.3} />
-        <Text style={[styles.calibrate, bar && { flex: 1 }]} numberOfLines={1}>{tr('Calibrate Tilt')}</Text>
+        style={({ pressed }) => [bar ? styles.bar : styles.round, pressed && { opacity: 0.8 }, style]}>
+        <Icon name="tilt" size={22} color={Colors.textSecondary} strokeWidth={2.3} />
+        {bar ? <Text style={[styles.calibrate, { flex: 1 }]} numberOfLines={1}>{tr('Calibrate Tilt')}</Text> : null}
         {bar ? <Icon name="chevron" size={18} color={Colors.textSecondary} /> : null}
       </Pressable>
     );
@@ -89,6 +90,10 @@ const styles = themedStyles(() => ({
   pill: {
     position: 'absolute', zIndex: 15, height: TILT_TILE_H, borderRadius: TILT_TILE_H / 2, flexDirection: 'row', alignItems: 'center',
     gap: 8, paddingLeft: 12, paddingRight: 16, ...GlassSurface,
+  },
+  round: {
+    position: 'absolute', zIndex: 15, width: TILT_TILE_H, height: TILT_TILE_H, borderRadius: TILT_TILE_H / 2,
+    alignItems: 'center', justifyContent: 'center', ...GlassSurface,
   },
   bar: {
     flexDirection: 'row', alignItems: 'center', gap: 12, minHeight: 52, paddingHorizontal: 14, paddingVertical: 6,

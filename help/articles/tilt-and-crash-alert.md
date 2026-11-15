@@ -4,7 +4,7 @@ summary: See your vehicle's roll and pitch, get warned before a steep lean, and 
 category: safety-privacy
 order: 52
 release: "2.0"
-updated: 2026-11-14
+updated: 2026-11-15
 sources:
   - app/src/app/tilt.tsx
   - app/src/components/tilt-gauge.tsx
@@ -52,7 +52,17 @@ The same switch is under **Map Buttons** in **Map Settings**: tap the round **Ma
 
 ## Calibrate It for Your Mount
 
-The tilt meter is off until you calibrate it, because your phone probably doesn't sit flat in its mount. Until then the Tilt screen shows **Calibrate** instead of readings, and the tile in Map Mode and Ride Mode says **Calibrate Tilt**. Tilt warnings don't buzz, and Crash Alert only watches for hard hits, not rollovers.
+The tilt meter is off until you calibrate it, because your phone probably doesn't sit flat in its mount. Until then the Tilt screen shows **Calibrate** instead of readings, and the tile in Map Mode says **Calibrate Tilt**.
+
+:::until 3.1
+In Ride Mode the tile says **Calibrate Tilt** too.
+:::
+
+:::release 3.1
+In Ride Mode it's a small round button with the tilt symbol until you calibrate. Tap it to open the Tilt screen.
+:::
+
+Tilt warnings don't buzz, and Crash Alert only watches for hard hits, not rollovers.
 
 1. Place your phone where it will be mounted, with the vehicle on flat and level ground.
 2. Open **Tilt** and press **Calibrate**, then **Calibrate** again to confirm.

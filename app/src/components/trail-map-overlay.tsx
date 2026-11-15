@@ -55,7 +55,7 @@ const WEB = Platform.OS === 'web';
  * website draws the same layers with Leaflet but can't save maps).
  */
 export function TrailMapOverlay({
-  trail, top = 12, left, cardTop, bottom = 12, route, ride, lookupHint = 'Tap a line to see who can ride it.', cardWidth, onFollow, ridden, bare = false, controls = false, trackline,
+  trail, top = 12, left, cardTop, bottom = 12, route, ride, lookupHint = 'Tap a line to see who can ride it.', cardWidth, onFollow, ridden, bare = false, controls = false, trackline, hideOfflineTag = false,
 }: {
   trail: TrailMap;
   /** Where the Map Settings button sits: its top edge. */
@@ -80,6 +80,8 @@ export function TrailMapOverlay({
   controls?: boolean;
   /** Ride Mode, for the leader (and organizers): the Leader Trackline switch for the whole ride. */
   trackline?: TracklineSwitch;
+  /** Ride Mode already says No Service in its own banner: leave out the No Signal tag so the two don't stack. */
+  hideOfflineTag?: boolean;
 }) {
   const insets = useSafeAreaInsets();
   const [open, setOpen] = useState(false);
@@ -112,7 +114,7 @@ export function TrailMapOverlay({
           <SettingsIcon color={Colors.text} />
           {changed ? <View style={styles.fabDot} /> : null}
         </Pressable>
-        {trail.offline ? (
+        {trail.offline && !hideOfflineTag ? (
           <View style={styles.offline} accessible accessibilityLabel={tr('No signal. The map is showing what\'s downloaded on this phone.')}>
             <Text style={styles.offlineText}>{tr('No Signal')}</Text>
             <Text style={styles.offlineSub}>{tr('Downloaded Map')}</Text>

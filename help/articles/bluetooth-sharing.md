@@ -41,7 +41,11 @@ Seeing nearby riders, sharing your spot, and sending messages over Bluetooth are
 - **A phone with service helps the rest.** Any phone on the ride that has signal puts what OnMyLead knows about the group, the other riders' spots, status taps and messages, on the air for the riders near it with none.
 - **Uploaded when anyone gets signal.** When any phone on the ride gets service, it passes what it heard to OnMyLead, including messages and who has seen what, so riders elsewhere and people at home see the group too.
 
-When it's working, the no-service banner in Ride Mode says **No Service. Sharing With 2 Nearby Phones Over Bluetooth.**
+When it's working, the no-service banner in Ride Mode shows how many nearby phones you're sharing with over Bluetooth.
+
+:::release 3.1
+From 3.1 the banner is one small line, for example **No Service 2 Nearby on Bluetooth**. Tap it to read the full sentence, and tap again to shrink it.
+:::
 
 ## Range
 
@@ -61,7 +65,11 @@ Riders farther away than that show where they were last seen, as before. See [Us
 Bluetooth Sharing is on by default. Turn it off or back on in either place:
 
 - **You:** switch **Bluetooth Sharing** off or on.
-- **Ride Mode:** when you have no service, the no-service banner has a **Bluetooth On** button. Tap it to turn Bluetooth Sharing off (it then says **Bluetooth Off**), and tap again to turn it back on. It starts again right away.
+- **Ride Mode:** when you have no service, the no-service banner has a Bluetooth button that shows whether it's on. Tap it to turn Bluetooth Sharing off, and tap again to turn it back on. It starts again right away.
+
+:::release 3.1
+From 3.1 the button is smaller and says **On** or **Off** next to the Bluetooth symbol.
+:::
 
 With it off, your phone doesn't use Bluetooth for OnMyLead at all. Your status taps, messages and location still go over the internet whenever you have service.
 

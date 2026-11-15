@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Platform } from 'react-native';
 
 import {
-  BROADCAST_SHOWN_MS, bluetoothReceipts, broadcastNotSwitchedOn, CANCELLED_SHOWN_MS, mergeReceipts, toAcknowledge,
+  bluetoothReceipts, broadcastNotSwitchedOn, CANCELLED_SHOWN_MS, mergeReceipts, sentShownFor, toAcknowledge,
   type Broadcast, type Receipt,
 } from '@/core/broadcast';
 import { ackRideItems, cancelRideItem, myReceipts } from '@/lib/api';
@@ -126,10 +126,10 @@ export function useBroadcast(rideId: string, me: string | null | undefined, fall
     if (!left.includes(b.id)) update(b.id, { state: 'sent' });
   }, [update]);
 
-  // Sent cards go away after a while; cancelled ones right after saying so.
+  // Sent cards go away on their own (core/broadcast sentShownFor); cancelled ones right after saying so.
   useEffect(() => {
     if (!card || (card.state !== 'sent' && card.state !== 'cancelled')) return;
-    const wait = card.state === 'cancelled' ? CANCELLED_SHOWN_MS : Math.max(0, Date.parse(card.at) + BROADCAST_SHOWN_MS - Date.now());
+    const wait = card.state === 'cancelled' ? CANCELLED_SHOWN_MS : sentShownFor(card, Date.now());
     const t = setTimeout(() => setCard((c) => (c?.id === card.id && c.state === card.state ? null : c)), wait);
     return () => clearTimeout(t);
   }, [card]);

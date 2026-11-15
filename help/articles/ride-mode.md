@@ -385,7 +385,11 @@ If your phone can't reach the server for a short while, a banner says **No Servi
 :::
 
 :::release 2.1
-Riders close to you on the same ride keep moving with no service, over Bluetooth, and the banner says **No Service. Sharing With 2 Nearby Phones Over Bluetooth**. Your status taps, quick replies and messages reach them too, phones pass everything along the group, and the card under your tap names who got it. Tap **Bluetooth On** on the banner to turn Bluetooth Sharing off, and tap it again to turn it back on. Seeing riders and sharing your spot, taps and messages over Bluetooth are Pro; on Free the button shows the **Pro** tag, and your phone still passes things along and sends EMERGENCY. Riders out of Bluetooth range show where they were last seen. See [Share With Nearby Riders With No Service](/help/bluetooth-sharing).
+Riders close to you on the same ride keep moving with no service, over Bluetooth, and the banner shows how many nearby phones you're sharing with. Your status taps, quick replies and messages reach them too, phones pass everything along the group, and the card under your tap names who got it. Tap the Bluetooth button on the banner to turn Bluetooth Sharing off, and tap it again to turn it back on. Seeing riders and sharing your spot, taps and messages over Bluetooth are Pro; on Free the button shows the **Pro** tag, and your phone still passes things along and sends EMERGENCY. Riders out of Bluetooth range show where they were last seen. See [Share With Nearby Riders With No Service](/help/bluetooth-sharing).
+:::
+
+:::release 3.1
+From 3.1 the no-service banner is one small line, such as **No Service Last-Seen Spots** or **No Service 2 Nearby on Bluetooth**, with a small Bluetooth **On**/**Off** button. Tap the line to read the full sentence. The **No Signal** tag under Map Settings stays hidden while this banner shows, so the two don't stack (it still shows in Full Map).
 :::
 
 Status taps and quick replies you make with no service wait on your phone and send on their own when you get signal.
