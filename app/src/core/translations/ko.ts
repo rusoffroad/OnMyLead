@@ -3542,6 +3542,9 @@ const dict: Record<string, string> = {
   "The route is already filled in.": "경로가 이미 입력되어 있습니다.",
   "Only friends you invite.": "초대한 친구만.",
   "Open to anyone. Shown to riders nearby.": "누구나 참여 가능. 근처 라이더에게 표시됩니다.",
+  "No Service": "서비스 없음",
+  "{n} Nearby on Bluetooth": "블루투스로 근처 {n}명",
+  "Last-Seen Spots": "마지막 위치",
 };
 
 export default dict;

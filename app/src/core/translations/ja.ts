@@ -3542,6 +3542,9 @@ const dict: Record<string, string> = {
   "The route is already filled in.": "ルートは入力済みです。",
   "Only friends you invite.": "招待した友達だけ。",
   "Open to anyone. Shown to riders nearby.": "誰でも参加可能。近くのライダーに表示されます。",
+  "No Service": "圏外",
+  "{n} Nearby on Bluetooth": "Bluetoothで近くに{n}人",
+  "Last-Seen Spots": "最後の位置",
 };
 
 export default dict;

@@ -701,6 +701,8 @@ export default function RideMode() {
   }, [statuses, watchesBubble, me, nameOf]);
 
   const offlineSince = viewerOfflineSince(lastHeardAt, now);
+  // The no-service banner is one short line; a tap shows (and screen readers read) the whole sentence.
+  const [offlineMore, setOfflineMore] = useState(false);
   // Each rider's last heading, so their arrow stays on after they stop while they're live (core/heading heldHeading).
   const [heldHeadings] = useState(() => new Map<string, { deg: number; at: number }>());
   const mapRiders: MapRider[] = joined.map((m) => {
@@ -835,6 +837,14 @@ export default function RideMode() {
   const foldedCount = helpCalls.length - shownHelpCalls.length + separations.length - shownSeparations.length;
 
   const alertsShown = shownSeparations.length + shownHelpCalls.length > 0;
+  const offlineSentence =
+    (nearby.state === 'on' && nearby.peers > 0 && bluetoothPro
+      ? activeShare
+        ? t(nearby.peers === 1 ? 'No Service. Sharing With {n} Nearby Phone Over Bluetooth.' : 'No Service. Sharing With {n} Nearby Phones Over Bluetooth.', { n: nearby.peers })
+        : t(nearby.peers === 1 ? 'No Service. Sharing With {n} Nearby Phone Over Bluetooth (Your Spot Stays Private Until You Share).' : 'No Service. Sharing With {n} Nearby Phones Over Bluetooth (Your Spot Stays Private Until You Share).', { n: nearby.peers })
+      : activeShare
+        ? t('No Service. Riders Show Where They Were Last Seen, and Yours Sends When Service Returns.')
+        : t('No Service. Riders Show Where They Were Last Seen.')) + (bluetoothOffered && !bluetoothMine ? ` ${t('Bluetooth Sharing Is Off.')}` : '');
   const hasBanners = !!precise.problem || offlineSince != null || !!(activeShare && shareOpen) || !!regroup || !!announcement;
   // Each value below comes from measurements that don't depend on it, so nothing feeds back.
   // On a tablet the banners sit in the sidebar, beside the panel rather than above it.
@@ -1155,7 +1165,8 @@ export default function RideMode() {
     crash.dismiss();
     void sendEmergency();
     const body = crashMessage(cause);
-    void broadcast.send({ id: newTapId(), kind: 'reply', label: body }, (tid) => sendQuickReplyReliably(id, body, tid));
+    // Urgent, so the card stays up as long as the EMERGENCY it follows.
+    void broadcast.send({ id: newTapId(), kind: 'reply', label: body, urgent: true }, (tid) => sendQuickReplyReliably(id, body, tid));
   }
 
   // CarPlay map (Navigation entitlement; builds without it ignore `map`): the ride route and the
@@ -1356,6 +1367,7 @@ export default function RideMode() {
         trail={trail}
         controls
         bare={fullMap}
+        hideOfflineTag={offlineSince != null && !fullMap}
         top={cornerTop}
         left={tablet && !fullMap ? sideW + 2 * Spacing.two + EDGE - Spacing.two : fullMap ? insets.left + EDGE + CORNER_EXIT_ROOM : undefined}
         cardTop={tablet || fullMap ? insets.top + 64 : insets.top + 118}
@@ -1426,18 +1438,30 @@ export default function RideMode() {
             </Pressable>
           ) : null}
           {offlineSince != null ? (
+            // One small line (3.1): No Service, plus how many phones are in Bluetooth range. Tap it for the full sentence.
             <View style={styles.offlineBanner} accessibilityLiveRegion="polite">
-              <View style={styles.offlineDot} />
-              <Text style={styles.offlineText}>
-                {nearby.state === 'on' && nearby.peers > 0 && bluetoothPro
-                  ? activeShare
-                    ? t(nearby.peers === 1 ? 'No Service. Sharing With {n} Nearby Phone Over Bluetooth.' : 'No Service. Sharing With {n} Nearby Phones Over Bluetooth.', { n: nearby.peers })
-                    : t(nearby.peers === 1 ? 'No Service. Sharing With {n} Nearby Phone Over Bluetooth (Your Spot Stays Private Until You Share).' : 'No Service. Sharing With {n} Nearby Phones Over Bluetooth (Your Spot Stays Private Until You Share).', { n: nearby.peers })
-                  : activeShare
-                    ? t('No Service. Riders Show Where They Were Last Seen, and Yours Sends When Service Returns.')
-                    : t('No Service. Riders Show Where They Were Last Seen.')}
-                {bluetoothOffered && !bluetoothMine ? ` ${t('Bluetooth Sharing Is Off.')}` : ''}
-              </Text>
+              <Pressable
+                onPress={() => setOfflineMore((v) => !v)}
+                accessibilityRole="button"
+                accessibilityState={{ expanded: offlineMore }}
+                accessibilityLabel={offlineSentence}
+                hitSlop={6}
+                style={styles.offlineMain}>
+                <View style={styles.offlineDot} />
+                {offlineMore ? (
+                  <Text style={styles.offlineMore}>{offlineSentence}</Text>
+                ) : (
+                  <Text style={styles.offlineText} numberOfLines={1}>
+                    {t('No Service')}
+                    <Text style={styles.offlineSub}>
+                      {'  '}
+                      {nearby.state === 'on' && nearby.peers > 0 && bluetoothPro && bluetoothMine
+                        ? t('{n} Nearby on Bluetooth', { n: nearby.peers })
+                        : t('Last-Seen Spots')}
+                    </Text>
+                  </Text>
+                )}
+              </Pressable>
               {bluetoothOffered ? (
                 <Pressable
                   onPress={() => setBluetoothMine(!bluetoothMine)}
@@ -1446,10 +1470,10 @@ export default function RideMode() {
                   accessibilityState={{ checked: bluetoothMine }}
                   accessibilityLabel={t('Bluetooth Sharing')}
                   accessibilityHint={t('Passes spots, taps and messages to nearby riders on this ride when there is no service')}
-                  style={[styles.shareAction, styles.btChip, bluetoothMine && styles.btChipOn]}>
-                  <Icon name="bluetooth" size={14} color={bluetoothMine ? Colors.sky : Colors.textSecondary} strokeWidth={2.2} />
+                  style={[styles.btChip, bluetoothMine && styles.btChipOn]}>
+                  <Icon name="bluetooth" size={13} color={bluetoothMine ? Colors.sky : Colors.textSecondary} strokeWidth={2.2} />
                   {/* Shows what it is now, like a switch; tapping flips it. */}
-                  <Text style={styles.shareActionText}>{bluetoothMine ? t('Bluetooth On') : t('Bluetooth Off')}</Text>
+                  <Text style={[styles.btChipText, !bluetoothMine && { color: Colors.textSecondary }]}>{bluetoothMine ? t('On') : t('Off')}</Text>
                   <ProTag feature="bluetooth_sharing" style={{ marginLeft: 2 }} />
                 </Pressable>
               ) : null}
@@ -2007,7 +2031,11 @@ const styles = themedStyles(() => ({
   shareText: { color: Colors.text, fontFamily: font(700), fontSize: 14, lineHeight: 18, textAlign: 'center' },
   shareAction: { minHeight: 32, paddingHorizontal: 12, borderRadius: 12, justifyContent: 'center', backgroundColor: Glass.tile },
   shareActionText: { color: Colors.text, fontFamily: font(700), fontSize: 13 },
-  btChip: { flexDirection: 'row', alignItems: 'center', gap: 4, borderWidth: 1, borderColor: 'transparent' },
+  btChip: {
+    flexDirection: 'row', alignItems: 'center', gap: 4, minHeight: 30, paddingHorizontal: 9, borderRadius: 10,
+    backgroundColor: Glass.tile, borderWidth: 1, borderColor: 'transparent',
+  },
+  btChipText: { color: Colors.text, fontFamily: font(700), fontSize: 12 },
   btChipOn: { borderColor: Colors.sky },
   // Tablets: the top bar, banners and riders become a column on the left, as tall as the screen.
   topTablet: { right: 'auto' },
@@ -2087,12 +2115,15 @@ const styles = themedStyles(() => ({
   typeText: { color: Colors.text, fontFamily: font(700), fontSize: 14 },
   fullMapBarBtn: { minHeight: 48 },
   offlineBanner: {
-    flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 16, paddingHorizontal: 14, paddingVertical: 10,
-    backgroundColor: Glass.panel, borderWidth: 1.5, borderColor: Colors.textSecondary, borderStyle: 'dashed',
+    flexDirection: 'row', alignItems: 'center', gap: 8, borderRadius: 14, paddingLeft: 12, paddingRight: 6, paddingVertical: 5,
+    minHeight: 40, backgroundColor: Glass.panel, borderWidth: 1, borderColor: Glass.edge,
   },
+  offlineMain: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 30 },
   // The same dashed grey as a rider who has lost service: dashed grey always means no signal.
-  offlineDot: { width: 12, height: 12, borderRadius: 6, borderWidth: 2.5, borderColor: Colors.textSecondary, borderStyle: 'dashed' },
+  offlineDot: { width: 10, height: 10, borderRadius: 5, borderWidth: 2, borderColor: Colors.textSecondary, borderStyle: 'dashed' },
   offlineText: { flex: 1, color: Colors.text, fontFamily: font(700), fontSize: 14, lineHeight: 18 },
+  offlineSub: { color: Colors.textSecondary, fontFamily: font(600), fontSize: 13 },
+  offlineMore: { flex: 1, color: Colors.text, fontFamily: font(600), fontSize: 13, lineHeight: 17 },
   announcement: {
     flexDirection: 'row', alignItems: 'center', gap: 10, borderRadius: 16, padding: 10, paddingRight: 12,
     backgroundColor: Glass.panel, borderWidth: 1, borderColor: 'rgba(242,178,51,0.45)',

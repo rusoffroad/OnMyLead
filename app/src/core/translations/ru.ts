@@ -3542,6 +3542,9 @@ const dict: Record<string, string> = {
   "The route is already filled in.": "Маршрут уже заполнен.",
   "Only friends you invite.": "Только друзья, которых вы пригласите.",
   "Open to anyone. Shown to riders nearby.": "Открыта для всех. Видна райдерам рядом.",
+  "No Service": "Нет сети",
+  "{n} Nearby on Bluetooth": "Рядом по Bluetooth: {n}",
+  "Last-Seen Spots": "Последние позиции",
 };
 
 export default dict;

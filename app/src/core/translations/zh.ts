@@ -3542,6 +3542,9 @@ const dict: Record<string, string> = {
   "The route is already filled in.": "路线已填好。",
   "Only friends you invite.": "仅限你邀请的好友。",
   "Open to anyone. Shown to riders nearby.": "对所有人开放。附近的骑手可以看到。",
+  "No Service": "无信号",
+  "{n} Nearby on Bluetooth": "蓝牙附近 {n} 人",
+  "Last-Seen Spots": "最后位置",
 };
 
 export default dict;

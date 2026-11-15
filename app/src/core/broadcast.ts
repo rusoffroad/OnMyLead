@@ -122,8 +122,19 @@ export function stateDetail(state: BroadcastState): string | null {
   }
 }
 
-/** After this long a sent card goes away on its own. */
+/** After this long a sent Need Help or EMERGENCY card goes away on its own. */
 export const BROADCAST_SHOWN_MS = 10 * 60_000;
+/** Any other sent card (On My Way, a quick reply...) clears quickly so Ride Mode stays calm. */
+export const SENT_SHOWN_MS = 15_000;
+
+/**
+ * How long a sent card stays up from now. Need Help and EMERGENCY keep the full ten minutes from
+ * the tap, so the rider can watch who has it; everything else clears 15 seconds after it is out.
+ */
+export function sentShownFor(b: Pick<Broadcast, 'at' | 'urgent'>, now: number): number {
+  if (b.urgent) return Math.max(0, Date.parse(b.at) + BROADCAST_SHOWN_MS - now);
+  return SENT_SHOWN_MS;
+}
 /** A cancelled card goes away after this long. */
 export const CANCELLED_SHOWN_MS = 4_000;
 /** Taps from other riders older than this aren't news; the app doesn't mark them seen. */
