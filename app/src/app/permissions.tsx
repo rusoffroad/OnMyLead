@@ -60,8 +60,8 @@ export default function PermissionsScreen() {
 
       {rows ? (
         <View style={[styles.columns, twoColumns && styles.columnsRow]}>
-          <Group title={t('Needed for Group Rides')} rows={needed} platform={platform} busy={busy} onTap={tap} />
-          <Group title={t('Optional')} rows={extras} platform={platform} busy={busy} onTap={tap} />
+          <Group title={t('Needed for Group Rides')} rows={needed} platform={platform} busy={busy} onTap={tap} wide={twoColumns} />
+          <Group title={t('Optional')} rows={extras} platform={platform} busy={busy} onTap={tap} wide={twoColumns} />
         </View>
       ) : null}
 
@@ -100,7 +100,7 @@ function Summary({ rows, attention }: { rows: PermissionRow[]; attention: Permis
           const c = lightColor(r);
           return (
             <View key={r.def.id} style={[styles.light, { backgroundColor: `${c}1F`, borderColor: `${c}66` }]}>
-              <Icon name={ICONS[r.def.id]} size={16} color={c} />
+              <Icon name={ICONS[r.def.id]} size={14} color={c} />
             </View>
           );
         })}
@@ -123,10 +123,10 @@ function lightColor(r: PermissionRow): string {
   return Colors.textSecondary;
 }
 
-function Group({ title, rows, platform, busy, onTap }: { title: string; rows: PermissionRow[]; platform: PermissionPlatform; busy: PermissionId | null; onTap: (r: PermissionRow) => void }) {
+function Group({ title, rows, platform, busy, onTap, wide }: { title: string; rows: PermissionRow[]; platform: PermissionPlatform; busy: PermissionId | null; onTap: (r: PermissionRow) => void; wide: boolean }) {
   if (!rows.length) return null;
   return (
-    <View style={styles.group}>
+    <View style={[styles.group, wide && { flex: 1 }]}>
       <ThemedText type="small" themeColor="textSecondary" accessibilityRole="header" style={styles.groupTitle}>{title}</ThemedText>
       <View style={styles.list}>
         {rows.map((r, i) => (
@@ -251,13 +251,13 @@ const styles = themedStyles(() => ({
     backgroundColor: Colors.backgroundElement, borderRadius: Radius.card, borderWidth: 1,
     padding: Spacing.three, gap: Spacing.two,
   },
-  lights: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
-  light: { width: 30, height: 30, borderRadius: 8, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
+  lights: { flexDirection: 'row', flexWrap: 'wrap', gap: 5 },
+  light: { width: 26, height: 26, borderRadius: 7, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
   summaryTitle: { fontFamily: font(700, 'display'), fontSize: 26, lineHeight: 30, marginTop: 2 },
   warn: { backgroundColor: Colors.backgroundElement, borderRadius: Radius.control, borderLeftWidth: 4, borderLeftColor: Colors.danger, padding: Spacing.three, gap: 4 },
   columns: { gap: Spacing.four },
   columnsRow: { flexDirection: 'row', alignItems: 'flex-start' },
-  group: { flex: 1, gap: Spacing.two },
+  group: { gap: Spacing.two },
   groupTitle: { fontWeight: 600, paddingHorizontal: Spacing.one },
   list: { borderRadius: Radius.card, overflow: 'hidden', backgroundColor: Colors.backgroundElement },
   divider: { height: 1, marginLeft: 66, backgroundColor: Colors.backgroundSelected },

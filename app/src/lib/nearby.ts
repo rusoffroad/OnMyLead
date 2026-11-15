@@ -215,7 +215,8 @@ export async function forgetNearbyKeys(rideId: string) {
 // Session
 // ---------------------------------------------------------------------------
 
-const ANDROID_BLUETOOTH_PERMISSIONS = [
+/** Android 12+ "Nearby devices". A function: PermissionsAndroid doesn't exist on the website. */
+const androidBluetoothPermissions = () => [
   PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN,
   PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT,
   PermissionsAndroid.PERMISSIONS.BLUETOOTH_ADVERTISE,
@@ -237,7 +238,7 @@ export async function bluetoothPermission(): Promise<string | null> {
   }
   if (Platform.OS !== 'android' || Platform.Version < 31) return 'granted';
   try {
-    const have = await Promise.all(ANDROID_BLUETOOTH_PERMISSIONS.map((p) => PermissionsAndroid.check(p)));
+    const have = await Promise.all(androidBluetoothPermissions().map((p) => PermissionsAndroid.check(p)));
     return have.every(Boolean) ? 'granted' : 'denied';
   } catch {
     return null;
@@ -253,8 +254,9 @@ export async function askBluetoothPermission(): Promise<string | string[] | null
   if (Platform.OS === 'ios') return native.requestAuthorization ? native.requestAuthorization().catch(() => null) : null;
   if (Platform.OS !== 'android' || Platform.Version < 31) return ['granted'];
   try {
-    const res = await PermissionsAndroid.requestMultiple(ANDROID_BLUETOOTH_PERMISSIONS);
-    return ANDROID_BLUETOOTH_PERMISSIONS.map((p) => String(res[p]));
+    const perms = androidBluetoothPermissions();
+    const res = await PermissionsAndroid.requestMultiple(perms);
+    return perms.map((p) => String(res[p]));
   } catch {
     return null;
   }
