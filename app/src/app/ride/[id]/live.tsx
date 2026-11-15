@@ -114,6 +114,7 @@ import { isNewerTap, newestTapPerRider, pushCallAt } from '@/core/siren';
 import { ProTag } from '@/components/pro-tag';
 
 import { t } from '@/lib/i18n';
+import { useScreenUsage } from '@/lib/usage';
 import { SheetModal } from '@/components/sheet-modal';
 // If anything in Ride Mode still throws, show Expo Router's retry screen instead of closing the app.
 export { ErrorBoundary } from 'expo-router';
@@ -175,6 +176,8 @@ export default function RideMode() {
   // Leaving Ride Mode while Android is tearing the screen down rejects the keep-awake release
   // ("current activity is no longer available"); the screen is going away anyway, so catch it.
   useKeepAwake(undefined, { suppressDeactivateWarnings: true });
+  // Ride Mode sessions and time for the owner's dashboard (lib/usage); counts only, never a location.
+  useScreenUsage('ride_mode');
   const trail = useTrailMap();
   const insets = useSafeAreaInsets();
   const layout = useLayout();

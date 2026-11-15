@@ -9,7 +9,9 @@ import {
 import { font, themedStyles } from '@/constants/theme';
 import { bucketFor, fmtAgo, fmtInt, fmtMoney, fmtPct } from '@/core/admin-format';
 import * as admin from '@/lib/admin';
+import { UsageTiles } from '@/components/admin-usage-tiles';
 import { growthSummary } from '@/lib/admin-growth';
+import { usageSummary } from '@/lib/admin-usage';
 
 const RECENT_LABEL: Record<admin.Overview['recent'][number]['kind'], string> = {
   signup: 'New Rider',
@@ -26,6 +28,8 @@ export default function Overview() {
   // Real riders without test and admin accounts; missing until that server update is on.
   const growth = admin.useAdminData(() => growthSummary(range.from, range.to), [range.from, range.to]);
   const g = growth.data;
+  // Real use with test, admin and App Review accounts left out; hidden until that server update is on.
+  const usage = admin.useAdminData(() => usageSummary(range.from, range.to), [range.from, range.to]);
   const charts = admin.useAdminData(async () => {
     const [signups, active, created, joins] = await Promise.all([
       admin.timeseries('signups', range.from, range.to, bucket),
@@ -53,6 +57,12 @@ export default function Overview() {
             <StatTile label="Monthly Active Users" value={fmtInt(o.mau)} hint="Opened the app in the last 30 days" />
             <StatTile label="Riding Now" value={fmtInt(o.rides_live)} tone="admin" hint={`${fmtInt(o.rides_upcoming)} upcoming`} onPress={() => router.push('/admin/rides')} />
           </StatGrid>
+
+          {usage.data ? (
+            <Panel title="Real Use" right={<LinkText label="Open Usage" href="/admin/usage" />}>
+              <UsageTiles s={usage.data} compact />
+            </Panel>
+          ) : null}
 
           <Panel title="Accounts">
             <StatGrid>

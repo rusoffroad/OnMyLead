@@ -4,7 +4,7 @@ summary: The live group map for ride day. See every rider, who is live and who w
 category: ride-mode
 order: 10
 release: "1.0"
-updated: 2026-11-14
+updated: 2026-11-15
 sources:
   - app/src/core/map-controls.ts
   - app/src/core/mode-exit.ts

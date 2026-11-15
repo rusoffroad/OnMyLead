@@ -4,7 +4,7 @@ summary: If you allow it, Meta, Google and TikTok learn when one of our ads brou
 category: safety-privacy
 order: 35
 release: "3.0"
-updated: 2026-11-10
+updated: 2026-11-15
 sources:
   - app/src/core/ad-tracking.ts
   - app/src/lib/ad-tracking.ts

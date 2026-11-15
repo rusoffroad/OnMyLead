@@ -4,8 +4,11 @@ summary: Your location is never public. See what strangers, riders on your ride 
 category: safety-privacy
 order: 30
 release: "1.0"
-updated: 2026-11-13
+updated: 2026-11-15
 sources:
+  - app/src/lib/usage.ts
+  - app/src/core/usage.ts
+  - supabase/migrations/20261115100000_rider_usage.sql
   - supabase/migrations/20261104050000_badge_leaderboard.sql
   - supabase/migrations/20261102950000_events.sql
   - supabase/migrations/20261102800000_abuse_reports.sql
@@ -126,6 +129,10 @@ Your app settings and your own Map Mode trails (with their photos) are backed up
 
 :::release 2.0
 When you agree to the Rider Safety and Liability Agreement, a record of it is saved (your account, the version, the time, the device and app version, and your IP address). Other riders never see it, and it's kept as a legal record if you delete your account. See [The Rider Safety and Liability Agreement](/help/rider-safety-agreement#what-gets-saved).
+:::
+
+:::release 3.2
+The app counts how often you open it and how long you use it, Map Mode and Ride Mode, as daily totals on your account, on every plan. It never records where you were or what you tapped for this. Only the OnMyLead team sees these counts, to learn which parts of the app riders really use, and they're deleted with your account.
 :::
 
 You can delete your account and its data at any time. See [Delete Your Account](/help/delete-account).
