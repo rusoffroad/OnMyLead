@@ -43,6 +43,9 @@ export function useRideChat(rideId: string | null | undefined, enabled: boolean)
   useEffect(() => {
     messagesRef.current = messages;
   }, [messages]);
+  /** Quick replies their riders took back over Bluetooth: the server's copy stays away until it hears too. */
+  const takenBack = useRef(new Set<string>());
+  const notTakenBack = (rows: ChatMessage[]) => (takenBack.current.size ? rows.filter((m) => !takenBack.current.has(m.id.toLowerCase())) : rows);
   const votesRef = useRef(votes);
   useEffect(() => {
     votesRef.current = votes;
@@ -61,6 +64,15 @@ export function useRideChat(rideId: string | null | undefined, enabled: boolean)
   useEffect(() => {
     if (!rideId || !enabled) return;
     return onNearbyEvent((e) => {
+      // Its rider took it back (heard over Bluetooth, or this rider's own Cancel with no service).
+      if (e.kind === 'cancel') {
+        takenBack.current.add(e.id);
+        setMessages((prev) => {
+          const m = prev.find((x) => x.id.toLowerCase() === e.id && x.kind === 'status' && (!e.userId || x.user_id.toLowerCase() === e.userId));
+          return m ? withoutMessage(prev, m.id) : prev;
+        });
+        return;
+      }
       if (e.kind !== 'reply') return;
       const m: ChatMessage = { id: e.reply.id, ride_id: rideId, user_id: e.reply.user_id, kind: 'status', body: e.reply.body, sent_at: e.reply.at, created_at: e.reply.at, via: 'bluetooth' };
       setMessages((prev) => (prev.some((x) => x.id === m.id) ? prev : mergeMessages(prev, [m])));
@@ -71,7 +83,7 @@ export function useRideChat(rideId: string | null | undefined, enabled: boolean)
     () =>
       rideId && enabled
         ? rideMessages(rideId, PAGE)
-            .then((rows) => setMessages((prev) => reconcileMessages(prev, rows, PAGE)))
+            .then((rows) => setMessages((prev) => reconcileMessages(prev, notTakenBack(rows), PAGE)))
             .catch((e) => setError(friendlyChatError(e instanceof Error ? e.message : String(e))))
         : Promise.resolve(),
     [rideId, enabled],
@@ -104,6 +116,7 @@ export function useRideChat(rideId: string | null | undefined, enabled: boolean)
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'ride_messages', filter: `ride_id=eq.${rideId}` }, (payload) => {
         const m = payload.new as ChatMessage;
         if (!m?.id) return;
+        if (takenBack.current.has(m.id.toLowerCase())) return;
         setMessages((prev) => mergeMessages(prev, [m]));
       })
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'ride_messages', filter: `ride_id=eq.${rideId}` }, (payload) => {

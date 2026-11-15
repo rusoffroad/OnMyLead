@@ -10,6 +10,7 @@ import { SocialPhoto, SocialTag } from '@/components/social-tag';
 import { ThemedText } from '@/components/themed-text';
 import { Card, ErrorText } from '@/components/ui';
 import { Colors, Radius, RideColors, Spacing, themedStyles } from '@/constants/theme';
+import { rideActionError } from '@/core/errors';
 import { rideLeaderIds } from '@/core/chat';
 import { friendlyRoleError, handOffPrompt, ROLE_LABEL, rosterActions, tailGunnerId } from '@/core/roles';
 import { handOffRide, setMemberRole, setTailGunner } from '@/lib/api';
@@ -82,7 +83,7 @@ export function RideRoster({
         setFriendNote(t('You and {name} are friends now.', { name }));
       } else await removeFriend(m.user_id);
     } catch (e) {
-      setError(e instanceof Error ? e.message : t('Something went wrong.'));
+      setError(e instanceof Error ? rideActionError(e.message) : t('Something went wrong.'));
     } finally {
       setBusy(null);
     }

@@ -219,6 +219,66 @@ begin
   end if;
 end $$;
 
+-- M7. Cancel with no service (migration 20261115200000_bluetooth_cancel.sql): Fay takes back her
+-- tap and her message over Bluetooth and Eve uploads the cancels. A forged or someone else's cancel
+-- is skipped; a repeat counts once; cancel_ride_item works as before.
+create function bm_cancel(p_user uuid, p_id uuid, p_at bigint) returns jsonb language sql as $$
+  select jsonb_build_object('k', 'c', 'user_id', p_user, 'id', p_id, 'at', p_at,
+    'mac', bluetooth_mac(bm_key(p_user), 'c|0c0c0c0c-0c0c-4c0c-8c0c-0c0c0c0c0c0c|' || p_user || '|' || p_id || '|' || p_at));
+$$;
+do $$
+declare t bigint := extract(epoch from now())::bigint - 3;
+begin
+  -- Same vector as core/__tests__/nearby.test.ts.
+  if bluetooth_mac(decode('020910171e252c333a41484f565d646b727980878e959ca3aab1b8bfc6cdd4db', 'hex'),
+    'c|11111111-2222-4333-8444-555555555555|aaaaaaaa-0000-4000-8000-000000000001|cccccccc-0000-4000-8000-000000000003|9')
+    <> 'a38c209b71c717bf228e7ec0ba1bb996' then
+    raise exception 'FAIL: server cancel code differs from the app''s';
+  end if;
+  if bm_upload('00000000-0000-0000-0000-0000000b1e11', jsonb_build_array(
+       bm_cancel('00000000-0000-0000-0000-0000000b1e12', '0c0c0c0c-0000-4000-8000-0000000000b1', t) || '{"mac":"00000000000000000000000000000000"}',
+       bm_cancel('00000000-0000-0000-0000-0000000b1e13', '0c0c0c0c-0000-4000-8000-0000000000b1', t),
+       bm_cancel('00000000-0000-0000-0000-0000000b1e13', '0c0c0c0c-0000-4000-8000-0000000000b1', t) || jsonb_build_object('user_id', '00000000-0000-0000-0000-0000000b1e12'),
+       bm_cancel('00000000-0000-0000-0000-0000000b1e12', '0c0c0c0c-0000-4000-8000-0000000000ff', t))) <> 0 then
+    raise exception 'FAIL: forged cancel accepted';
+  end if;
+  if (select cancelled_at from rider_statuses where id = '0c0c0c0c-0000-4000-8000-0000000000b1') is not null then
+    raise exception 'FAIL: forged cancel took the tap back';
+  end if;
+  if bm_upload('00000000-0000-0000-0000-0000000b1e11', jsonb_build_array(
+       bm_cancel('00000000-0000-0000-0000-0000000b1e12', '0c0c0c0c-0000-4000-8000-0000000000b1', t),
+       bm_cancel('00000000-0000-0000-0000-0000000b1e12', '0c0c0c0c-0000-4000-8000-0000000000a1', t))) <> 2 then
+    raise exception 'FAIL: good relayed cancels refused';
+  end if;
+  if (select cancelled_at from rider_statuses where id = '0c0c0c0c-0000-4000-8000-0000000000b1') is null then
+    raise exception 'FAIL: relayed cancel left the tap out';
+  end if;
+  if exists (select 1 from ride_receipts where item_id = '0c0c0c0c-0000-4000-8000-0000000000b1') then
+    raise exception 'FAIL: receipts kept for a cancelled tap';
+  end if;
+  if exists (select 1 from ride_messages where id = '0c0c0c0c-0000-4000-8000-0000000000a1') then
+    raise exception 'FAIL: relayed cancel left the message in the chat';
+  end if;
+  -- The same cancel again (another phone, or Fay's own later) changes nothing.
+  if bm_upload('00000000-0000-0000-0000-0000000b1e13', jsonb_build_array(
+       bm_cancel('00000000-0000-0000-0000-0000000b1e12', '0c0c0c0c-0000-4000-8000-0000000000b1', t))) <> 0 then
+    raise exception 'FAIL: a repeat cancel counted';
+  end if;
+  -- Fay's own queued cancel arriving later is fine (already taken back).
+  perform as_user('00000000-0000-0000-0000-0000000b1e12');
+  execute 'set local role authenticated';
+  if cancel_ride_item('0c0c0c0c-0000-4000-8000-0000000000b1') <> 'status' then
+    raise exception 'FAIL: own cancel after the relayed one';
+  end if;
+  insert into rider_statuses (id, ride_id, user_id, status, tapped_at)
+  values ('0c0c0c0c-0000-4000-8000-0000000000b3', '0c0c0c0c-0c0c-4c0c-8c0c-0c0c0c0c0c0c', auth.uid(), 'ok', now());
+  if cancel_ride_item('0c0c0c0c-0000-4000-8000-0000000000b3') <> 'status' then
+    raise exception 'FAIL: cancel_ride_item changed';
+  end if;
+  execute 'reset role';
+end $$;
+
+drop function bm_cancel(uuid, uuid, bigint);
 drop function bm_upload(uuid, jsonb);
 drop function bm_ack(uuid, uuid, int, bigint);
 drop function bm_msg(uuid, uuid, text, bigint);

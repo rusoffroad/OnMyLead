@@ -349,6 +349,33 @@ export function nearbyForget(id: string) {
   pushOutgoing();
 }
 
+/**
+ * This rider took back one of their own taps or messages (Cancel on the Ride Mode card), with or
+ * without service: nearby phones that already have it drop it, and the first one with service tells
+ * the server. Ride Mode and the chat on this phone drop it too (a 'cancel' event). True when it
+ * went out over Bluetooth.
+ */
+export function nearbyCancel(rideId: string, id: string): boolean {
+  const s = session;
+  const onAir = !!s && s.rideId === rideId && !!native;
+  if (onAir) sendNow([s.mesh.ownCancel(id, Date.now())]);
+  else s?.mesh.forget(id);
+  dropFromView(id);
+  emit({ kind: 'cancel', id: id.toLowerCase(), userId: s?.mesh.myId ?? null, fromServer: false });
+  return onAir;
+}
+
+/** Takes a cancelled tap or message out of what Bluetooth Sharing shows. */
+function dropFromView(id: string, userId?: string) {
+  const key = id.toLowerCase();
+  const same = (x: string) => x.toLowerCase() === key;
+  const statuses = Object.entries(view.statuses).filter(([u, st]) => !(same(st.id) && (!userId || u === userId)));
+  const replies = view.replies.filter((r) => !(same(r.id) && (!userId || r.user_id === userId)));
+  if (statuses.length !== Object.keys(view.statuses).length || replies.length !== view.replies.length) {
+    publish({ statuses: Object.fromEntries(statuses), replies });
+  }
+}
+
 /** This rider saw these other riders' taps or messages on screen (hooks/use-broadcast useAcknowledge). */
 export function nearbySeen(rideId: string, ids: string[]) {
   const s = session;
@@ -423,11 +450,13 @@ function pushOutgoing() {
 export type NearbyEvent =
   | { kind: 'position'; position: Position; fromServer: boolean }
   | { kind: 'status'; status: NearbyStatusRow; fromServer: boolean }
-  | { kind: 'reply'; reply: NearbyReplyRow; fromServer: boolean };
+  | { kind: 'reply'; reply: NearbyReplyRow; fromServer: boolean }
+  /** A rider took back a tap or message (userId null: this rider, on a phone without Bluetooth Sharing on). */
+  | { kind: 'cancel'; id: string; userId: string | null; fromServer: boolean };
 
 const itemListeners = new Set<(e: NearbyEvent) => void>();
 
-/** Each new spot, tap or message heard over Bluetooth, as it arrives. Returns the unsubscribe. */
+/** Each new spot, tap, message or cancel heard over Bluetooth, as it arrives. Returns the unsubscribe. */
 export function onNearbyEvent(l: (e: NearbyEvent) => void): () => void {
   itemListeners.add(l);
   return () => {
@@ -456,6 +485,12 @@ function receive(b64: string) {
     const position = asPosition(item);
     publish({ positions: { ...view.positions, [item.userId]: position } });
     emit({ kind: 'position', position, fromServer });
+    return;
+  }
+  if (item.kind === 'cancel') {
+    // Its rider took a tap or message back: it goes away here too (no receipt for a cancel).
+    dropFromView(item.id, item.userId);
+    emit({ kind: 'cancel', id: item.id, userId: item.userId, fromServer });
     return;
   }
   if (item.kind === 'ack') {

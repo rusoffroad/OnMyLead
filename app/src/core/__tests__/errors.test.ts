@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { isTransientError } from '../errors';
+import { isTransientError, rideActionError } from '../errors';
 
 describe('requests that never got an answer', () => {
   it('knows the fetch layer’s own wording for no signal, cancelled and timed out', () => {
@@ -21,5 +21,21 @@ describe('requests that never got an answer', () => {
     expect(isTransientError('TypeError: NetworkError when attempting to fetch resource.')).toBe(true);
     expect(isTransientError('AbortError: Request cancelled')).toBe(true);
     expect(isTransientError(null)).toBe(false);
+  });
+});
+
+describe('Ride Mode alerts', () => {
+  const RAW = 'Error: fetch failed: UnexpectedException: The Internet connection appears to be offline. (at ExpoModulesCore/Promise.swift:56)';
+  it('says No Service instead of the raw error seen in Ride Mode with no signal', () => {
+    expect(rideActionError(RAW)).toBe('No service. Try again when you have signal.');
+    expect(rideActionError('TypeError: Network request failed')).toBe('No service. Try again when you have signal.');
+    expect(rideActionError('timed out')).toBe('No service. Try again when you have signal.');
+  });
+  it('turns other raw phone errors into a plain try-again, and keeps what the server wrote for riders', () => {
+    expect(rideActionError("TypeError: Cannot read property 'id' of undefined")).toBe('Something went wrong. Try again.');
+    expect(rideActionError('java.lang.IllegalStateException: boom')).toBe('Something went wrong. Try again.');
+    expect(rideActionError('')).toBe('Something went wrong. Try again.');
+    expect(rideActionError(null)).toBe('Something went wrong. Try again.');
+    expect(rideActionError('Only the ride leader can do that.')).toBe('Only the ride leader can do that.');
   });
 });

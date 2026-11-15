@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  ACK_WINDOW_MS, bluetoothReceipts, BROADCAST_SHOWN_MS, SENT_SHOWN_MS, sentShownFor, broadcastNotSwitchedOn, headline, isDuplicateSend, mergeReceipts, queuedLine, stateDetail, tally,
+  ACK_WINDOW_MS, bluetoothReceipts, BROADCAST_SHOWN_MS, SENT_SHOWN_MS, sentShownFor, broadcastNotSwitchedOn, cancelErrorText, withoutCancelled, headline, isDuplicateSend, mergeReceipts, queuedLine, stateDetail, tally,
   tallyLine, toAcknowledge,
   type Receipt,
 } from '../broadcast';
@@ -112,5 +112,19 @@ describe('sentShownFor', () => {
   it('keeps Need Help and EMERGENCY up for ten minutes from the tap', () => {
     expect(sentShownFor({ at, urgent: true }, t0 + 60_000)).toBe(BROADCAST_SHOWN_MS - 60_000);
     expect(sentShownFor({ at, urgent: true }, t0 + 11 * 60_000)).toBe(0);
+  });
+});
+
+describe('Cancel', () => {
+  it('never shows the raw error (Ride Mode, no service, 3.1)', () => {
+    const raw = 'Error: fetch failed: UnexpectedException: The Internet connection appears to be offline. (at ExpoModulesCore/Promise.swift:56)';
+    expect(cancelErrorText(raw)).toBe('No service. Try again when you have signal.');
+    expect(cancelErrorText('only the sender can cancel this')).toBe('Something went wrong. Try again.');
+  });
+
+  it('keeps taps taken back off Ride Mode, whatever the case of the id', () => {
+    const statuses: Record<string, { id?: string; status: string }> = { u1: { id: 'ABC', status: 'stuck' }, u2: { id: 'def', status: 'ok' }, u3: { status: 'ok' } };
+    expect(withoutCancelled(statuses, new Set(['abc']))).toEqual({ u2: statuses.u2, u3: statuses.u3 });
+    expect(withoutCancelled(statuses, new Set())).toEqual(statuses);
   });
 });

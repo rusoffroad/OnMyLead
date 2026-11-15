@@ -154,14 +154,26 @@ export type NearbyAck = Common & {
   state: number;
 };
 
-export type NearbyItem = NearbyPosition | NearbyStatus | NearbyReply | NearbyAck;
+/**
+ * A rider took back one of their own taps or messages (Cancel on the Ride Mode card). Phones that
+ * hear it drop the item and won't take it again, and a gateway uploads it so the server cancels it
+ * too. Phones on builds before 3.1 don't know this packet and skip it.
+ */
+export type NearbyCancel = Common & {
+  kind: 'cancel';
+  /** The tap or message taken back. */
+  id: string;
+};
+
+export type NearbyItem = NearbyPosition | NearbyStatus | NearbyReply | NearbyAck | NearbyCancel;
 
 /** An item before the hop count and the rider's code are added. */
 export type UnsignedItem =
   | Omit<NearbyPosition, 'mac' | 'hops'>
   | Omit<NearbyStatus, 'mac' | 'hops'>
   | Omit<NearbyReply, 'mac' | 'hops'>
-  | Omit<NearbyAck, 'mac' | 'hops'>;
+  | Omit<NearbyAck, 'mac' | 'hops'>
+  | Omit<NearbyCancel, 'mac' | 'hops'>;
 
 export type RideKeys = {
   rideId: string;
@@ -312,6 +324,8 @@ export function canonical(rideId: string, item: UnsignedItem): string {
       return `r|${base}|${item.id}|${item.body}|${item.at}`;
     case 'ack':
       return `a|${base}|${item.id}|${item.state}|${item.at}`;
+    case 'cancel':
+      return `c|${base}|${item.id}|${item.at}`;
   }
 }
 
@@ -323,7 +337,7 @@ export function riderMac(riderKey: Uint8Array, rideId: string, item: UnsignedIte
 // Packets
 // ---------------------------------------------------------------------------
 
-const TYPE = { position: 1, status: 2, reply: 3, ack: 4 } as const;
+const TYPE = { position: 1, status: 2, reply: 3, ack: 4, cancel: 5 } as const;
 
 function encodeBody(item: NearbyItem): Uint8Array {
   const w = new Writer();
@@ -351,9 +365,11 @@ function encodeBody(item: NearbyItem): Uint8Array {
     if (text.length > REPLY_PART_BYTES) throw new Error('part too long');
     w.u8(text.length);
     w.bytes(text);
-  } else {
+  } else if (item.kind === 'ack') {
     w.bytes(uuidBytes(item.id));
     w.u8(item.state);
+  } else {
+    w.bytes(uuidBytes(item.id));
   }
   return w.done();
 }
@@ -405,6 +421,9 @@ function decodeBody(b: Uint8Array): NearbyItem | null {
     const state = r.u8();
     if (state !== ACK_DELIVERED && state !== ACK_SEEN) return null;
     return { kind: 'ack', ...common, id, state };
+  }
+  if (type === TYPE.cancel) {
+    return { kind: 'cancel', ...common, id: bytesUuid(r.bytes(16)) };
   }
   return null;
 }
@@ -479,12 +498,15 @@ export const fromE7 = (v: number) => v / 1e7;
 const relaySec = (item: NearbyItem) =>
   item.kind === 'position' ? POSITION_RELAY_SEC
     : item.kind === 'ack' ? ACK_RELAY_SEC
-      : item.kind === 'status' && item.status === 'emergency' ? EMERGENCY_RELAY_SEC
+      // A cancel lives as long as the longest tap it can take back (an EMERGENCY), so a late copy
+      // of the tap still meets it.
+      : (item.kind === 'status' && item.status === 'emergency') || item.kind === 'cancel' ? EMERGENCY_RELAY_SEC
         : EVENT_RELAY_SEC;
 
-/** Sending order: emergencies first, then other taps, then messages, then spots (own first), then receipts. */
+/** Sending order: emergencies first, then other taps and cancels, then messages, then spots (own first), then receipts. */
 function rank(item: NearbyItem, myId: string): number {
   if (item.kind === 'status') return item.status === 'emergency' ? 0 : 1;
+  if (item.kind === 'cancel') return 1;
   if (item.kind === 'reply') return 2;
   if (item.kind === 'position') return item.userId === myId ? 3 : 4;
   return 5;
@@ -520,12 +542,12 @@ export function pickFrames<T extends NearbyItem>(items: T[], myId: string, lastS
       .map((x) => x.g);
   // Each kind is put in line once; what's already picked is skipped when a line is used.
   const lines = new Map<NearbyItem['kind'], T[]>();
-  for (const kind of ['position', 'ack', 'status'] as const) lines.set(kind, inLine(items.filter((i) => i.kind === kind), roundKey));
+  for (const kind of ['position', 'ack', 'status', 'cancel'] as const) lines.set(kind, inLine(items.filter((i) => i.kind === kind), roundKey));
   const waiting = (kind: NearbyItem['kind']) => (lines.get(kind) ?? []).filter((i) => !picked.has(i));
   // Emergencies (leaving room for the own spot), the own spot, then the rider's own taps.
   for (const i of sos) if (left > (own ? 1 : 0)) take([i]);
   if (own) take([own]);
-  for (const i of items) if (i.kind === 'status' && i.userId === myId && !picked.has(i) && left > 0) take([i]);
+  for (const i of items) if ((i.kind === 'status' || i.kind === 'cancel') && i.userId === myId && !picked.has(i) && left > 0) take([i]);
   // Then a share of other riders' spots and of receipts, so locations and "Seen by" keep moving
   // through the mesh however many taps and messages are live.
   let n = 0;
@@ -551,7 +573,7 @@ export function pickFrames<T extends NearbyItem>(items: T[], myId: string, lastS
   // so a crowd of taps can't keep every message off the air.
   const next = ring.find((g) => g.length <= left);
   const hold = next ? next.length : 0;
-  for (const i of waiting('status')) if (left > hold) take([i]);
+  for (const i of [...waiting('cancel'), ...waiting('status')]) if (left > hold) take([i]);
   // Then the other messages, whole, then the rest of the spots and receipts.
   for (const g of ring) if (g.length <= left) take(g);
   for (const i of [...waiting('position'), ...waiting('ack')]) if (left > 0) take([i]);
@@ -568,12 +590,16 @@ function monotonicMs(fallback: number): number {
 export function roundKey(i: NearbyItem): string {
   if (i.kind === 'position') return `p:${i.userId}`;
   if (i.kind === 'ack') return `a:${i.id}@${i.userId}`;
+  if (i.kind === 'cancel') return `x:${i.id}`;
   return `${i.kind === 'reply' ? 'r' : 's'}:${i.id}`;
 }
 
 /** The key an event is kept under: taps and whole messages by id, message parts and receipts by more. */
-const eventKey = (i: NearbyStatus | NearbyReply | NearbyAck) =>
-  i.kind === 'reply' ? `${i.id}#${i.part}` : i.kind === 'ack' ? `${i.id}@${i.userId}` : i.id;
+const eventKey = (i: NearbyStatus | NearbyReply | NearbyAck | NearbyCancel) =>
+  i.kind === 'reply' ? `${i.id}#${i.part}` : i.kind === 'ack' ? `${i.id}@${i.userId}` : i.kind === 'cancel' ? cancelKey(i.id) : i.id;
+
+/** Where a cancel is kept: it also marks the item as taken back, so a late copy is turned away. */
+const cancelKey = (id: string) => `x:${id.toLowerCase()}`;
 
 export type Heard = {
   item: NearbyItem;
@@ -690,6 +716,31 @@ export class NearbyMesh {
     for (const k of [...this.events.keys()]) if (k === key || k.startsWith(`${key}#`)) this.events.delete(k);
   }
 
+  /**
+   * This rider took back one of their own taps or messages: it stops going out here, and the
+   * returned cancel tells the phones that already have it to drop it too.
+   */
+  ownCancel(id: string, at: number): NearbyCancel {
+    this.forget(id);
+    const base = { kind: 'cancel' as const, userId: this.myId, id: id.toLowerCase(), at: Math.floor(at / 1000), flags: 0 };
+    const item: NearbyCancel = { ...base, hops: 0, mac: this.sign(base) };
+    this.events.set(cancelKey(item.id), { item, heardAt: at, uploaded: true, mine: true });
+    return item;
+  }
+
+  /** True once this tap or message has been taken back (heard here, or this rider's own). */
+  isCancelled(id: string): boolean {
+    return this.events.has(cancelKey(id));
+  }
+
+  /** Drops what this phone holds of an item its rider took back (only that rider's own). */
+  private dropCancelled(c: NearbyCancel) {
+    const key = c.id;
+    for (const [k, h] of [...this.events]) {
+      if ((k === key || k.startsWith(`${key}#`)) && h.item.userId === c.userId) this.events.delete(k);
+    }
+  }
+
   // --- Gateway: what the server knows, put on the air for riders near this phone with no service.
 
   /** Another rider's spot from the server. Returns it when it is newer than what this phone has. */
@@ -708,7 +759,7 @@ export class NearbyMesh {
   bridgeStatus(s: { id: string; userId: string; status: RiderStatusKind; possibleCrash?: boolean; lat: number | null; lng: number | null; at: number }): NearbyStatus | null {
     const userId = s.userId.toLowerCase();
     const id = s.id.toLowerCase();
-    if (userId === this.myId || this.events.has(id) || !STATUS_KINDS.includes(s.status)) return null;
+    if (userId === this.myId || this.events.has(id) || this.isCancelled(id) || !STATUS_KINDS.includes(s.status)) return null;
     const item: NearbyStatus = {
       kind: 'status', userId, id, status: s.status, flags: (s.possibleCrash ? FLAG_POSSIBLE_CRASH : 0) | FLAG_FROM_SERVER,
       latE7: s.lat == null ? null : toE7(s.lat), lngE7: s.lng == null ? null : toE7(s.lng), at: Math.floor(s.at / 1000), hops: 0, mac: NO_MAC,
@@ -721,7 +772,7 @@ export class NearbyMesh {
   bridgeReply(r: { id: string; userId: string; body: string; at: number }): NearbyReply[] {
     const userId = r.userId.toLowerCase();
     const id = r.id.toLowerCase();
-    if (userId === this.myId || this.events.has(`${id}#0`)) return [];
+    if (userId === this.myId || this.events.has(`${id}#0`) || this.isCancelled(id)) return [];
     return this.storeReplyParts({ userId, id, body: fitReply(r.body), at: Math.floor(r.at / 1000), flags: FLAG_FROM_SERVER, mac: NO_MAC }, r.at, true);
   }
 
@@ -757,7 +808,10 @@ export class NearbyMesh {
     const key = eventKey(item);
     const prev = this.events.get(key);
     if (prev && !(item.kind === 'ack' && prev.item.kind === 'ack' && item.state > prev.item.state)) return null;
+    // A tap or message its rider already took back: a late copy is turned away.
+    if ((item.kind === 'status' || item.kind === 'reply') && this.isCancelled(item.id)) return null;
     this.events.set(key, { item, heardAt: now, uploaded: fromServer, mine: false });
+    if (item.kind === 'cancel') this.dropCancelled(item);
     if (item.kind === 'reply') return this.wholeReply(item.id);
     return item;
   }
@@ -880,6 +934,8 @@ export function uploadRow(i: NearbyItem) {
       return { k: 'r', user_id: i.userId, id: i.id, body: i.body, at: i.at, mac: i.mac };
     case 'ack':
       return { k: 'a', user_id: i.userId, id: i.id, state: i.state, at: i.at, mac: i.mac };
+    case 'cancel':
+      return { k: 'c', user_id: i.userId, id: i.id, at: i.at, mac: i.mac };
   }
 }
 
@@ -904,9 +960,9 @@ export function nearbyPower(s: { online: boolean; peers: number; batterySaver: b
  * What a phone on Free does with Bluetooth Sharing (2.1, Bluetooth Sharing is Pro): it still passes
  * every packet along for the group (relay), and still sends and hears status taps, so EMERGENCY,
  * Need Help and a Crash Alert get through, and so does the I'm OK (or any later tap) that ends one,
- * whatever order the packets arrive in. Seeing riders' spots, sending its own spot and messages
- * over Bluetooth are Pro.
+ * whatever order the packets arrive in, and so does a rider taking a tap back (a cancel). Seeing
+ * riders' spots, sending its own spot and messages over Bluetooth are Pro.
  */
 export function nearbyFreeAllows(item: { kind: string }): boolean {
-  return item.kind === 'status';
+  return item.kind === 'status' || item.kind === 'cancel';
 }

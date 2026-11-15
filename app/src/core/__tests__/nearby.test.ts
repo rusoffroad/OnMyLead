@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   ACK_DELIVERED, ACK_SEEN, EMERGENCY_RELAY_SEC, FLAG_FROM_SERVER, MAX_FRAME_BYTES, MAX_HOPS, MAX_REPLY_PARTS,
   MAX_FRAMES_PER_ROUND, NO_MAC, NearbyMesh, POSITION_RELAY_SEC, REPLY_PART_BYTES, TAG_WINDOW_SEC,
-  canonical, fitReply, pickFrames, fromBase64, fromHex, nearbyPower, openFrame, rideTag, riderMac, sealFrame, splitReply, toBase64, toHex, uploadRow,
+  canonical, fitReply, nearbyFreeAllows, pickFrames, fromBase64, fromHex, nearbyPower, openFrame, rideTag, riderMac, sealFrame, splitReply, toBase64, toHex, uploadRow,
   type NearbyItem, type RideKeys,
 } from '../nearby';
 import { RIDE_MESSAGE_MAX } from '../ride-message';
@@ -313,6 +313,102 @@ describe('NearbyMesh', () => {
     a.ownStatus({ id: C, status: 'stuck', lat: null, lng: null, at: T0 });
     a.forget(C);
     expect(a.live(T0)).toHaveLength(0);
+  });
+});
+
+describe('Cancel with no service', () => {
+  const uuid = (n: number) => `00000000-0000-4000-8000-${String(n).padStart(12, '0')}`;
+
+  it('seals and opens a cancel, signed the way the server checks it', () => {
+    const a = new NearbyMesh(keys(2), A);
+    const item = a.ownCancel(C.toUpperCase(), T0);
+    expect(item).toMatchObject({ kind: 'cancel', userId: A, id: C, at: T0 / 1000, hops: 0 });
+    const frame = sealFrame(key(1), item, nonce(), T0 / 1000);
+    expect(frame.length).toBeLessThan(MAX_FRAME_BYTES);
+    expect(openFrame(key(1), frame, T0 / 1000)).toEqual(item);
+    const base = { kind: 'cancel' as const, userId: A, id: C, at: 9, flags: 0 };
+    expect(canonical(RIDE, base)).toBe(`c|${RIDE}|${A}|${C}|9`);
+    // Same vector as supabase/tests/bluetooth_mesh_test.sql.
+    expect(riderMac(key(2), RIDE, base)).toBe('a38c209b71c717bf228e7ec0ba1bb996');
+    expect(uploadRow(item)).toEqual({ k: 'c', user_id: A, id: C, at: T0 / 1000, mac: item.mac });
+  });
+
+  it('takes a tap back on the phones that have it, which then pass the cancel on and upload it', () => {
+    const a = new NearbyMesh(keys(2), A);
+    const b = new NearbyMesh(keys(3), B);
+    const c = new NearbyMesh(keys(4), C);
+    a.ownStatus({ id: uuid(1), status: 'stopped', lat: null, lng: null, at: T0 });
+    for (const f of a.outgoing(T0, nonce)) b.receive(f, T0 + 100);
+    expect(b.live(T0 + 100).map((i) => i.kind)).toEqual(['status']);
+    // A taps Cancel with no service: the tap stops going out from A, and B drops it on hearing the cancel.
+    a.ownCancel(uuid(1), T0 + 1000);
+    expect(a.live(T0 + 1000).map((i) => i.kind)).toEqual(['cancel']);
+    const heard = a.outgoing(T0 + 1000, nonce).map((f) => b.receive(f, T0 + 1100));
+    expect(heard).toEqual([expect.objectContaining({ kind: 'cancel', id: uuid(1), userId: A })]);
+    expect(b.live(T0 + 1100).map((i) => i.kind)).toEqual(['cancel']);
+    // B passes it on to C, and uploads it once it has service.
+    for (const f of b.outgoing(T0 + 1200, nonce)) c.receive(f, T0 + 1300);
+    expect(c.isCancelled(uuid(1))).toBe(true);
+    expect(b.pendingUploads()).toEqual([expect.objectContaining({ kind: 'cancel', id: uuid(1) })]);
+  });
+
+  it('turns away a late copy of a tap or message that was taken back, from the air or the server', () => {
+    const a = new NearbyMesh(keys(2), A);
+    const b = new NearbyMesh(keys(3), B);
+    const late = new NearbyMesh(keys(2), A);
+    a.ownCancel(uuid(2), T0);
+    for (const f of a.outgoing(T0, nonce)) b.receive(f, T0 + 10);
+    // The tap itself arrives after the cancel (another phone still had it).
+    late.ownStatus({ id: uuid(2), status: 'need_help', lat: null, lng: null, at: T0 - 5000 });
+    late.ownReply({ id: uuid(3), body: 'Hold up', at: T0 - 5000 });
+    for (const f of late.outgoing(T0, nonce)) expect(b.receive(f, T0 + 20)?.kind === 'status' ? 'status' : 'other').toBe('other');
+    expect(b.live(T0 + 20).some((i) => i.kind === 'status')).toBe(false);
+    expect(b.bridgeStatus({ id: uuid(2), userId: A, status: 'need_help', lat: null, lng: null, at: T0 - 5000 })).toBeNull();
+    a.ownCancel(uuid(3), T0);
+    for (const f of a.outgoing(T0, nonce)) b.receive(f, T0 + 30);
+    expect(b.bridgeReply({ id: uuid(3), userId: A, body: 'Hold up', at: T0 - 5000 })).toEqual([]);
+  });
+
+  it('takes back a quick reply (On My Way) on the phones that have it, every part', () => {
+    const a = new NearbyMesh(keys(2), A);
+    const b = new NearbyMesh(keys(3), B);
+    a.ownReply({ id: uuid(7), body: 'x'.repeat(150), at: T0 });
+    for (const f of a.outgoing(T0, nonce)) b.receive(f, T0 + 10);
+    expect(b.live(T0 + 10).filter((i) => i.kind === 'reply')).toHaveLength(2);
+    a.ownCancel(uuid(7), T0 + 20);
+    for (const f of a.outgoing(T0 + 20, nonce)) b.receive(f, T0 + 30);
+    expect(b.live(T0 + 30).map((i) => i.kind)).toEqual(['cancel']);
+    expect(b.pendingUploads().map((i) => i.kind)).toEqual(['cancel']);
+  });
+
+  it("can't take back another rider's tap", () => {
+    const a = new NearbyMesh(keys(2), A);
+    const b = new NearbyMesh(keys(3), B);
+    const c = new NearbyMesh(keys(4), C);
+    a.ownStatus({ id: uuid(4), status: 'stuck', lat: null, lng: null, at: T0 });
+    for (const f of a.outgoing(T0, nonce)) c.receive(f, T0 + 10);
+    // B sends a cancel for A's tap: C keeps A's tap.
+    b.ownCancel(uuid(4), T0 + 20);
+    for (const f of b.outgoing(T0 + 20, nonce)) c.receive(f, T0 + 30);
+    expect(c.live(T0 + 30).some((i) => i.kind === 'status' && i.id === uuid(4))).toBe(true);
+  });
+
+  it("goes out ahead of other riders' taps when the round is full, and on Free too", () => {
+    const a = new NearbyMesh(keys(2), A);
+    for (let n = 0; n < 40; n++) a.bridgeStatus({ id: uuid(100 + n), userId: B, status: 'ok', lat: null, lng: null, at: T0 - n * 1000 });
+    a.ownCancel(uuid(5), T0);
+    const picked = a.outgoing(T0, nonce).map((f) => openFrame(key(1), f, T0 / 1000));
+    expect(picked).toHaveLength(MAX_FRAMES_PER_ROUND);
+    expect(picked[0]).toMatchObject({ kind: 'cancel', id: uuid(5) });
+    expect(nearbyFreeAllows({ kind: 'cancel' })).toBe(true);
+    expect(nearbyFreeAllows({ kind: 'position' })).toBe(false);
+  });
+
+  it('lives as long as an EMERGENCY, so it outlasts the tap it takes back', () => {
+    const a = new NearbyMesh(keys(2), A);
+    a.ownCancel(uuid(6), T0);
+    expect(a.live(T0 + (EMERGENCY_RELAY_SEC - 60) * 1000)).toHaveLength(1);
+    expect(a.live(T0 + (EMERGENCY_RELAY_SEC + 60) * 1000)).toHaveLength(0);
   });
 });
 

@@ -45,7 +45,8 @@ import {
   breakdownKey, breakdownSpot, BREAKDOWN_SPEAK_WITHIN_MS, isActiveCall, MECHANICAL_LABEL, spokenBreakdown, type TappedStatus,
 } from '@/core/breakdown';
 import { BATTERY_PLANS, batteryBannerTag } from '@/core/battery';
-import { tally } from '@/core/broadcast';
+import { tally, withoutCancelled } from '@/core/broadcast';
+import { rideActionError } from '@/core/errors';
 import { withAlpha } from '@/core/color';
 import { BUBBLE_PRESETS, computeBubble, type BubblePreset, type BubbleRider, type BubbleSettings } from '@/core/bubble';
 import { crashMessage, type CrashCause } from '@/core/crash-detect';
@@ -374,7 +375,8 @@ export default function RideMode() {
     setMembers(d.members);
     setRegroup(d.regroup);
     for (const c of d.cancelled) cancelledTaps.current.add(c);
-    setStatuses(d.statuses);
+    // A tap taken back over Bluetooth that the server hasn't heard about yet stays taken back.
+    setStatuses(withoutCancelled(d.statuses, cancelledTaps.current));
     setPositions(d.positions);
     setLastHeardAt(Date.now());
   }, []);
@@ -608,7 +610,7 @@ export default function RideMode() {
         } else if (e.kind === 'status') {
           if (!memberIds.current.has(e.status.user_id)) return;
           // A tap its rider took back, relayed again over Bluetooth: it stays taken back.
-          if (e.status.id && cancelledTaps.current.has(e.status.id)) return;
+          if (e.status.id && (cancelledTaps.current.has(e.status.id) || cancelledTaps.current.has(e.status.id.toLowerCase()))) return;
           // Over Bluetooth with no service: the Emergency Siren sounds here too (lib/siren), unless
           // the rider has already tapped something newer (a relayed old EMERGENCY after I'm OK).
           const newer = isNewerTap(statusesNow.current[e.status.user_id], e.status);
@@ -623,6 +625,19 @@ export default function RideMode() {
             if (!isNewerTap(prev[e.status.user_id], e.status)) return prev;
             const { user_id: _u, possible_crash: _c, ...tap } = e.status;
             return { ...prev, [e.status.user_id]: tap };
+          });
+        } else if (e.kind === 'cancel') {
+          // A rider took back a tap (heard over Bluetooth, or this rider's own): it goes away here,
+          // stops the siren if it was an EMERGENCY, and a late copy of it changes nothing.
+          cancelledTaps.current.add(e.id);
+          tapTakenBack(e.id);
+          const mine = (u: string) => !e.userId || u.toLowerCase() === e.userId;
+          const drop = (prev: Record<string, TappedStatus>) =>
+            Object.fromEntries(Object.entries(prev).filter(([u, st]) => !(st.id?.toLowerCase() === e.id && mine(u))));
+          statusesNow.current = drop(statusesNow.current);
+          setStatuses((prev) => {
+            const next = drop(prev);
+            return Object.keys(next).length === Object.keys(prev).length ? prev : next;
           });
         } else if (memberIds.current.has(e.reply.user_id)) {
           // Read out, the way announcements are; the chat shows it too (hooks/use-ride-chat).
@@ -928,7 +943,7 @@ export default function RideMode() {
       setShare(s);
       setAskShare(false);
     } catch (e) {
-      Alert.alert(t('Could Not Start Sharing'), e instanceof Error ? e.message : String(e));
+      Alert.alert(t('Could Not Start Sharing'), rideActionError(e instanceof Error ? e.message : String(e)));
     } finally {
       setBusy(false);
     }
@@ -994,19 +1009,21 @@ export default function RideMode() {
     quickReply(body);
   }
 
-  /** Takes back the last tap, for everyone. */
+  /** Takes back the last tap, for everyone (with no service: nearby riders now, the rest with signal). */
   async function cancelTap() {
     const b = broadcast.card;
     if (!b) return;
+    let when: 'now' | 'later' | undefined;
     try {
-      await broadcast.cancel();
+      when = await broadcast.cancel();
     } catch (e) {
+      // Already rider-readable text (hooks/use-broadcast), never the raw error.
       Alert.alert(t('Could Not Cancel'), e instanceof Error ? e.message : String(e));
       return;
     }
     if (b.kind === 'reply') {
       setLastReply((r) => (r === b.label ? null : r));
-      chat.reload();
+      if (when !== 'later') chat.reload();
     } else {
       setStatuses((prev) => {
         if (!me || prev[me]?.id !== b.id) return prev;
@@ -1014,7 +1031,10 @@ export default function RideMode() {
         delete next[me];
         return next;
       });
-      refresh();
+      // Taken back on this phone: a copy that comes back (Bluetooth, or the server before it hears
+      // the cancel) stays taken back.
+      cancelledTaps.current.add(b.id);
+      if (when !== 'later') refresh();
     }
   }
 
@@ -1030,7 +1050,7 @@ export default function RideMode() {
       await dropRegroup(id, p.lat, p.lng, 'Regroup here');
       refresh();
     } catch (e) {
-      Alert.alert(t('Could Not Set Regroup Point'), e instanceof Error ? e.message : String(e));
+      Alert.alert(t('Could Not Set Regroup Point'), rideActionError(e instanceof Error ? e.message : String(e)));
     }
   }
 
