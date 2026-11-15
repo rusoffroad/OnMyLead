@@ -86,6 +86,11 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
 - Battery Saver (`/battery`, You tab, 1.0.1): Best Accuracy (default, 25 m / 15 s), Balanced
   (75 m / 30 s) or Max Battery Saver (200 m / 45 s, ~100 m accuracy), set per device in
   `core/battery.ts`; warns before leaving Best Accuracy.
+- Permissions (`/permissions`, You > Settings, 3.1): every OS permission the app uses on this
+  device with its live status (Location, Always, Precise, Google Location Accuracy, Notifications,
+  Bluetooth; Motion, Camera, Music access, Local Network, Ad Measurement); a tap re-asks when the
+  OS still can, otherwise opens OnMyLead in Settings. Rules `core/permissions.ts`, reads
+  `lib/permissions.ts` (website: browser location only).
 - Personal sharing (`/share`): chosen riders, timer (open-ended capped at 24 h), Add 1 Hour,
   read-only Family Link (`/f/[token]`).
 - Freshness: Live / Last Seen / lost, no-service banner; Ride Bubble (Together / N Separated) with
