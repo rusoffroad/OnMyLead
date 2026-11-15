@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# One-time setup on the server, so approved website updates go live without anyone running a command:
+# One-time setup on the server, so new website updates go live without anyone running a command:
 #   ssh rus 'bash ~/onmylead/deploy/install-auto-update.sh'
 # Adds one line to this user's crontab (keeping every other line, including Basecamp's) that runs
 # auto-update.sh every minute. Running it again changes nothing. To undo:
@@ -14,7 +14,7 @@ if grep -q 'onmylead-auto-update' <<<"$current"; then
   echo "Already installed."
 else
   { [ -n "$current" ] && printf '%s\n' "$current"; printf '%s\n' "$line"; } | crontab -
-  echo "Installed: the server now checks for approved website updates every minute."
+  echo "Installed: the server now checks for website updates every minute."
 fi
 # What's being served now counts as live, so the first check doesn't redeploy the same build.
 if [ ! -f "$dir/.live-build" ]; then

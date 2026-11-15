@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Put the newest OnMyLead web build online, and say clearly whether it worked.
-# Normally nobody runs this by hand any more: auto-update.sh runs it when an approved update
+# Normally nobody runs this by hand any more: auto-update.sh runs it when a new update
 # arrives (docs/server-updates.md). By hand still works:
 #   First time, from the Mac:
 #     ssh -t rus 'git clone https://github.com/rusoffroad/OnMyLead ~/onmylead && bash ~/onmylead/deploy/deploy.sh'
@@ -14,7 +14,7 @@ say()  { printf '\n\033[1m%s\033[0m\n' "$*"; }
 fail() { printf '\n\033[1;31mDEPLOY FAILED: %s\033[0m\n' "$*"; exit 1; }
 REPO=https://github.com/rusoffroad/OnMyLead
 SUDO=${SUDO-sudo}
-# Which build to serve. The "Update server" workflow moves `web-live` once Chris approves an update
+# Which build to serve. The "Update server" workflow moves `web-live` after each merge
 # (docs/server-updates.md) and auto-update.sh calls this with WEB_BRANCH=web-live. Run by hand, it
 # serves the newest build, as before.
 WEB_BRANCH=${WEB_BRANCH:-web-build}
