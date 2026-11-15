@@ -5,6 +5,7 @@ import { Linking, Platform, Pressable, Switch, Text, View } from 'react-native';
 import { BadgeStrip } from '@/components/badge-strip';
 import { Icon } from '@/components/icon';
 import { MenuGroup, MenuRow } from '@/components/menu';
+import { usePermissions } from '@/hooks/use-permissions';
 import { RiderPhoto } from '@/components/rider-photo';
 import { ThemedText } from '@/components/themed-text';
 import { Button, Choice, ErrorText, Screen } from '@/components/ui';
@@ -64,6 +65,7 @@ import { ProTag } from '@/components/pro-tag';
 export default function You() {
   const { session, loading } = useSession();
   const ads = useAdMeasurement();
+  const permissions = usePermissions();
   const [rideName, setRideName] = useState<string | null>(null);
   /** When the rider's personal share ends (epoch ms; far off for "until I turn it off"), or null when not sharing. */
   const [sharingUntil, setSharingUntil] = useState<number | null>(null);
@@ -365,6 +367,19 @@ export default function You() {
       {session ? (
         <MenuGroup title={t('Settings')}>
           <MenuRow icon="bell" color={RideColors.sweep} title={t('Notifications')} detail={settingsSummary(notifications)} onPress={() => router.push('/notifications')} />
+          <MenuRow
+            icon="lock"
+            color={permissions.attention.length ? RideColors.yellow : RideColors.green}
+            title={t('Permissions')}
+            detail={!permissions.rows
+              ? t('Location, Bluetooth, notifications and more')
+              : permissions.attention.length === 0
+                ? t('Everything a group ride needs is allowed')
+                : permissions.attention.length === 1
+                  ? t('1 permission needs your OK. Tap to fix it')
+                  : t('{n} permissions need your OK. Tap to fix them', { n: permissions.attention.length })}
+            onPress={() => router.push('/permissions' as Href)}
+          />
           <MenuRow
             icon="turn"
             color={RideColors.green}

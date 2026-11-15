@@ -60,10 +60,66 @@ public class OnMyLeadNearbyModule: Module {
       self.radio?.snapshot() ?? ["state": "off", "peers": 0]
     }
 
+    // You > Permissions (src/lib/permissions.ts): Bluetooth permission without starting the radio.
+    Function("authorization") { () -> String in
+      NearbyAuthorization.current()
+    }
+
+    // Shows Apple's Bluetooth question if it was never asked, then resolves with the answer.
+    // Already answered: resolves at once (iOS won't ask twice; the page opens Settings instead).
+    AsyncFunction("requestAuthorization") { (promise: Promise) in
+      if CBManager.authorization != .notDetermined {
+        promise.resolve(NearbyAuthorization.current())
+        return
+      }
+      NearbyAuthorization.ask { promise.resolve($0) }
+    }
+
     OnDestroy {
       self.radio?.stop()
       self.radio = nil
     }
+  }
+}
+
+/// Asks for Bluetooth with a short-lived central manager that never scans.
+final class NearbyAuthorization: NSObject, CBCentralManagerDelegate {
+  private static var pending: NearbyAuthorization?
+  private var manager: CBCentralManager?
+  private let done: (String) -> Void
+
+  private init(done: @escaping (String) -> Void) {
+    self.done = done
+    super.init()
+  }
+
+  static func current() -> String {
+    switch CBManager.authorization {
+    case .allowedAlways: return "granted"
+    case .denied: return "denied"
+    case .restricted: return "restricted"
+    case .notDetermined: return "undetermined"
+    @unknown default: return "undetermined"
+    }
+  }
+
+  static func ask(done: @escaping (String) -> Void) {
+    DispatchQueue.main.async {
+      if pending != nil { done(current()); return }
+      let asker = NearbyAuthorization(done: done)
+      pending = asker
+      // Creating the manager shows the question; its first state update comes after the answer.
+      asker.manager = CBCentralManager(delegate: asker, queue: .main, options: [CBCentralManagerOptionShowPowerAlertKey: false])
+    }
+  }
+
+  func centralManagerDidUpdateState(_ central: CBCentralManager) {
+    if CBManager.authorization == .notDetermined { return }
+    let result = NearbyAuthorization.current()
+    manager?.delegate = nil
+    manager = nil
+    NearbyAuthorization.pending = nil
+    done(result)
   }
 }
 

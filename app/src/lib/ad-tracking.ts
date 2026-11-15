@@ -148,6 +148,23 @@ export async function askForTracking(): Promise<void> {
   await flush();
 }
 
+/**
+ * You > Permissions: the rider tapped Ad Measurement there, so show Apple's question now (it shows
+ * only if never answered) and pick up the answer. iPhone and iPad only.
+ */
+export async function askForTrackingNow(): Promise<void> {
+  if (Platform.OS !== 'ios') return;
+  asked = true;
+  try {
+    const p = await Tracking.getTrackingPermissionsAsync();
+    if (p.status === 'undetermined' && p.canAskAgain) await Tracking.requestTrackingPermissionsAsync();
+  } catch {
+    // Read as not allowed below.
+  }
+  await refreshConsent();
+  await flush();
+}
+
 /** Starts at launch: the install event, sign-ups and trial starts, and resending what's waiting. */
 export function startAdTracking(): () => void {
   if (!native) return () => {};
