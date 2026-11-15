@@ -112,6 +112,9 @@ describe('sentShownFor', () => {
   it('keeps Need Help and EMERGENCY up for ten minutes from the tap', () => {
     expect(sentShownFor({ at, urgent: true }, t0 + 60_000)).toBe(BROADCAST_SHOWN_MS - 60_000);
     expect(sentShownFor({ at, urgent: true }, t0 + 11 * 60_000)).toBe(0);
+  });
+});
+
 describe('Cancel', () => {
   it('never shows the raw error (Ride Mode, no service, 3.1)', () => {
     const raw = 'Error: fetch failed: UnexpectedException: The Internet connection appears to be offline. (at ExpoModulesCore/Promise.swift:56)';
