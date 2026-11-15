@@ -25,11 +25,15 @@ sources:
   - app/src/core/auth-link.ts
   - app/src/lib/starlink.ts
   - app/src/components/fuel-check.tsx
-related: [accurate-location, faq, ride-mode, location-sharing, offline-maps, notification-settings, contact-support]
-keywords: [not working, problem, broken, bug, help, no signal, no service, alerts, download, password, tablet, wrong location, miles away, approximate, precise location]
+related: [permissions, accurate-location, faq, ride-mode, location-sharing, offline-maps, notification-settings, contact-support]
+keywords: [permissions, not working, problem, broken, bug, help, no signal, no service, alerts, download, password, tablet, wrong location, miles away, approximate, precise location]
 ---
 
 Start here when something doesn't work the way you expect. If your problem isn't listed, [contact us](/help/contact-support).
+
+:::release 3.1
+First, check **You > Settings > Permissions**: it shows every permission OnMyLead uses, which ones are off, and turns them back on with one tap. See [Check and Fix App Permissions](/help/permissions).
+:::
 
 ## A Rider Shows as a Hollow Dot or "Last Seen"
 

@@ -19,7 +19,7 @@ sources:
   - app/src/core/pro.ts
   - supabase/migrations/20261104060000_bluetooth_sharing.sql
   - supabase/migrations/20261104100000_bluetooth_mesh.sql
-related: [ride-mode, ride-chat, location-sharing, emergency-and-safety, status-buttons, offline-maps, battery-saver, privacy]
+related: [permissions, ride-mode, ride-chat, location-sharing, emergency-and-safety, status-buttons, offline-maps, battery-saver, privacy]
 keywords: [bluetooth, no service, no signal, offline, dead zone, mesh, relay, nearby, out of range, no cell, message, talk, seen by, got it]
 ---
 
@@ -62,6 +62,10 @@ Riders farther away than that show where they were last seen, as before. See [Us
 - **Allow Bluetooth.** The first time, iPhone and iPad ask to use Bluetooth, and Android asks for **Nearby devices**. Say yes.
 - **Keep Bluetooth on.** If Bluetooth is off in the phone's settings, nothing goes out.
 - **Download the ride's map.** See [Offline Maps](/help/offline-maps).
+
+:::release 3.1
+If you said no to Bluetooth, open **You > Settings > Permissions** and tap **Bluetooth** to turn it back on. See [Check and Fix App Permissions](/help/permissions).
+:::
 
 ## Turn It On or Off
 

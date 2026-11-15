@@ -202,6 +202,7 @@ function RootLayout() {
         <Stack.Screen name="blocked" options={{ title: tr('Blocked Riders') }} />
         <Stack.Screen name="report-rider" options={{ title: tr('Report a Rider') }} />
         <Stack.Screen name="battery" options={{ title: tr('Battery Saver') }} />
+        <Stack.Screen name="permissions" options={{ title: tr('Permissions') }} />
         <Stack.Screen name="appearance" options={{ title: tr('Appearance') }} />
         <Stack.Screen name="language" options={{ title: tr('Language') }} />
         <Stack.Screen name="tilt" options={{ title: tr('Tilt') }} />

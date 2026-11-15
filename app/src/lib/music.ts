@@ -43,6 +43,27 @@ export async function setMusicVolume(v: number): Promise<void> {
   await native?.setVolume(v).catch(() => {});
 }
 
+/**
+ * You > Permissions: whether Music Controls may read what is playing. iPhone: Apple Music access
+ * ('granted' | 'ask' | 'denied'). Android: Notification Access ('granted' | 'denied'). Null
+ * without the module.
+ */
+export async function musicAccess(): Promise<'granted' | 'ask' | 'denied' | null> {
+  if (!native) return null;
+  try {
+    const a = (await native.getState()).access;
+    if (Platform.OS === 'ios') return a === 'granted' || a === 'ask' || a === 'denied' ? a : null;
+    return a === true ? 'granted' : 'denied';
+  } catch {
+    return null;
+  }
+}
+
+/** Opens where Music Controls' access is changed: OnMyLead in Settings (iPhone), Notification Access (Android). */
+export async function openMusicAccessSettings(): Promise<void> {
+  await native?.openAccessSettings().catch(() => {});
+}
+
 /** iPhone: Apple's prompt for song names. Android: opens Notification Access in Settings. */
 export async function askMusicAccess(): Promise<void> {
   if (!native) return;

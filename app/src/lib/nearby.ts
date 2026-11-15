@@ -38,6 +38,9 @@ type NearbyNative = {
   setPower(level: string): void;
   drain(): string[];
   getState(): { state: string; peers: number };
+  /** iPhone and iPad only, builds from 3.1 (19): CBManager.authorization. */
+  authorization?(): string;
+  requestAuthorization?(): Promise<string>;
   addListener(event: 'onFrame', l: (e: { data: string }) => void): { remove(): void };
   addListener(event: 'onState', l: (e: { state: string; peers: number }) => void): { remove(): void };
 };
@@ -211,6 +214,53 @@ export async function forgetNearbyKeys(rideId: string) {
 // ---------------------------------------------------------------------------
 // Session
 // ---------------------------------------------------------------------------
+
+/** Android 12+ "Nearby devices". A function: PermissionsAndroid doesn't exist on the website. */
+const androidBluetoothPermissions = () => [
+  PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN,
+  PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT,
+  PermissionsAndroid.PERMISSIONS.BLUETOOTH_ADVERTISE,
+];
+
+/**
+ * You > Permissions: the Bluetooth permission as the phone reports it, without starting the radio.
+ * iPhone: 'granted' | 'denied' | 'restricted' | 'undetermined', or null on a build without the
+ * call. Android: 'granted' or 'denied' (Android can't say whether it was ever asked).
+ */
+export async function bluetoothPermission(): Promise<string | null> {
+  if (!native) return null;
+  if (Platform.OS === 'ios') {
+    try {
+      return native.authorization ? native.authorization() : null;
+    } catch {
+      return null;
+    }
+  }
+  if (Platform.OS !== 'android' || Platform.Version < 31) return 'granted';
+  try {
+    const have = await Promise.all(androidBluetoothPermissions().map((p) => PermissionsAndroid.check(p)));
+    return have.every(Boolean) ? 'granted' : 'denied';
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Shows the system Bluetooth question. iPhone: the answer ('granted', 'denied', ...). Android: one
+ * PermissionsAndroid result per permission ('granted' | 'denied' | 'never_ask_again').
+ */
+export async function askBluetoothPermission(): Promise<string | string[] | null> {
+  if (!native) return null;
+  if (Platform.OS === 'ios') return native.requestAuthorization ? native.requestAuthorization().catch(() => null) : null;
+  if (Platform.OS !== 'android' || Platform.Version < 31) return ['granted'];
+  try {
+    const perms = androidBluetoothPermissions();
+    const res = await PermissionsAndroid.requestMultiple(perms);
+    return perms.map((p) => String(res[p]));
+  } catch {
+    return null;
+  }
+}
 
 async function askAndroidPermission(): Promise<boolean> {
   if (Platform.OS !== 'android') return true;
