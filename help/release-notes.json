@@ -36,6 +36,10 @@
         "text": "Events is now Events and Group Rides. A switch at the top shows public events, public group rides near you (the same rides as the Rides tab, nearest first, with the distance chip) or your own events, and Create makes a public ride while you're on Group Rides. The Home tile is renamed to match; the tab bar keeps the short name Events."
       },
       {
+        "kind": "new",
+        "text": "You > Settings > Permissions lists every permission OnMyLead uses (location, Always, Precise Location, notifications, Bluetooth, camera and more) with what your phone says about each one. Tap one that's off to see the question again, or, where iPhone or Android won't ask twice, to open OnMyLead in Settings."
+      },
+      {
         "kind": "fixed",
         "text": "Cancel on a status or quick reply now works with no service. Riders close by drop it over Bluetooth right away, and it's taken back for everyone else as soon as a phone gets signal, instead of showing an error."
       },
