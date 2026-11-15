@@ -7,7 +7,7 @@ on the server; visitors reach it only through the tunnel, the same way Basecamp 
 How an update reaches the site:
 1. A change is merged into `main` on GitHub.
 2. GitHub builds the web version (the **Build web** workflow) and saves the finished files on the `web-build` branch.
-3. Chris approves the **Update server** run; it moves the `web-live` branch to that build.
+3. The **Update server** workflow moves the `web-live` branch to that build.
 4. `deploy/auto-update.sh` on the server notices within a minute and runs `deploy/deploy.sh`, which downloads it and serves it.
 
 ## One-time setup
@@ -33,8 +33,7 @@ ssh -t rus 'git clone https://github.com/rusoffroad/OnMyLead ~/onmylead && bash 
 Authentication → URL Configuration: Site URL `https://onmylead.com`; add redirect URL `https://onmylead.com/auth-callback`.
 
 ## Updating later
-Nothing to run. After a merge, the **Update server** workflow asks Chris to approve, then moves the
-`web-live` branch; the server checks it every minute and deploys it (`auto-update.sh`, installed once
+Nothing to run. After a merge, the **Update server** workflow moves the `web-live` branch; the server checks it every minute and deploys it (`auto-update.sh`, installed once
 with `ssh rus 'bash ~/onmylead/deploy/install-auto-update.sh'`). See `docs/server-updates.md`.
 
 By hand still works: `ssh rus 'bash ~/onmylead/deploy/deploy.sh'` serves the newest build.

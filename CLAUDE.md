@@ -42,9 +42,9 @@ device check before release.
 **Rule 7: Release Protection.** Never publish an app update, submit to the App Store or Google
 Play, buy a paid service, change production credentials, or make a breaking production deployment
 without Chris's explicit OK. Migrations, function deploys and website deploys go live only through
-the **Update server** workflow, after Chris taps Approve on it (`docs/server-updates.md`); never
-approve for him. Only while that workflow is off do they run from the Mac thread after his typed
-OK. Phone builds run only from the "Phone build and server updates" thread on Chris's Mac, after
+the **Update server** workflow, which runs automatically after each merge into `main` (Chris's
+standing OK, 2026-11-15; `docs/server-updates.md`), so every merge must be safe for production.
+Only while that workflow is off do they run from the Mac thread after his typed OK. Phone builds run only from the "Phone build and server updates" thread on Chris's Mac, after
 he types an OK there. Never disturb a build that is in review
 (`help/release.json` `versions`).
 
