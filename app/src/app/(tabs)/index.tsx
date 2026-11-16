@@ -20,6 +20,7 @@ import { StarlinkHomeCard } from '@/components/home/starlink-card';
 import { HelpRow, Toolkit } from '@/components/home/toolkit';
 import { Icon } from '@/components/icon';
 import { InboxBell } from '@/components/inbox-bell';
+import { InvitePromo } from '@/components/invite-promo';
 import { LanguageButton } from '@/components/language-button';
 import { Logo } from '@/components/logo';
 import { ProLock } from '@/components/pro-gate';
@@ -115,6 +116,12 @@ export default function HomeScreen() {
   const [customizing, setCustomizing] = useState(false);
   const [trailsNear, setTrailsNear] = useState<number | null>(trailCount);
   const insets = useSafeAreaInsets();
+  // The one-time Invite Friends pop-up only ever opens while Home is on screen.
+  const [focused, setFocused] = useState(false);
+  useFocusEffect(useCallback(() => {
+    setFocused(true);
+    return () => setFocused(false);
+  }, []));
   // One satellite picture for the map header and the Map Mode tile (cached on the phone).
   const heroUrl = useHeroMap(Math.min(layout.width, 1200), HERO_HEIGHT + insets.top);
 
@@ -500,6 +507,7 @@ export default function HomeScreen() {
           }}
         />
       ) : null}
+      {session ? <InvitePromo active={focused} /> : null}
     </>
   );
 
