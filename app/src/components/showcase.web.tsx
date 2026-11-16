@@ -137,7 +137,9 @@ export function Showcase() {
             <Step
               n={1}
               shot="create"
-              alt="Create a Ride with The Route set to Mapped, next to Freeride, and the vehicles welcome"
+              alt={SHOWCASE_QUICK_CREATE
+                ? 'The 3.1 Create a Ride screen, already filled in: Today, a meeting time, Where You Are Now, Freeride, Friends I Invite, More Options and Create Private Ride'
+                : 'Create a Ride with The Route set to Mapped, next to Freeride, and the vehicles welcome'}
               title="Create a Ride"
               text={SHOWCASE_QUICK_CREATE
                 ? 'One short screen, already filled in: today, the next quarter hour, where you are, and a ride for the friends you invite. Tap Create and share the link, or tap the day, the time or the meeting point to change it. Your last meeting spots are one tap. Pick Mapped and tap along the trail so the route snaps to it, or import a GPX file, or pick Freeride and everyone follows the leader. Under More Options, set which machines are welcome or make it approval-only.'
@@ -613,7 +615,7 @@ function Step({ n, shot, alt, title, text, points }: { n: number; shot: string; 
  * the 2.x ones once 3.0 is live: `name-3.webp` sits beside `name.webp` until SHOWCASE_REDESIGN_3 is on.
  * Remake them with store/tools/web-shots/showcase.sh.
  */
-const FRESH_3 = new Set(['group-map', 'find', 'live', 'navigate', 'vehicle']);
+const FRESH_3 = new Set(['group-map', 'find', 'live', 'navigate', 'vehicle', ...(SHOWCASE_QUICK_CREATE ? ['create'] : [])]);
 const v3 = (name: string) => (SHOWCASE_REDESIGN_3 && FRESH_3.has(name) ? `${name}-3` : name);
 
 // The headline features of OnMyLead 3.0, each with the real screen. Pro features say so.
