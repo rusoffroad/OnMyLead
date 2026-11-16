@@ -9,6 +9,7 @@ export const ADMIN_SECTIONS: AdminSection[] = [
   { key: 'trials', title: 'Pro Trials', href: '/admin/trials', group: 'People' },
   { key: 'reports', title: 'Reports', href: '/admin/reports', group: 'People' },
   { key: 'contact', title: 'Contact Messages', href: '/admin/contact', group: 'People' },
+  { key: 'email', title: 'Email Riders', href: '/admin/email', group: 'People' },
   { key: 'agreements', title: 'Rider Agreements', href: '/admin/agreements', group: 'People' },
   { key: 'reviews', title: 'Store Reviews', href: '/admin/reviews', group: 'People' },
   { key: 'rides', title: 'Rides', href: '/admin/rides', group: 'Rides' },

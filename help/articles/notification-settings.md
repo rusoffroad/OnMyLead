@@ -4,8 +4,10 @@ summary: Choose which ride, chat, group and account notifications you get, set a
 category: account
 order: 30
 release: "1.0"
-updated: 2026-11-15
+updated: 2026-11-16
 sources:
+  - supabase/functions/rider-email/index.ts
+  - supabase/functions/_shared/rider-email.ts
   - supabase/migrations/20261110100000_event_group_invite.sql
   - supabase/migrations/20261104150000_waypoint_alerts.sql
   - app/src/app/notifications.tsx
@@ -109,6 +111,8 @@ Messages riders type in Ride Mode with **✎ Message** follow the **Rider Status
 - **Badges and Pro Trial**: when you earn a badge (see [Earn Badges and Ranks](/help/badges-and-ranks)), and a week, 3 days and a day before your Pro Trial ends. It also tells you when a trail you shared is hidden from the public map (see [Navigate Offroad and Map Your Own Trails](/help/navigation-mode)).
 :::
 - **Email Me Too**: the same Pro Trial reminders by email.
+
+Now and then OnMyLead emails riders news, like a new app version or an offer, from Chris at OnMyLead. To stop those, tap **Unsubscribe** at the bottom of any of them. Ride cancellation emails and Pro Trial reminders keep their own switches here.
 
 ## Tapping a Notification
 
