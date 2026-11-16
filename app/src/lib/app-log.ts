@@ -2,6 +2,7 @@ import { AppState, Platform } from 'react-native';
 
 import { addEntry, formatLog, requestLine, type LogEntry, type LogKind } from '@/core/app-log';
 import { rememberScreen } from '@/core/contact';
+import { requestTimeoutMs } from '@/core/request-timeout';
 
 /**
  * The in-memory activity log a bug report carries (see core/app-log.ts for what it keeps and what
@@ -75,16 +76,27 @@ export function startAppLog() {
   });
 }
 
-/** fetch for the Supabase client: the same, plus a log line when a request fails. */
+/**
+ * fetch for the Supabase client: the same, plus a log line when a request fails, plus a time cap
+ * on sign-in and database calls (core/request-timeout.ts) so one hung request can't hold the
+ * supabase-js session lock and stall every later request.
+ */
 export const loggedFetch: typeof fetch = async (input, init) => {
   const url = typeof input === 'string' ? input : input instanceof URL ? input.href : (input as Request).url;
   const method = init?.method ?? (typeof input === 'object' && 'method' in input ? (input as Request).method : 'GET');
+  const cap = requestTimeoutMs(url, !!init?.signal);
+  const controller = cap != null ? new AbortController() : null;
+  const timer = controller && cap != null ? setTimeout(() => controller.abort(), cap) : null;
   try {
-    const res = await fetch(input, init);
+    const res = await fetch(input, controller ? { ...init, signal: controller.signal } : init);
     if (!res.ok) logEvent('request', requestLine(method, url, res.status));
     return res;
   } catch (e) {
-    logEvent('request', requestLine(method, url, (e as Error)?.message ?? 'no response'));
-    throw e;
+    // An abort from our own cap reads as a timeout, which the outbox treats as no answer.
+    const err = controller?.signal.aborted ? new Error('Network request timed out') : e;
+    logEvent('request', requestLine(method, url, (err as Error)?.message ?? 'no response'));
+    throw err;
+  } finally {
+    if (timer) clearTimeout(timer);
   }
 };
