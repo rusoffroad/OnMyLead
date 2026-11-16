@@ -4,7 +4,7 @@ import { useSyncExternalStore } from 'react';
 
 import type { LatLng } from '@/core/geo';
 import {
-  finishedStatus, planArea, planRide, rideBox, tileKey, tilesToRemove, type DownloadPlan, type OfflineChoice,
+  downloadLanes, FETCHES_PER_LANE, finishedStatus, planArea, planRide, rideBox, tileKey, tilesToRemove, type DownloadPlan, type OfflineChoice,
   type OfflineLayer, type OfflineMap,
 } from '@/core/offline-maps';
 import { areasToOffer, OFFLINE_AREA_PREFIX, offlineAreaKey, offlineAreaValue, type SyncedOfflineArea } from '@/core/synced-settings';
@@ -18,8 +18,10 @@ import { tc } from '@/core/i18n';
  * Downloaded maps. The squares go into the same folders the ride maps already read from
  * (lib/trail-tiles), so a downloaded area simply shows, signal or not. Each download keeps a list
  * of its squares beside the list of downloads, so deleting one removes only what no other
- * download still needs. One download runs at a time, four squares at once, which keeps the
- * agencies' free map servers happy and still saves a typical ride in a couple of minutes on LTE.
+ * download still needs. One download runs at a time. Inside it every map service (USGS, Forest
+ * Service, BLM, OpenStreetMap) downloads at the same time, six squares at once each (core
+ * offline-maps downloadLanes), so a slow agency server only holds up its own layers and each
+ * server sees no more than a browser would ask of it.
  */
 
 const KEY = 'offline-maps.v1';
@@ -222,7 +224,7 @@ async function run(id: string) {
   let saved = 0;
   let failed = 0;
   let bytes = 0;
-  let next = 0;
+  let done = 0;
   let lastEmit = 0;
   const report = (force = false) => {
     const now = Date.now();
@@ -231,24 +233,30 @@ async function run(id: string) {
     update(id, { saved, failed, bytes, total: jobs.length }, false);
   };
 
-  const worker = async () => {
-    while (next < jobs.length && stopRequested !== id && maps.some((m) => m.id === id)) {
-      const { layer, t } = jobs[next++];
-      const file = tileFile(layer, t.z, t.x, t.y);
-      try {
-        if (!file.exists) await fetchTile(layer, t, file);
-        bytes += file.size ?? 0;
-        saved++;
-      } catch {
-        failed++;
+  // One lane per map service, all running at once, each with its own few fetches (core/offline-maps).
+  const lane = async (list: typeof jobs) => {
+    let next = 0;
+    const worker = async () => {
+      while (next < list.length && stopRequested !== id && maps.some((m) => m.id === id)) {
+        const { layer, t } = list[next++];
+        const file = tileFile(layer, t.z, t.x, t.y);
+        try {
+          if (!file.exists) await fetchTile(layer, t, file);
+          bytes += file.size ?? 0;
+          saved++;
+        } catch {
+          failed++;
+        }
+        done++;
+        report();
       }
-      report();
-    }
+    };
+    await Promise.all(Array.from({ length: FETCHES_PER_LANE }, worker));
   };
-  await Promise.all([worker(), worker(), worker(), worker()]);
+  await Promise.all(downloadLanes(jobs).map(lane));
   if (!maps.some((m) => m.id === id)) return; // deleted while downloading
-  const done = next >= jobs.length && stopRequested !== id;
-  update(id, { saved, failed, bytes, total: jobs.length, status: done ? finishedStatus(jobs.length, failed) : 'paused' });
+  const finished = done >= jobs.length && stopRequested !== id;
+  update(id, { saved, failed, bytes, total: jobs.length, status: finished ? finishedStatus(jobs.length, failed) : 'paused' });
 }
 
 async function fetchTile(layer: OfflineLayer, t: Tile, file: File) {
