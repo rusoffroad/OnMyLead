@@ -1,5 +1,19 @@
 [
   {
+    "version": "3.2",
+    "title": "Steadier Rider Line",
+    "intro": "OnMyLead 3.2 keeps the distances on the rider line steady in Ride Mode and on CarPlay.",
+    "whatsNew": "What's new in 3.2:\n\n• Steadier rider line: a rider right beside the leader no longer flicks between a few yards and 200 ft, in Ride Mode and on CarPlay.",
+    "apple": null,
+    "google": null,
+    "notes": [
+      {
+        "kind": "fixed",
+        "text": "The rider line in Ride Mode and on CarPlay holds steady. A friend riding right beside the leader no longer jumps between a few yards and about 200 feet over and over: every rider is compared at the same moment, and dots ease between updates."
+      }
+    ]
+  },
+  {
     "version": "3.1",
     "title": "The Map on CarPlay",
     "intro": "OnMyLead 3.1 puts the map on your car's CarPlay screen, with turn-by-turn for the trail ahead, shows your trails and roads there with a Layers button to pick them, brings your ride's messages and group chats to the car, adds an Exit button to Map Mode and Ride Mode, makes Leave Ride easy to find, and turns Create a Ride into one short screen that opens already filled in. CarPlay is part of OnMyLead Pro.",
