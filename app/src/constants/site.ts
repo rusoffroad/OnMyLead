@@ -101,6 +101,11 @@ export const SHOWCASE_REDESIGN_3: boolean = true;
  */
 export const SHOWCASE_EASY_LEAVE: boolean = false;
 /**
+ * True once 3.2 is in the stores: the organizer ends the ride for everyone from Ride Mode's Exit
+ * sheet (End Ride for Everyone). Until then the showcase doesn't mention it.
+ */
+export const SHOWCASE_END_RIDE_IN_MODE: boolean = false;
+/**
  * The showcase's Create a Ride step in its 3.1 words (one short screen that starts on today, now
  * and where you are; everything else under More Options). Off until the app version with it (3.1)
  * is live in the stores; when it flips, retake the step's screenshot (site/create) too.

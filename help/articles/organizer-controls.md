@@ -15,6 +15,7 @@ sources:
   - app/src/core/roles.ts
   - app/src/core/cancel.ts
   - app/src/lib/api.ts
+  - app/src/core/mode-exit.ts
   - supabase/migrations/20261007000000_init.sql
   - supabase/migrations/20261015000000_notification_settings.sql
 related: [leader-sweep-and-tail-gunner, approvals-and-waitlist, edit-cancel-or-delete-a-ride, ride-mode, invite-riders, ride-chat]
@@ -51,6 +52,10 @@ When everyone is off the trail:
 
 1. Open the ride page.
 2. In the **You're Organizing** card on **Details**, tap **End Ride for Everyone**.
+
+:::release 3.2
+You can also end it from [Ride Mode](/help/ride-mode): tap **‹ Exit** at the top left, then **End Ride for Everyone** under **Ride over?**, and confirm with **End Ride**. Ride Mode closes. This needs service.
+:::
 
 Ending the ride stops everyone's location sharing for this ride. Riders then see their ride summary on the ride page. See [Ride Summary and Ride Again](/help/ride-summary-and-ride-again).
 

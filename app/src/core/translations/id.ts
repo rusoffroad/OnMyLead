@@ -3595,6 +3595,12 @@ const dict: Record<string, string> = {
   "Everything a group ride needs is allowed": "Semua yang dibutuhkan riding grup sudah diizinkan",
   "1 permission needs your OK. Tap to fix it": "1 izin butuh OK kamu. Ketuk untuk memperbaiki",
   "{n} permissions need your OK. Tap to fix them": "{n} izin butuh OK kamu. Ketuk untuk memperbaiki",
+  "End the Ride for Everyone?": "Akhiri riding untuk semua?",
+  "{rideName} ends for the whole group. Everyone’s location sharing stops and Ride Mode closes. Do this when the ride is over.": "{rideName} berakhir untuk seluruh grup. Berbagi lokasi semua orang berhenti dan Mode Riding ditutup. Lakukan ini saat riding sudah selesai.",
+  "End Ride": "Akhiri Riding",
+  "Keep Riding": "Lanjut Riding",
+  "Ride over? End it for everyone. Just done yourself? Leave the ride.": "Riding selesai? Akhiri untuk semua. Hanya kamu yang selesai? Keluar dari riding.",
+  "Could Not End the Ride": "Tidak bisa mengakhiri riding",
 };
 
 export default dict;

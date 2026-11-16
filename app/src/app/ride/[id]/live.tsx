@@ -55,7 +55,7 @@ import { actionHalfWidth, CONTROL_GAP, CONTROL_H, CONTROL_SIDE, phoneControls } 
 import { riderFreshness, viewerOfflineSince } from '@/core/freshness';
 import { followCamActive, followMeStatus, followMeTap } from '@/core/follow-camera';
 import { RESTORE_LABEL, restoreA11yLabel, swipeRestores } from '@/core/full-map';
-import { backPress, rideExitAsks } from '@/core/mode-exit';
+import { backPress, canEndRideHere, rideExitAsks } from '@/core/mode-exit';
 import { isVerticalSwipe } from '@/core/panel-swipe';
 import { heldHeading } from '@/core/heading';
 import { positionsFilter, rosterKey } from '@/core/live-costs';
@@ -89,7 +89,7 @@ import { useTilt } from '@/hooks/use-tilt';
 import { useTrailMap } from '@/hooks/use-trail-map';
 import {
   activeRegroup, dropRegroup, getMembers, getPositions, getPrivateDetails, getRide, getRideRoute, myActiveShares, myVehicles,
-  setLeaderTrackline, startLocationShare, stopLocationShare, type ActiveShare, type VehicleWithCost,
+  setLeaderTrackline, setRideStatus, startLocationShare, stopLocationShare, type ActiveShare, type VehicleWithCost,
 } from '@/lib/api';
 import { useBatteryMode } from '@/lib/battery';
 import { clearCarPlay, onCarPlayAction, showRideOnCarPlay } from '@/lib/carplay';
@@ -100,7 +100,7 @@ import { useFlag } from '@/lib/app-settings';
 import {
   nearbyAvailable, nearbyBridge, onNearbyEvent, setNearbyConditions, setNearbyRelayOnly, setNearbySharing, startNearby, stopNearby, useBluetoothSharingSetting, useNearby,
 } from '@/lib/nearby';
-import { flushOutbox, sendQuickReplyReliably, sendStatusReliably } from '@/lib/outbox';
+import { flushOutbox, sendQuickReplyReliably, sendStatusReliably, withTimeout } from '@/lib/outbox';
 import { cachedRide, rememberRide } from '@/lib/ride-cache';
 import { useSession } from '@/lib/session';
 import { setCrashSettings, useTiltSettings } from '@/lib/tilt';
@@ -1395,8 +1395,18 @@ export default function RideMode() {
   // Exit (top left, the Full Map bar, Android back, the car screen) only leaves this screen: the
   // rider stays on the ride. The sheet asks whether the group keeps seeing them while sharing, and
   // offers Leave Ride to anyone who can leave (the Exit button is where riders look for it).
+  // The organizer (and co-organizers) can end a live ride for everyone from the same sheet, when
+  // the ride is over. It changes the ride for the group, so it needs service (like a hand-off).
+  const canEnd = canEndRideHere(ride, me, mine);
+  const endRide = async () => {
+    await withTimeout(setRideStatus(id, 'ended'));
+    setShare(null);
+    stopSendingLocation();
+    setExitOpen(false);
+    leaveModeScreen();
+  };
   const exitRide = (viaBack = false) => {
-    if (rideExitAsks(!!activeShare, !!leaveButton, viaBack)) setExitOpen(true);
+    if (rideExitAsks(!!activeShare, !!leaveButton || canEnd, viaBack)) setExitOpen(true);
     else leaveModeScreen();
   };
   useModeBackButton(() => {
@@ -1979,6 +1989,7 @@ export default function RideMode() {
           leaveModeScreen();
         }}
         leave={leaveButton}
+        onEndRide={canEnd ? endRide : undefined}
       />
 
       <RiderList

@@ -3595,6 +3595,12 @@ const dict: Record<string, string> = {
   "Everything a group ride needs is allowed": "Tutto ciò che serve a un’uscita di gruppo è consentito",
   "1 permission needs your OK. Tap to fix it": "1 permesso aspetta il tuo OK. Tocca per sistemarlo",
   "{n} permissions need your OK. Tap to fix them": "{n} permessi aspettano il tuo OK. Tocca per sistemarli",
+  "End the Ride for Everyone?": "Terminare l’uscita per tutti?",
+  "{rideName} ends for the whole group. Everyone’s location sharing stops and Ride Mode closes. Do this when the ride is over.": "{rideName} termina per tutto il gruppo. La condivisione della posizione di tutti si ferma e la modalità Uscita si chiude. Fallo quando l’uscita è finita.",
+  "End Ride": "Termina uscita",
+  "Keep Riding": "Continua a guidare",
+  "Ride over? End it for everyone. Just done yourself? Leave the ride.": "Uscita finita? Terminala per tutti. Hai finito solo tu? Lascia l’uscita.",
+  "Could Not End the Ride": "Impossibile terminare l’uscita",
 };
 
 export default dict;
