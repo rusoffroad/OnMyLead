@@ -4,7 +4,7 @@ summary: Set the day, time and meeting point, pick who can join, and share your 
 category: rides
 order: 10
 release: "1.0"
-updated: 2026-11-14
+updated: 2026-11-16
 sources:
   - app/src/components/meet-point-mapbox-map.tsx
   - app/src/components/meet-point-map.tsx

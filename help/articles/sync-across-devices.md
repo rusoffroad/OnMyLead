@@ -4,7 +4,7 @@ summary: Sign in with the same account on your iPhone, iPad, Android phone, tabl
 category: account
 order: 25
 release: "2.0"
-updated: 2026-11-15
+updated: 2026-11-16
 sources:
   - app/src/lib/map-waypoints.ts
   - app/src/core/map-waypoints.ts
@@ -58,6 +58,10 @@ Syncing your settings and trails is a Pro feature. See [Free and Pro](/help/free
 :::
 
 - Announcements you closed, and the Starlink page connecting by itself
+
+:::release 3.1
+- The one-time **Invite Friends** pop-up on Home, so you see it on one device only
+:::
 
 **Map Mode trails**
 

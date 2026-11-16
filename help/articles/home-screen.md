@@ -4,7 +4,7 @@ summary: What's on your home screen. Map Mode, joining and starting rides, event
 category: getting-started
 order: 15
 release: "2.0"
-updated: 2026-11-14
+updated: 2026-11-16
 sources:
   - app/src/components/found-us-card.tsx
   - app/src/lib/found-us.ts
@@ -142,6 +142,10 @@ Join a Ride, Create a Ride, Find a Ride, Events and Map Mode all fit on the firs
 
 :::release 3.0
 In your first month, Home asks once: **How Did You Find OnMyLead?** Tap where you heard about us (Facebook, a friend, a riding club and so on) and tap **Send**, or tap **Not Now** and it won't ask again. Your answer is only counted, never shown to other riders.
+:::
+
+:::release 3.1
+Once, a few seconds after Home opens, it tells you about **Invite Friends, Both Get 50% Off**: tap **Invite Friends** to get your invite link, or **Not Now**. It doesn't show again. See [Invite Friends and Get 50% Off](/help/refer-a-friend).
 :::
 
 ## Join, Create and Find
