@@ -1,11 +1,13 @@
 import { router } from 'expo-router';
+import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
+import Svg, { Circle, Defs, G, LinearGradient, Path, Rect, Stop } from 'react-native-svg';
 
 import { Icon, type IconName } from '@/components/icon';
 import { TextBox } from '@/components/keyboard';
 import { Colors, font, Spacing, themedStyles, TileSurface } from '@/constants/theme';
 import { withAlpha } from '@/core/color';
-import { startRideDetail, type Quota } from '@/core/home';
+import { leadLinePoints, smoothPath, startRideDetail, weekCells, type Quota } from '@/core/home';
 import { showNotice } from '@/lib/confirm';
 import { Gradient } from './parts';
 import { t } from '@/lib/i18n';
@@ -81,35 +83,100 @@ export function ActionTiles({ quota, onStart }: { quota: Quota | null; onStart: 
 
 /**
  * One of the two action tiles (3.1 restyle, Chris 2026-11-16: the old tile had a big empty middle,
- * a lone icon up top and the words squeezed into the bottom). Now the icon chip and an arrow share
- * the top row, the title and line sit right under them, a soft wash of the tile's colour comes in
- * from the top-left and a large faint copy of the icon fills the bottom-right corner.
+ * a lone icon up top and the words squeezed into the bottom). Built like the Map Mode card above
+ * it: a small icon and line in the tile's colour, the big title under it, and along the bottom a
+ * little picture that runs into a round go button. Start a Ride draws riders following a red lead
+ * line; Events and Group Rides draws a week of calendar days with one marked.
  */
 function Tile({
   icon, title, detail, onPress, tone, lines = 1,
 }: { icon: IconName; title: string; detail: string; onPress: () => void; tone: 'red' | 'gold'; lines?: 1 | 2 }) {
-  const ink = tone === 'red' ? '#FF4A51' : Colors.gold;
-  const wash = tone === 'red' ? 'rgba(229,38,46,0.2)' : withAlpha(Colors.gold, 0.16);
+  const red = tone === 'red';
+  const ink = red ? '#FF5A60' : Colors.gold;
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={`${title}. ${detail}`}
       onPress={onPress}
-      style={({ pressed }) => [styles.tile, { transform: [{ scale: pressed ? 0.98 : 1 }] }]}>
-      <Gradient colors={[wash, withAlpha('#000000', 0)]} angle="diagonal" radius={20} overlay />
-      <View pointerEvents="none" style={styles.tileMark}>
-        <Icon name={icon} size={96} color={withAlpha(ink, 0.09)} strokeWidth={1.6} />
-      </View>
-      <View style={[styles.tileEdge, { backgroundColor: ink }]} />
-      <View style={styles.tileTop}>
-        <View style={[styles.tileIcon, tone === 'red' ? styles.tileIconRed : styles.tileIconGold]}>
-          <Icon name={icon} size={20} color={ink} strokeWidth={2.1} />
+      style={({ pressed }) => [styles.tile, { borderColor: withAlpha(ink, 0.55), transform: [{ scale: pressed ? 0.98 : 1 }] }]}>
+      <Gradient colors={[withAlpha(ink, red ? 0.2 : 0.15), withAlpha(ink, 0.03)]} angle="diagonal" radius={20} overlay />
+      <View>
+        <View style={styles.tileKicker}>
+          <Icon name={icon} size={15} color={ink} strokeWidth={2.2} />
+          <Text style={[styles.tileDetail, { color: ink }]} numberOfLines={1}>{detail}</Text>
         </View>
-        <Icon name="chevron" size={18} color={Colors.textSecondary} strokeWidth={2.2} />
+        <Text style={styles.tileTitle} numberOfLines={lines} adjustsFontSizeToFit minimumFontScale={0.8}>{title}</Text>
       </View>
-      <Text style={styles.tileTitle} numberOfLines={lines} adjustsFontSizeToFit minimumFontScale={0.8}>{title}</Text>
-      <Text style={styles.tileDetail} numberOfLines={1}>{detail}</Text>
+      <View style={styles.tileFoot}>
+        <TileArt tone={tone} ink={ink} />
+        <View style={[styles.tileGo, { backgroundColor: red ? Colors.accent : ink }]}>
+          <Icon name="chevron" size={18} color={red ? '#fff' : '#1D1606'} strokeWidth={2.6} />
+        </View>
+      </View>
     </Pressable>
+  );
+}
+
+const ART_H = 40;
+
+/**
+ * The little picture along the bottom of a tile, drawn to the width it's given (measured, not
+ * "100%": see Gradient in ./parts). It is decoration, so screen readers skip it.
+ */
+function TileArt({ tone, ink }: { tone: 'red' | 'gold'; ink: string }) {
+  const [w, setW] = useState(0);
+  return (
+    <View
+      pointerEvents="none"
+      accessible={false}
+      importantForAccessibility="no-hide-descendants"
+      style={styles.tileArt}
+      onLayout={(e) => setW(Math.round(e.nativeEvent.layout.width))}>
+      {w > 0 ? (
+        <Svg width={w} height={ART_H} viewBox={`0 0 ${w} ${ART_H}`}>
+          {tone === 'red' ? <LeadLine w={w} ink={ink} /> : <WeekDays w={w} ink={ink} />}
+        </Svg>
+      ) : null}
+    </View>
+  );
+}
+
+/** Riders strung out along a trail that ends at the go button: the leader's line. */
+function LeadLine({ w, ink }: { w: number; ink: string }) {
+  const pts = leadLinePoints(w, ART_H);
+  return (
+    <>
+      <Defs>
+        <LinearGradient id="tileLead" x1="0" y1="0" x2="1" y2="0">
+          <Stop offset={0} stopColor={ink} stopOpacity={0} />
+          <Stop offset={0.35} stopColor={ink} stopOpacity={0.55} />
+          <Stop offset={1} stopColor={ink} stopOpacity={1} />
+        </LinearGradient>
+      </Defs>
+      <Path d={smoothPath(pts)} stroke="url(#tileLead)" strokeWidth={2.5} strokeLinecap="round" fill="none" />
+      {pts.slice(1, -1).map((p, i) => (
+        <Circle key={i} cx={p.x} cy={p.y} r={4.5} fill={Colors.textSecondary} stroke={Colors.backgroundElement} strokeWidth={2} opacity={0.55 + i * 0.2} />
+      ))}
+    </>
+  );
+}
+
+/** A week of calendar days with one marked, leading to the go button. */
+function WeekDays({ w, ink }: { w: number; ink: string }) {
+  const cells = weekCells(w, ART_H);
+  return (
+    <>
+      {cells.map((c, i) => {
+        const on = i === cells.length - 2;
+        return (
+          <G key={i} opacity={on ? 1 : 0.3 + (i / cells.length) * 0.5}>
+            <Rect x={c.x} y={c.y} width={c.w} height={c.h} rx={5} fill={on ? ink : withAlpha(ink, 0.1)} stroke={ink} strokeWidth={on ? 0 : 1.2} />
+            <Rect x={c.x + 4} y={c.y + 5} width={c.w - 8} height={2} rx={1} fill={on ? '#1D1606' : ink} opacity={on ? 0.75 : 0.9} />
+            {on ? <Circle cx={c.x + c.w / 2} cy={c.y + c.h - 8} r={2.6} fill="#1D1606" opacity={0.8} /> : null}
+          </G>
+        );
+      })}
+    </>
   );
 }
 
@@ -133,13 +200,11 @@ const styles = themedStyles(() => ({
   codeGo: { backgroundColor: '#fff', borderRadius: 14, paddingHorizontal: 24, minHeight: 54, justifyContent: 'center' },
   codeGoText: { color: '#B81C23', fontFamily: font(700), fontSize: 17 },
   pair: { flexDirection: 'row', alignItems: 'stretch', gap: 12 },
-  tile: { flex: 1, borderRadius: 20, paddingHorizontal: 16, paddingTop: 16, paddingBottom: 16, overflow: 'hidden', ...TileSurface },
-  tileEdge: { position: 'absolute', top: 0, left: 16, width: 28, height: 3, borderBottomLeftRadius: 2, borderBottomRightRadius: 2 },
-  tileMark: { position: 'absolute', right: -14, bottom: -16, transform: [{ rotate: '-8deg' }] },
-  tileTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 },
-  tileIcon: { width: 38, height: 38, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.backgroundSelected },
-  tileIconRed: { backgroundColor: 'rgba(229,38,46,0.16)' },
-  tileIconGold: { backgroundColor: withAlpha(Colors.gold, 0.16) },
-  tileTitle: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 22, lineHeight: 24 },
-  tileDetail: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 13.5, lineHeight: 18, marginTop: 4 },
+  tile: { flex: 1, minHeight: 150, borderRadius: 20, padding: 16, overflow: 'hidden', justifyContent: 'space-between', gap: 14, ...TileSurface },
+  tileKicker: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  tileDetail: { flexShrink: 1, fontFamily: font(600), fontSize: 13.5, lineHeight: 18 },
+  tileTitle: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 26, lineHeight: 28, marginTop: 4 },
+  tileFoot: { flexDirection: 'row', alignItems: 'center' },
+  tileArt: { flex: 1, minWidth: 0, height: ART_H },
+  tileGo: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', boxShadow: '0px 6px 14px -6px rgba(0, 0, 0, 0.6)' },
 }));
