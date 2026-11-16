@@ -149,6 +149,15 @@ export function sendQuickReplyReliably(rideId: string, body: string, id?: string
   return sendOrQueue({ kind: 'reply', id, rideId, body, tappedAt: new Date().toISOString() });
 }
 
+/** Screens that show a ride (the ride page) hear when a queued start or leave for it reached the server. */
+const sentListeners = new Set<(rideId: string) => void>();
+export function onRideActionSent(fn: (rideId: string) => void): () => void {
+  sentListeners.add(fn);
+  return () => {
+    sentListeners.delete(fn);
+  };
+}
+
 export async function flushOutbox(): Promise<number> {
   const items = await read();
   if (!items.length) return 0;
@@ -173,6 +182,18 @@ export async function flushOutbox(): Promise<number> {
   // Read again: a tap may have been queued or cancelled while this ran.
   const now = await read();
   await AsyncStorage.setItem(KEY, JSON.stringify(now.filter((i) => !done.some((d) => sameItem(d, i)))));
+  // A start or leave that went out changed the ride: a ride page open since there was no service
+  // still shows the old status (3.1 build 22 test: "Start Ride Mode" after the ride had gone live).
+  for (const d of done) {
+    if (d.kind !== 'start' && d.kind !== 'leave') continue;
+    sentListeners.forEach((fn) => {
+      try {
+        fn(d.rideId);
+      } catch {
+        // A screen's refresh must never break the queue.
+      }
+    });
+  }
   return done.length;
 }
 
