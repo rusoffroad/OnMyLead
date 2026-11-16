@@ -22,8 +22,8 @@
     "title": "The Map on CarPlay",
     "intro": "OnMyLead 3.1 puts the map on your car's CarPlay screen, with turn-by-turn for the trail ahead, shows your trails and roads there with a Layers button to pick them, brings your ride's messages and group chats to the car, adds an Exit button to Map Mode and Ride Mode, makes Leave Ride easy to find, and turns Create a Ride into one short screen that opens already filled in. CarPlay is part of OnMyLead Pro.",
     "whatsNew": "What's new in 3.1:\n\n• The map on CarPlay: trails, your route, your group and turn-by-turn (Pro).\n• Ride messages and group chats on CarPlay, with one-tap replies (Pro).\n• Create a Ride is one short screen that starts on today, now and where you are.\n• An Exit button in Map Mode and Ride Mode. Exit never leaves the ride.\n• Leave Ride now sits right under the ride's name.\n• Fixed a crash in Ride Mode. Zoom In at Intersections is now off unless you turn it on.",
-    "apple": null,
-    "google": null,
+    "apple": "2026-11-16",
+    "google": "2026-11-16",
     "notes": [
       {
         "kind": "new",

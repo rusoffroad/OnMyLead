@@ -99,7 +99,7 @@ export const SHOWCASE_REDESIGN_3: boolean = true;
  * The showcase's Leave Any Time line in its 3.1 words (Leave Ride beside You're Going under the
  * ride's name, and under Exit in Ride Mode). Off until the app version with it (3.1) is live in the stores.
  */
-export const SHOWCASE_EASY_LEAVE: boolean = false;
+export const SHOWCASE_EASY_LEAVE: boolean = true;
 /**
  * True once 3.2 is in the stores: the organizer ends the ride for everyone from Ride Mode's Exit
  * sheet (End Ride for Everyone). Until then the showcase doesn't mention it.
@@ -110,9 +110,9 @@ export const SHOWCASE_END_RIDE_IN_MODE: boolean = false;
  * and where you are; everything else under More Options). Off until the app version with it (3.1)
  * is live in the stores; when it flips, retake the step's screenshot (site/create) too.
  */
-export const SHOWCASE_QUICK_CREATE: boolean = false;
+export const SHOWCASE_QUICK_CREATE: boolean = true;
 /**
  * The showcase's Events card in its 3.1 words (Events and Group Rides: events, public group rides
  * near you and your own, under one switch). Off until the app version with it (3.1) is live in the stores.
  */
-export const SHOWCASE_EVENTS_AND_RIDES: boolean = false;
+export const SHOWCASE_EVENTS_AND_RIDES: boolean = true;
