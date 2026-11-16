@@ -22,6 +22,7 @@ import { TwoPane } from '@/components/two-pane';
 import { Button, Card, ErrorText, Screen, Tag } from '@/components/ui';
 import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import { withoutBlocked } from '@/core/blocks';
+import { isTransientError, rideActionError } from '@/core/errors';
 import { canCancel, cancelPrompt, deletePrompt, ridersToTell } from '@/core/cancel';
 import { latestAnnouncement, rideLeaderIds } from '@/core/chat';
 import { rideDirections } from '@/core/directions';
@@ -48,6 +49,9 @@ import { useEntitlements } from '@/lib/entitlements';
 import { currentNotificationSettings } from '@/lib/notification-settings';
 import { requirePro, requireTripSlot } from '@/lib/pro';
 import { syncRideReminders } from '@/lib/push';
+import { prefetchNearbyKeys } from '@/lib/nearby';
+import { dropQueuedLeave, startRideReliably } from '@/lib/outbox';
+import { cachedRide, rememberRide } from '@/lib/ride-cache';
 import { openStore } from '@/lib/rus';
 import { useSession } from '@/lib/session';
 import type { Ride, RideMember, RidePrivateDetails } from '@/lib/types';
@@ -89,11 +93,24 @@ export default function RidePage() {
         const [d, m] = await Promise.all([getPrivateDetails(r.id), getMembers(r.id)]);
         setDetails(d);
         setMembers(m);
+        // Kept on this phone so Ride Mode opens on the trail with no service (lib/ride-cache).
+        if (m.some((x) => x.user_id === me && x.status === 'joined')) {
+          rememberRide(r.id, { ride: r, members: m });
+          prefetchNearbyKeys(r.id);
+        }
         // The route is part of the private details, so only riders on the ride get one back.
         if (d) setRoute((await getRideRoute(r.id)).route);
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : tr('Could not load the ride.'));
+      const message = e instanceof Error ? e.message : tr('Could not load the ride.');
+      // No service: show the ride as this phone last saw it (opened by its id, as from Home).
+      const saved = isTransientError(message) && /^[0-9a-f-]{36}$/i.test(code) ? await cachedRide(code) : null;
+      if (saved?.ride) {
+        setRide((r) => r ?? saved.ride);
+        setMembers((m) => (m.length ? m : saved.members));
+        return;
+      }
+      setError(rideActionError(message));
     }
   }, [code, me]);
 
@@ -140,8 +157,28 @@ export default function RidePage() {
 
   const join = () =>
     me
-      ? act('join', () => joinRide({ rideId: ride.id, inviteCode: /^[0-9a-f-]{36}$/i.test(code) ? undefined : ride.invite_code }))
+      ? act('join', async () => {
+        await joinRide({ rideId: ride.id, inviteCode: /^[0-9a-f-]{36}$/i.test(code) ? undefined : ride.invite_code });
+        await dropQueuedLeave(ride.id);
+      })
       : router.push('/sign-in');
+
+  // Start Ride Mode works with no service: Ride Mode opens at once and the start reaches the
+  // server (and the group) once there is signal (lib/outbox).
+  const start = async () => {
+    setBusy('start');
+    setError(null);
+    try {
+      const sent = await startRideReliably(ride.id);
+      if (!sent) setRide((r) => (r ? { ...r, status: 'live' } : r));
+      router.push(`/ride/${ride.id}/live`);
+      if (sent) await load();
+    } catch (e) {
+      setError(rideActionError(e instanceof Error ? e.message : null));
+    } finally {
+      setBusy(null);
+    }
+  };
 
   const resyncReminders = () => syncRideReminders(currentNotificationSettings().reminder_minutes);
 
@@ -252,7 +289,7 @@ export default function RidePage() {
 
       {/* What to do next sits right under the name: start the ride, join, check in or enter Ride Mode. */}
       {isManager && ride.status === 'scheduled' ? (
-        <Button title={tr('Start Ride Mode')} big loading={busy === 'start'} onPress={() => act('start', async () => { await setRideStatus(ride.id, 'live'); router.push(`/ride/${ride.id}/live`); })} />
+        <Button title={tr('Start Ride Mode')} big loading={busy === 'start'} onPress={start} />
       ) : null}
       {cancelled ? null : !mine || mine.status === 'cancelled' || mine.status === 'declined' ? (
         ride.status === 'ended' ? (

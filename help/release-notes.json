@@ -45,6 +45,10 @@
       },
       {
         "kind": "fixed",
+        "text": "Ride Mode opens with no service, with the ride and riders your phone saw last, your downloaded maps and Bluetooth Sharing. Start Ride Mode works with no service too (the ride goes live for everyone once your phone gets signal), and so does Leave Ride, instead of doing nothing or showing No Service."
+      },
+      {
+        "kind": "fixed",
         "text": "Fixed Ride Mode closing by itself during a ride when the phone couldn't save part of your ride track: it no longer retries over and over."
       },
       {

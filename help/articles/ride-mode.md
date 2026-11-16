@@ -4,8 +4,10 @@ summary: The live group map for ride day. See every rider, who is live and who w
 category: ride-mode
 order: 10
 release: "1.0"
-updated: 2026-11-15
+updated: 2026-11-16
 sources:
+  - app/src/core/offline-ride.ts
+  - app/src/lib/ride-cache.ts
   - app/src/core/map-controls.ts
   - app/src/core/mode-exit.ts
   - app/src/components/exit-mode.tsx
@@ -393,6 +395,10 @@ From 3.1 the no-service banner is one small line, such as **No Service Last-Seen
 :::
 
 Status taps and quick replies you make with no service wait on your phone and send on their own when you get signal.
+
+:::release 3.1
+Ride Mode also opens with no service. It shows the ride and riders as your phone last saw them, with your downloaded maps, and Bluetooth Sharing starts as usual. Organizers can tap **Start Ride Mode** with no service: Ride Mode opens right away, and the ride goes live for everyone once your phone gets signal. **Leave Ride** works with no service too (see [Join a Ride](/help/join-a-ride)). Open the ride page once with service before you go, so your phone has the ride saved.
+:::
 
 :::release 2.1
 ## See the Land in 3D

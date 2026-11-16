@@ -4,8 +4,10 @@ summary: Join with an invite link, a QR code or a code, or from Find. Learn what
 category: joining
 order: 20
 release: "1.0"
-updated: 2026-11-13
+updated: 2026-11-16
 sources:
+  - app/src/core/offline-ride.ts
+  - app/src/lib/outbox.ts
   - app/src/components/events/part-of-event.tsx
   - app/src/core/leaving.ts
   - app/src/components/leave-ride.tsx
@@ -138,6 +140,10 @@ On onmylead.com, the ride page works the same way.
 :::
 
 Leaving always stops your phone sharing your location for that ride, whether or not the ride has started.
+
+:::release 3.1
+**No service?** **Leave Ride**, **Withdraw** and **Leave Waitlist** still work. You're off the ride on your phone right away, and OnMyLead hears once your phone gets signal. An organizer handing the ride to someone else, or cancelling it, needs service, because that changes the ride for everyone.
+:::
 
 Organized the ride? See [Leave a Ride You Organize](/help/leader-sweep-and-tail-gunner).
 

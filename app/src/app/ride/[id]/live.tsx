@@ -100,6 +100,7 @@ import {
   nearbyAvailable, nearbyBridge, onNearbyEvent, setNearbyConditions, setNearbyRelayOnly, setNearbySharing, startNearby, stopNearby, useBluetoothSharingSetting, useNearby,
 } from '@/lib/nearby';
 import { flushOutbox, sendQuickReplyReliably, sendStatusReliably } from '@/lib/outbox';
+import { cachedRide, rememberRide } from '@/lib/ride-cache';
 import { useSession } from '@/lib/session';
 import { setCrashSettings, useTiltSettings } from '@/lib/tilt';
 import { statusesAndCancels } from '@/lib/ride-taps';
@@ -170,7 +171,18 @@ async function loadSnapshot(id: string): Promise<RideSnapshot> {
   // older tap) never takes the place of the one the rider made after it.
   const statuses: RideSnapshot['statuses'] = newestTapPerRider(st);
   const pos = await getPositions(members.filter((x) => x.status === 'joined').map((x) => x.user_id));
-  return { ride, members, regroup, statuses, cancelled: taps.cancelled, positions: Object.fromEntries(pos.map((p) => [p.user_id, p])) };
+  const snap = { ride, members, regroup, statuses, cancelled: taps.cancelled, positions: Object.fromEntries(pos.map((p) => [p.user_id, p])) };
+  // Kept on this phone so Ride Mode opens with no service next time (lib/ride-cache).
+  void rememberRide(id, { ride, members, extra: { regroup, statuses, cancelled: snap.cancelled, positions: snap.positions } });
+  return snap;
+}
+
+/** Ride Mode as this phone last saw it, for opening with no service. Null if it never saw this ride. */
+async function savedSnapshot(id: string): Promise<RideSnapshot | null> {
+  const c = await cachedRide(id);
+  if (!c?.ride) return null;
+  const x = (c.extra ?? {}) as Partial<RideSnapshot>;
+  return { ride: c.ride, members: c.members, regroup: x.regroup ?? null, statuses: x.statuses ?? {}, cancelled: x.cancelled ?? [], positions: x.positions ?? {} };
 }
 
 export default function RideMode() {
@@ -367,7 +379,11 @@ export default function RideMode() {
   const rosterGate = useRef(new RosterGate());
   // The same riders as a stable key: the live position listener restarts only when it changes.
   const [memberKey, setMemberKey] = useState('');
-  const apply = useCallback((d: RideSnapshot) => {
+  // The server answered at least once since Ride Mode opened (a saved copy never replaces that).
+  const heardServer = useRef(false);
+  const apply = useCallback((d: RideSnapshot, fresh = true) => {
+    if (fresh) heardServer.current = true;
+    else if (heardServer.current) return;
     setRide(d.ride);
     routeMiles.current = d.ride?.route_miles;
     memberIds.current = new Set(d.members.filter((m) => m.status === 'joined').map((m) => m.user_id));
@@ -378,9 +394,9 @@ export default function RideMode() {
     // A tap taken back over Bluetooth that the server hasn't heard about yet stays taken back.
     setStatuses(withoutCancelled(d.statuses, cancelledTaps.current));
     setPositions(d.positions);
-    setLastHeardAt(Date.now());
+    if (fresh) setLastHeardAt(Date.now());
   }, []);
-  const refresh = useCallback(() => loadSnapshot(id).then(apply).catch(() => {}), [id, apply]);
+  const refresh = useCallback(() => loadSnapshot(id).then((d) => apply(d)).catch(() => {}), [id, apply]);
 
   const loadRoute = useCallback(() => getRideRoute(id).then((r) => setRoute({ ...r, loaded: true })).catch(() => {}), [id]);
 
@@ -411,7 +427,11 @@ export default function RideMode() {
 
   // Initial load, then ask to share if this rider has no active ride share.
   useEffect(() => {
-    loadSnapshot(id).then(apply).catch(() => {});
+    // Opens at once with the ride and riders this phone saw last, so with no service the map,
+    // Bluetooth Sharing and the status buttons still work on the trail. The server's answer
+    // replaces it as soon as it comes.
+    savedSnapshot(id).then((d) => d && apply(d, false)).catch(() => {});
+    loadSnapshot(id).then((d) => apply(d)).catch(() => {});
     loadRoute();
     loadShare();
     getPrivateDetails(id)

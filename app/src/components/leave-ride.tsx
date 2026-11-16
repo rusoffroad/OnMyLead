@@ -14,9 +14,11 @@ import {
   friendlyLeaveError, handOffAndLeavePrompt, handOffCandidates, LEAVE_LABEL, leadsRide, leaveAloneCancelPrompt,
   leaveConfirm, leaveKind, spotLine, type LeaveKind,
 } from '@/core/leaving';
+import { leaveWorksOffline } from '@/core/offline-ride';
 import { ROLE_LABEL } from '@/core/roles';
 import { cancelRide, handOffRide, leaveRide } from '@/lib/api';
 import { confirmAsync, showNotice } from '@/lib/confirm';
+import { leaveRideReliably } from '@/lib/outbox';
 import { stopSendingLocationFor } from '@/lib/location';
 import type { Ride, RideMember } from '@/lib/types';
 
@@ -78,7 +80,11 @@ export function LeaveRide({ ride, members, me, sharing, onLeft, look = 'bar', sk
       sharing,
       waitlisted: mine?.status === 'waitlisted',
     });
-    if (await confirmAsync(p.title, p.message, p.confirm, t('Stay'))) run(() => leaveRide(ride.id), 'left');
+    // Leaving yourself works with no service: off the ride on this phone now, the server hears
+    // once there is signal (lib/outbox). Handing over and cancelling still need service.
+    if (await confirmAsync(p.title, p.message, p.confirm, t('Stay'))) {
+      run(() => (me && leaveWorksOffline(kind) ? leaveRideReliably(ride.id, me) : leaveRide(ride.id)), 'left');
+    }
   }
 
   const label = kind === 'withdraw' && mine?.status === 'waitlisted' ? t('Leave Waitlist') : LEAVE_LABEL[kind];
