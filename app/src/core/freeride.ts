@@ -135,6 +135,19 @@ export function placeOnTrail(
   return { placed, lengthM, spanM, behindM, leaderId: leader.id };
 }
 
+/**
+ * The same line with its riders' spots replaced by `placed` (the smoothed spots from
+ * convoy-sync LineSmoother), with each rider's distance behind the leader and the spread worked
+ * out again from them so the words under the line match the dots.
+ */
+export function withPlaced(line: FreerideLine, placed: PlacedRider[]): FreerideLine {
+  if (!line.leaderId) return line;
+  const behindM: Record<string, number> = {};
+  for (const r of placed) if (r.place) behindM[r.id] = r.id === line.leaderId ? 0 : Math.max(0, line.lengthM - r.place.alongM);
+  const spanM = Math.max(0, ...Object.values(behindM));
+  return { ...line, placed, behindM, spanM };
+}
+
 /** Places riders on the leader's trail over time, remembering each rider's spot between fixes. */
 export class FreerideTracker {
   private hints: Record<string, number> = {};

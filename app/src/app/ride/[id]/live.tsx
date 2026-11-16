@@ -66,7 +66,8 @@ import { isApproximateFix, LOCATION_PROBLEM_BANNER } from '@/core/precise-locati
 import { shouldCenterOnOpen } from '@/core/map-center';
 import { rideVehicle, vehicleRange, vehicleTitle } from '@/core/garage';
 import { chatMessageText, latestAnnouncement, QUICK_REPLIES, rideLeaderIds, spokenAnnouncement, type QuickReply } from '@/core/chat';
-import { FreerideTracker, summarizeFreeride } from '@/core/freeride';
+import { FreerideTracker, summarizeFreeride, withPlaced } from '@/core/freeride';
+import { LineSmoother, spotNow as lineSpotNow } from '@/core/convoy-sync';
 import { tracklineError, tracklineOn } from '@/core/leader-trackline';
 import { RouteTracker, summarizeMe, type RideRoute } from '@/core/route';
 import { formatRemaining, formatRemainingShort, RIDE_SHARE_OPTIONS_MIN } from '@/core/sharing';
@@ -259,7 +260,7 @@ export default function RideMode() {
   const announced = useRef(new Set<string>());
   const [route, setRoute] = useState<{ route: RideRoute | null; offline: boolean; loaded?: boolean }>({ route: null, offline: false });
   // This phone's own fix, kept on the phone: it places me on the route even when I'm not sharing.
-  const [myFix, setMyFix] = useState<{ lat: number; lng: number; course?: number | null; speed?: number | null } | null>(null);
+  const [myFix, setMyFix] = useState<{ lat: number; lng: number; course?: number | null; speed?: number | null; at?: number } | null>(null);
   // Each rider's last progress along the route, so loops and out-and-backs don't make them jump.
   const [tracker] = useState(() => new RouteTracker());
   const routeMiles = useRef<number | null | undefined>(undefined);
@@ -472,7 +473,7 @@ export default function RideMode() {
       .then(async (p) => {
         if (p.status !== 'granted' || gone) return;
         sub = await Location.watchPositionAsync({ accuracy: Location.Accuracy.High, distanceInterval: followEveryM }, (l) =>
-          setMyFix({ lat: l.coords.latitude, lng: l.coords.longitude, course: l.coords.heading, speed: l.coords.speed }),
+          setMyFix({ lat: l.coords.latitude, lng: l.coords.longitude, course: l.coords.heading, speed: l.coords.speed, at: l.timestamp }),
         );
         if (gone) sub.remove();
       })
@@ -793,9 +794,35 @@ export default function RideMode() {
     });
     return tracker.place(route.route, riders);
   }, [route.route, joined, leaderIds, positions, me, myFix, tracker]);
+  // The rider line (the strip and the CarPlay line) compares everyone at the same moment and eases
+  // the rest (core/convoy-sync), so a friend riding beside you doesn't flick between a few yards and
+  // 200 ft as their 5 second old spot ages. Kept apart from `placed`, which the rest of Ride Mode uses.
+  const [lineTracker] = useState(() => new RouteTracker());
+  const [lineSmoother] = useState(() => new LineSmoother());
+  const lineSpotOf = useCallback(
+    (userId: string, nowMs: number) => {
+      if (userId === me && myFix) {
+        return lineSpotNow({ lat: myFix.lat, lng: myFix.lng, atMs: myFix.at ?? nowMs, speedMps: myFix.speed, headingDeg: myFix.course }, nowMs);
+      }
+      const p = positions[userId];
+      return p ? lineSpotNow({ lat: p.lat, lng: p.lng, atMs: Date.parse(p.recorded_at), speedMps: p.speed_mps, headingDeg: p.heading_deg }, nowMs) : null;
+    },
+    [me, myFix, positions],
+  );
+  // The moment the line is drawn for: the screen's clock, or the newest fix if one is newer.
+  const lineNow = useMemo(
+    () => Object.values(positions).reduce((t, p) => Math.max(t, Date.parse(p.recorded_at) || 0), Math.max(now, myFix?.at ?? 0)),
+    [positions, now, myFix],
+  );
+  const linePlaced = useMemo(() => {
+    if (!route.route) return [];
+    const nowMs = lineNow;
+    const riders = joined.map((m) => ({ id: m.user_id, role: bubbleRole(m.role, leaderIds.includes(m.user_id)), at: lineSpotOf(m.user_id, nowMs) }));
+    return lineSmoother.smooth(lineTracker.place(route.route, riders), nowMs);
+  }, [route.route, joined, leaderIds, lineSpotOf, lineNow, lineTracker, lineSmoother]);
   // Riders on the route strip whose spot is only where they were last seen.
   const lastSeenIds = mapRiders.filter((r) => r.id !== me && r.freshness && r.freshness.state !== 'live').map((r) => r.id);
-  const routeSummary = route.route ? summarizeMe(route.route, placed, me) : null;
+  const routeSummary = route.route ? summarizeMe(route.route, linePlaced, me) : null;
 
   // Freeride: no route, so the line shows the group behind the leader, measured along the trail
   // the leader has ridden (kept on this phone from the leader's live spots; never uploaded).
@@ -836,9 +863,12 @@ export default function RideMode() {
   const [freerideTracker] = useState(() => new FreerideTracker());
   const freerideLine = useMemo(() => {
     if (!freeride) return null;
-    const riders = joined.map((m) => ({ id: m.user_id, role: bubbleRole(m.role, leaderIds.includes(m.user_id)), at: spotOf(m.user_id) }));
-    return freerideTracker.place(leaderTrail, trailLeaderId, riders);
-  }, [freeride, joined, leaderIds, spotOf, leaderTrail, trailLeaderId, freerideTracker]);
+    // Compared at the same moment and eased, like the route line above (core/convoy-sync).
+    const nowMs = lineNow;
+    const riders = joined.map((m) => ({ id: m.user_id, role: bubbleRole(m.role, leaderIds.includes(m.user_id)), at: lineSpotOf(m.user_id, nowMs) }));
+    const line = freerideTracker.place(leaderTrail, trailLeaderId, riders);
+    return withPlaced(line, lineSmoother.smooth(line.placed, nowMs));
+  }, [freeride, joined, leaderIds, lineSpotOf, lineNow, leaderTrail, trailLeaderId, freerideTracker, lineSmoother]);
   const freerideStrip = freerideLine ? { summary: summarizeFreeride(freerideLine, me), waiting: !freerideLine.leaderId } : null;
 
   // With a route, tell this rider whether their machine's range (from the garage) covers it.
@@ -1255,7 +1285,7 @@ export default function RideMode() {
         })
       : null,
     // The same rider line as the phone's strip, along the bottom of the car map.
-    bar: carRiderBar(route.route ? placed : freerideLine?.placed ?? [], me, (id) => {
+    bar: carRiderBar(route.route ? linePlaced : freerideLine?.placed ?? [], me, (id) => {
       const r = mapRiders.find((x) => x.id === id);
       return {
         color: puckInk(r?.role ?? 'rider'),
@@ -1711,7 +1741,7 @@ export default function RideMode() {
             }}>
           <RouteStrip
             lengthM={route.route?.lengthM ?? freerideLine?.lengthM ?? 0}
-            riders={route.route ? placed : freerideLine?.placed ?? []}
+            riders={route.route ? linePlaced : freerideLine?.placed ?? []}
             meId={me}
             summary={routeSummary}
             nameOf={nameOf}
