@@ -90,6 +90,10 @@
       {
         "kind": "improved",
         "text": "A calmer Ride Mode with no service: the no-service banner is one small line with a small Bluetooth On/Off button (tap the line for the full sentence), the No Signal tag no longer sits on top of it, the card after an everyday tap like On My Way clears after 15 seconds (Need Help, EMERGENCY and Crash Alerts stay up for 10 minutes), and the Tilt tile is a small round button until you calibrate it."
+      },
+      {
+        "kind": "improved",
+        "text": "Offline map downloads are much faster. Satellite, topo and every trail layer now download at the same time, so a slow government map server no longer holds up the whole download."
       }
     ]
   },

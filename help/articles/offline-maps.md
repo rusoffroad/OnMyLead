@@ -4,7 +4,7 @@ summary: Download a ride's map or any area before you leave, so the map and rout
 category: routes-maps
 order: 60
 release: "1.0"
-updated: 2026-11-15
+updated: 2026-11-16
 sources:
   - app/src/app/maps/index.tsx
   - app/src/app/maps/area.tsx
@@ -111,6 +111,10 @@ Each download on **On This Phone** shows its maps, its size and how it's going.
 - **Delete** takes it off your phone. Tap **Delete** again to confirm, or **Keep**.
 
 One download runs at a time. If you close the app during a download, it's paused; open Offline Maps and tap **Resume**.
+
+:::release 3.1
+Downloads are faster: satellite and topo, Forest Service, BLM and OpenStreetMap pieces now download at the same time instead of one after another, so a slow agency map server only holds up its own layer.
+:::
 
 Deleting a download only removes pieces that no other download also uses, so overlapping maps keep working.
 

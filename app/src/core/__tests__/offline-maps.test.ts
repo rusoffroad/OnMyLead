@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   areaLayerPlan, boxesOverlap, boxMiles, countInBox, finishedStatus, formatBoxMiles, formatBytes, layersFor, LAYER_ZOOMS,
   MAX_TILES_PER_LAYER, planArea, planRide, rideLayerPlan, statusLine, tileKey, tilesToRemove, type OfflineMap,
+  downloadLanes, FETCHES_PER_LANE, LAYER_LANE, type OfflineLayer,
 } from '../offline-maps';
 import { boxAround, tilesInBox } from '../trails';
 
@@ -109,5 +110,19 @@ describe('deleting', () => {
     const t = { z: 12, x: 1, y: 2 };
     const mine = [tileKey('imagery', t), tileKey('topo', t)];
     expect(tilesToRemove(mine, [tileKey('topo', t)])).toEqual(['imagery/12/1/2']);
+  });
+});
+
+describe('downloadLanes', () => {
+  it('gives every map service its own lane, keeping each lane in order', () => {
+    const jobs = (['imagery', 'mvum', 'topo', 'blm', 'fsclosed', 'osm', 'fstrails', 'imagery'] as OfflineLayer[]).map((layer, i) => ({ layer, i }));
+    const lanes = downloadLanes(jobs);
+    expect(lanes.map((l) => l.map((j) => j.i))).toEqual([[0, 2, 7], [1, 4, 6], [3], [5]]);
+  });
+
+  it('puts every layer in a lane and runs a browser-like number of fetches per service', () => {
+    for (const layer of ['imagery', 'topo', 'mvum', 'blm', 'fsclosed', 'fstrails', 'osm'] as OfflineLayer[]) expect(LAYER_LANE[layer]).toBeTruthy();
+    expect(FETCHES_PER_LANE).toBeLessThanOrEqual(6);
+    expect(downloadLanes([])).toEqual([]);
   });
 });
