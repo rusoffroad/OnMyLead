@@ -30,6 +30,7 @@ import { logScreen, startAppLog } from '@/lib/app-log';
 import { startAppearance, takeReturnPath, useAppearance } from '@/lib/appearance';
 import { startAdTracking } from '@/lib/ad-tracking';
 import { startFoundUs } from '@/lib/found-us';
+import { startOutboxSync } from '@/lib/outbox';
 import { startAppSettings } from '@/lib/app-settings';
 import { startEntitlements } from '@/lib/entitlements';
 import { startUsageCounts } from '@/lib/usage';
@@ -130,6 +131,8 @@ function RootLayout() {
   useEffect(() => startAdTracking(), []);
   // Where riders found OnMyLead: the website keeps the ad or link a visitor came from (lib/found-us.ts).
   useEffect(() => startFoundUs(), []);
+  // Taps, a Start Ride Mode or a Leave Ride made with no service go to the server once there is signal.
+  useEffect(() => startOutboxSync(), []);
   // Settings, Map Mode trails and Map Mode waypoints follow the account to the rider's other devices.
   useEffect(() => {
     startAppearanceSync();

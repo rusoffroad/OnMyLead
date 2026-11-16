@@ -206,6 +206,21 @@ async function loadKeys(rideId: string): Promise<{ rideKey: Uint8Array; riderKey
   }
 }
 
+/**
+ * Saves the ride's Bluetooth keys ahead of time (the ride page calls this for riders on the ride),
+ * so Bluetooth Sharing starts in Ride Mode even if this phone first opens it with no service.
+ * Only fetches when none are saved yet.
+ */
+export async function prefetchNearbyKeys(rideId: string): Promise<void> {
+  if (!nearbyAvailable) return;
+  try {
+    if (await SecureStore.getItemAsync(keyName(rideId))) return;
+    await loadKeys(rideId);
+  } catch {
+    // Tried again the next time the ride page opens.
+  }
+}
+
 /** Drops a ride's saved keys (the ride ended or the rider left). */
 export async function forgetNearbyKeys(rideId: string) {
   await SecureStore.deleteItemAsync(keyName(rideId)).catch(() => {});

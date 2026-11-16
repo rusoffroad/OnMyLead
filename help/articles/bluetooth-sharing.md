@@ -4,7 +4,7 @@ summary: With no cell service, riders on the same ride pass spots, status taps a
 category: ride-mode
 order: 25
 release: "2.1"
-updated: 2026-11-15
+updated: 2026-11-16
 sources:
   - app/src/core/nearby.ts
   - app/src/lib/nearby.ts
@@ -58,7 +58,12 @@ Riders farther away than that show where they were last seen, as before. See [Us
 
 ## Before You Lose Service
 
+:::until 3.1
 - **Open Ride Mode once with service.** Your phone gets the ride's Bluetooth keys from OnMyLead then and keeps them for that ride. Joining a ride needs service.
+:::
+:::release 3.1
+- **Open the ride page once with service.** Your phone gets the ride's Bluetooth keys from OnMyLead then and keeps them, with the ride and its riders, so Ride Mode and Bluetooth Sharing work from the first time you open them with no service. Joining a ride needs service.
+:::
 - **Allow Bluetooth.** The first time, iPhone and iPad ask to use Bluetooth, and Android asks for **Nearby devices**. Say yes.
 - **Keep Bluetooth on.** If Bluetooth is off in the phone's settings, nothing goes out.
 - **Download the ride's map.** See [Offline Maps](/help/offline-maps).
