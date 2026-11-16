@@ -1,5 +1,5 @@
 import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
-import { useCallback, useState, type ComponentProps } from 'react';
+import { useCallback, useEffect, useState, type ComponentProps } from 'react';
 import { Pressable, Text, View } from 'react-native';
 
 import { DirectionsCard } from '@/components/directions';
@@ -50,7 +50,7 @@ import { currentNotificationSettings } from '@/lib/notification-settings';
 import { requirePro, requireTripSlot } from '@/lib/pro';
 import { syncRideReminders } from '@/lib/push';
 import { prefetchNearbyKeys } from '@/lib/nearby';
-import { dropQueuedLeave, startRideReliably } from '@/lib/outbox';
+import { dropQueuedLeave, onRideActionSent, startRideReliably } from '@/lib/outbox';
 import { cachedRide, rememberRide } from '@/lib/ride-cache';
 import { openStore } from '@/lib/rus';
 import { useSession } from '@/lib/session';
@@ -120,6 +120,10 @@ export default function RidePage() {
       track('ride_preview_opened', { signed_in: !!me });
     }, [load, me]),
   );
+  // A Start Ride Mode or Leave Ride made with no service reached the server: show the ride as it is now.
+  useEffect(() => onRideActionSent((id) => {
+    if (id === ride?.id) load();
+  }), [ride?.id, load]);
 
   async function act(key: string, fn: () => Promise<unknown>) {
     setBusy(key);
