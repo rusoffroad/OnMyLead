@@ -59,6 +59,10 @@ Syncing your settings and trails is a Pro feature. See [Free and Pro](/help/free
 
 - Announcements you closed, and the Starlink page connecting by itself
 
+:::release 3.1
+- The one-time **Invite Friends** pop-up on Home, so you see it on one device only
+:::
+
 **Map Mode trails**
 
 Every trail in **My Trails** (ones you recorded, drew or saved from other riders), with its details, named spots and photos, is backed up privately to your account. Sign in on another device and they're there. Delete a trail on one device and it's deleted on the others too.

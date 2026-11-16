@@ -40,6 +40,10 @@
         "text": "You > Settings > Permissions lists every permission OnMyLead uses (location, Always, Precise Location, notifications, Bluetooth, camera and more) with what your phone says about each one. Tap one that's off to see the question again, or, where iPhone or Android won't ask twice, to open OnMyLead in Settings."
       },
       {
+        "kind": "new",
+        "text": "A one-time pop-up on Home about Invite Friends: send your link to a riding buddy who's new to OnMyLead, and when they finish their first ride you both get Pro Annual for $14.99 the first year instead of $29.99. It shows once."
+      },
+      {
         "kind": "fixed",
         "text": "Cancel on a status or quick reply now works with no service. Riders close by drop it over Bluetooth right away, and it's taken back for everyone else as soon as a phone gets signal, instead of showing an error."
       },

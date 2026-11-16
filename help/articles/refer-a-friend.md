@@ -4,9 +4,12 @@ summary: Invite a riding buddy who's new to OnMyLead. When they finish their fir
 category: pro
 order: 45
 release: "2.0"
-updated: 2026-11-15
+updated: 2026-11-16
 sources:
   - app/src/app/invite-friends.tsx
+  - app/src/components/invite-promo.tsx
+  - app/src/core/invite-promo.ts
+  - app/src/lib/invite-promo.ts
   - app/src/components/referral-reward.tsx
   - app/src/app/friend/[code].tsx
   - app/src/app/pro.tsx
@@ -32,6 +35,10 @@ Invite a riding buddy who's new to OnMyLead. When they finish their first ride, 
 1. On **You** (your picture at the top of Home), under **Settings**, tap **Invite Friends**. You can also tap **Invite Friends, Both Get 50% Off** at the bottom of the Pro screen.
 :::
 2. Tap **Share Invite** and send it, or tap **Copy Link**.
+
+:::release 3.1
+Once, a few seconds after you open Home, OnMyLead shows **Invite Friends, Both Get 50% Off**. Tap **Invite Friends** to go straight to your invite link, or **Not Now** to close it. It doesn't show again, and it doesn't show at all if you've already earned the discount or invites are paused.
+:::
 
 Your invite link is your friend link, so your friend can also add you as a friend. See [Add Friends](/help/friends).
 

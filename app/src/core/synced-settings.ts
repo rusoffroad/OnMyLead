@@ -62,6 +62,7 @@ export const SYNCED_SETTINGS: Record<string, string> = {
   'home.layout.v1': 'Customize Home: which sections show, and their order',
   'starlink.autoConnect.v1': 'Starlink page connects by itself',
   'onmylead.dismissedNotices': 'Announcements the rider closed',
+  'promo.inviteFriends.v1': 'The one-time Invite Friends pop-up was seen',
   // Appearance (themes thread; lib/appearance applies a change from another device)
   'onmylead.appearance': 'Theme, Dark/Light/Match Phone and Color Blind Mode',
   // Language (lib/i18n applies a change from another device)
