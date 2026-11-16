@@ -1,5 +1,19 @@
 [
   {
+    "version": "3.2",
+    "title": "End the Ride from Ride Mode",
+    "intro": "OnMyLead 3.2 lets the organizer end a ride for everyone right from Ride Mode's Exit button, next to Leave Ride.",
+    "whatsNew": "What's new in 3.2:\n\n• Organizers can end the ride for everyone from Ride Mode: tap Exit, then End Ride for Everyone. Leave Ride is right there too.",
+    "apple": null,
+    "google": null,
+    "notes": [
+      {
+        "kind": "new",
+        "text": "End Ride for Everyone in Ride Mode: when the ride is over, the organizer and co-organizers tap ‹ Exit and pick End Ride for Everyone under Ride over?, then confirm. The ride ends for the whole group, everyone's location sharing stops and Ride Mode closes. It needs service. Riders still find Leave Ride in the same place."
+      }
+    ]
+  },
+  {
     "version": "3.1",
     "title": "The Map on CarPlay",
     "intro": "OnMyLead 3.1 puts the map on your car's CarPlay screen, with turn-by-turn for the trail ahead, shows your trails and roads there with a Layers button to pick them, brings your ride's messages and group chats to the car, adds an Exit button to Map Mode and Ride Mode, makes Leave Ride easy to find, and turns Create a Ride into one short screen that opens already filled in. CarPlay is part of OnMyLead Pro.",

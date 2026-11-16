@@ -3,7 +3,7 @@ import Head from 'expo-router/head';
 import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from 'react';
 
 import { storeLink } from '@/lib/found-us';
-import { APP_STORE_URL, COMPANY, PLAY_STORE_URL, PRO_PRICES, RUS_URL, SHOWCASE_3D_TERRAIN, SHOWCASE_COMMENT_REPLIES, SHOWCASE_EMERGENCY_SIREN, SHOWCASE_GROUP_PHOTOS, SHOWCASE_INTERSECTION_ZOOM, SHOWCASE_LEADER_TRACKLINE, SHOWCASE_MAP_FEATURES, SHOWCASE_NO_SERVICE, SHOWCASE_PARK_TRAILS, SHOWCASE_PHOTO_CROP, SHOWCASE_REDESIGN_3, SHOWCASE_EASY_LEAVE, SHOWCASE_QUICK_CREATE, SHOWCASE_EVENTS_AND_RIDES, SHOWCASE_SPREAD_RULER, TRIAL_DAYS } from '@/constants/site';
+import { APP_STORE_URL, COMPANY, PLAY_STORE_URL, PRO_PRICES, RUS_URL, SHOWCASE_3D_TERRAIN, SHOWCASE_COMMENT_REPLIES, SHOWCASE_EMERGENCY_SIREN, SHOWCASE_GROUP_PHOTOS, SHOWCASE_INTERSECTION_ZOOM, SHOWCASE_LEADER_TRACKLINE, SHOWCASE_MAP_FEATURES, SHOWCASE_NO_SERVICE, SHOWCASE_PARK_TRAILS, SHOWCASE_PHOTO_CROP, SHOWCASE_REDESIGN_3, SHOWCASE_EASY_LEAVE, SHOWCASE_END_RIDE_IN_MODE, SHOWCASE_QUICK_CREATE, SHOWCASE_EVENTS_AND_RIDES, SHOWCASE_SPREAD_RULER, TRIAL_DAYS } from '@/constants/site';
 import type { SocialProvider } from '@/core/auth-link';
 import { FREE_MAP_HOURS } from '@/core/pro';
 import { REFERRAL_PRICE, referralsSwitchedOn } from '@/core/referrals';
@@ -345,7 +345,7 @@ export function Showcase() {
               <Feature title="Every Notification in One Place">Missed a ping or swiped it away? Tap the bell on the Rides tab to see the last 30 days, with rider alerts in red so they stand out. Open one, swipe it away, or Clear All, and your phone’s own list clears too.</Feature>
               <Feature title="Ride Day Weather and Daylight">Every upcoming ride shows the meet day’s forecast, with a heads-up for storms, high wind or heat, and a daylight bar that tells you if the group gets back after dark.</Feature>
               {SHOWCASE_EASY_LEAVE ? (
-                <Feature title="Leave Any Time">Plans changed? Leave Ride sits right under the ride’s name, next to You’re Going, and under Exit in Ride Mode. It stops your location sharing for that ride and opens your spot to the waitlist. Organizers hand the ride to another rider and go, instead of cancelling it on everyone. It always asks first.</Feature>
+                <Feature title="Leave Any Time">Plans changed? Leave Ride sits right under the ride’s name, next to You’re Going, and under Exit in Ride Mode. It stops your location sharing for that ride and opens your spot to the waitlist. Organizers hand the ride to another rider and go, instead of cancelling it on everyone.{SHOWCASE_END_RIDE_IN_MODE ? ' Ride over? The organizer ends it for everyone from the same Exit button.' : ''} It always asks first.</Feature>
               ) : (
                 <Feature title="Leave Any Time">Leave Ride is one tap away on every ride page and in Ride Mode, and it stops your location sharing for that ride. Organizers hand the ride to another rider and go, instead of cancelling it on everyone. Or swipe a ride left in your list. It always asks first.</Feature>
               )}

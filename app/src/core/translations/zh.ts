@@ -3595,6 +3595,12 @@ const dict: Record<string, string> = {
   "Everything a group ride needs is allowed": "组队骑行所需的权限都已允许",
   "1 permission needs your OK. Tap to fix it": "有 1 项权限需要你确认。点按修复",
   "{n} permissions need your OK. Tap to fix them": "有 {n} 项权限需要你确认。点按修复",
+  "End the Ride for Everyone?": "为所有人结束骑行？",
+  "{rideName} ends for the whole group. Everyone’s location sharing stops and Ride Mode closes. Do this when the ride is over.": "{rideName} 将为整个队伍结束。所有人的位置共享会停止，骑行模式会关闭。请在骑行结束时使用。",
+  "End Ride": "结束骑行",
+  "Keep Riding": "继续骑行",
+  "Ride over? End it for everyone. Just done yourself? Leave the ride.": "骑行结束了？为所有人结束。只是你自己不骑了？离开骑行。",
+  "Could Not End the Ride": "无法结束骑行",
 };
 
 export default dict;

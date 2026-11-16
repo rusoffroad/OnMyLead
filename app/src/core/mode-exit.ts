@@ -26,13 +26,40 @@ export function rideExitAsks(sharing: boolean, canLeave = false, viaBack = false
   return sharing || (canLeave && !viaBack);
 }
 
+/**
+ * End Ride for Everyone in the Exit sheet: the same people who can end it on the ride page (the
+ * organizer and co-organizers, `is_ride_manager` on the server), and only while it's live.
+ */
+export function canEndRideHere(
+  ride: { status: string; organizer_id?: string | null } | null | undefined,
+  me: string | null | undefined,
+  mine: { role: string } | null | undefined,
+): boolean {
+  if (!ride || !me || ride.status !== 'live') return false;
+  return ride.organizer_id === me || mine?.role === 'organizer' || mine?.role === 'co_organizer';
+}
+
+export type EndRidePrompt = { label: string; title: string; message: string; confirm: string; stay: string };
+
+/** Ending changes the ride for the whole group, so it asks once. It needs service (like a hand-off). */
+export function endRidePrompt(rideName: string): EndRidePrompt {
+  return {
+    label: tc('End Ride for Everyone'),
+    title: tc('End the Ride for Everyone?'),
+    message: tc('{rideName} ends for the whole group. Everyone’s location sharing stops and Ride Mode closes. Do this when the ride is over.', { rideName }),
+    confirm: tc('End Ride'),
+    stay: tc('Keep Riding'),
+  };
+}
+
 export type RideExitPrompt = { title: string; message: string; keep: string; stop: string | null; stay: string; done: string };
 
 /**
  * The Exit Ride Mode sheet. While sharing it asks whether the group keeps seeing you; either way
- * Leave Ride sits under the choices for riders who are done with the ride.
+ * Leave Ride sits under the choices for riders who are done with the ride, and the organizer gets
+ * End Ride for Everyone there too while the ride is live (`canEnd`).
  */
-export function rideExitPrompt(rideName: string, sharing = true): RideExitPrompt {
+export function rideExitPrompt(rideName: string, sharing = true, canEnd = false): RideExitPrompt {
   return {
     title: tc('Exit Ride Mode?'),
     message: sharing
@@ -41,7 +68,9 @@ export function rideExitPrompt(rideName: string, sharing = true): RideExitPrompt
     keep: sharing ? tc('Exit and Keep Sharing') : tc('Exit Ride Mode'),
     stop: sharing ? tc('Stop Sharing and Exit') : null,
     stay: tc('Stay in Ride Mode'),
-    done: tc('Done with this ride? Leaving takes you off it for good.'),
+    done: canEnd
+      ? tc('Ride over? End it for everyone. Just done yourself? Leave the ride.')
+      : tc('Done with this ride? Leaving takes you off it for good.'),
   };
 }
 

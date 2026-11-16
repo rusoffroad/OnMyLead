@@ -438,6 +438,10 @@ If you're sharing your location, Exit first asks what you want:
 When you aren't sharing, **‹ Exit** still asks once, so the way off the ride is right there: tap **Exit Ride Mode** to close the screen and stay on the ride, or **Leave Ride** at the bottom, under **Done with this ride?**, to leave it. The Android Back button closes Ride Mode straight away when you aren't sharing.
 :::
 
+:::release 3.2
+**Organizers: end the ride from here.** While the ride is live, the organizer and co-organizers also see **End Ride for Everyone** in the Exit sheet, under **Ride over?**. Tap it and confirm with **End Ride**: the ride ends for the whole group, everyone's location sharing stops, and Ride Mode closes. Ending a ride needs service; with no signal you're told to try again when you have it. **Leave Ride** is still right under it if only you are done.
+:::
+
 :::release 2.0
 ## Leave the Ride
 

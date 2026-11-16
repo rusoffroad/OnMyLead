@@ -6,7 +6,9 @@ import { BottomSheet } from '@/components/bottom-sheet';
 import { Icon } from '@/components/icon';
 import { Button } from '@/components/ui';
 import { Colors, font, Glass, Radius, Spacing, themedStyles } from '@/constants/theme';
-import { EXIT_LABEL, exitTarget, rideExitPrompt } from '@/core/mode-exit';
+import { rideActionError } from '@/core/errors';
+import { EXIT_LABEL, endRidePrompt, exitTarget, rideExitPrompt } from '@/core/mode-exit';
+import { confirmAsync, showNotice } from '@/lib/confirm';
 import { t } from '@/lib/i18n';
 
 /**
@@ -89,9 +91,11 @@ export function useModeBackButton(onBack: () => void) {
 /**
  * Exit Ride Mode: the rider stays on the ride, and while sharing picks whether the group keeps
  * seeing them. `leave` is the Leave Ride button, under the choices, for a rider who's done.
+ * `onEndRide` (the organizer, while the ride is live) adds End Ride for Everyone above it: it asks
+ * once, then ends the ride for the group.
  */
 export function ExitRideSheet({
-  visible, onClose, rideName, sharing = true, onKeepSharing, onStopSharing, leave,
+  visible, onClose, rideName, sharing = true, onKeepSharing, onStopSharing, leave, onEndRide,
 }: {
   visible: boolean;
   onClose: () => void;
@@ -100,9 +104,24 @@ export function ExitRideSheet({
   onKeepSharing: () => void;
   onStopSharing: () => Promise<void>;
   leave?: ReactNode;
+  onEndRide?: () => Promise<void>;
 }) {
   const [busy, setBusy] = useState(false);
-  const p = rideExitPrompt(rideName, sharing);
+  const [ending, setEnding] = useState(false);
+  const p = rideExitPrompt(rideName, sharing, !!onEndRide);
+  const end = async () => {
+    if (!onEndRide) return;
+    const e = endRidePrompt(rideName);
+    if (!(await confirmAsync(e.title, e.message, e.confirm, e.stay))) return;
+    setEnding(true);
+    try {
+      await onEndRide();
+    } catch (err) {
+      showNotice(t('Could Not End the Ride'), rideActionError(err instanceof Error ? err.message : String(err)));
+    } finally {
+      setEnding(false);
+    }
+  };
   const stop = async () => {
     setBusy(true);
     try {
@@ -119,9 +138,10 @@ export function ExitRideSheet({
         {p.stop ? <Button title={p.stop} kind="secondary" loading={busy} onPress={stop} /> : null}
         <Button title={p.stay} kind="ghost" onPress={onClose} />
       </View>
-      {leave ? (
+      {leave || onEndRide ? (
         <View style={styles.leave}>
           <Text style={styles.done}>{p.done}</Text>
+          {onEndRide ? <Button title={endRidePrompt(rideName).label} kind="danger" loading={ending} disabled={busy} onPress={end} /> : null}
           {leave}
         </View>
       ) : null}

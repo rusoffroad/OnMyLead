@@ -73,6 +73,10 @@ Yes, until the ride goes live. On the ride page, tap **Edit Ride Details** in th
 
 Rides don't end on their own. The organizer taps **End Ride for Everyone** on the ride page. Ending a ride stops everyone's location sharing for that ride.
 
+:::release 3.2
+In Ride Mode, the organizer can also tap **‹ Exit**, then **End Ride for Everyone**.
+:::
+
 ## Why Can't I See the Exact Meeting Spot?
 
 Only riders who have joined see it. Before you join, you see the general area, within about a mile. See [Privacy](/help/privacy).

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { backPress, EXIT_LABEL, exitTarget, mapExitPrompt, rideExitAsks, rideExitPrompt } from '../mode-exit';
+import { backPress, canEndRideHere, endRidePrompt, EXIT_LABEL, exitTarget, mapExitPrompt, rideExitAsks, rideExitPrompt } from '../mode-exit';
 
 describe('Exit Ride Mode and Map Mode', () => {
   it('goes back where the rider came from, or Home when opened from a notification or link', () => {
@@ -28,6 +28,27 @@ describe('Exit Ride Mode and Map Mode', () => {
     expect(p.keep).toBe('Exit Ride Mode');
     expect(p.stop).toBeNull();
     expect(p.done).toMatch(/Leaving takes you off it/);
+  });
+
+  it('offers End Ride for Everyone to the organizer and co-organizers of a live ride only', () => {
+    const live = { status: 'live', organizer_id: 'org' };
+    expect(canEndRideHere(live, 'org', null)).toBe(true);
+    expect(canEndRideHere(live, 'co', { role: 'co_organizer' })).toBe(true);
+    expect(canEndRideHere(live, 'lead', { role: 'leader' })).toBe(false);
+    expect(canEndRideHere(live, 'r', { role: 'rider' })).toBe(false);
+    expect(canEndRideHere(live, null, null)).toBe(false);
+    for (const status of ['scheduled', 'ended', 'cancelled']) expect(canEndRideHere({ status, organizer_id: 'org' }, 'org', null)).toBe(false);
+    expect(canEndRideHere(null, 'org', null)).toBe(false);
+  });
+
+  it('End Ride asks once and says what it does to the group', () => {
+    const e = endRidePrompt('Moab Saturday');
+    expect(e.label).toBe('End Ride for Everyone');
+    expect(e.title).toBe('End the Ride for Everyone?');
+    expect(e.message).toContain('Moab Saturday ends for the whole group');
+    expect([e.confirm, e.stay]).toEqual(['End Ride', 'Keep Riding']);
+    expect(rideExitPrompt('Moab Saturday', true, true).done).toMatch(/^Ride over\? End it for everyone/);
+    expect(rideExitPrompt('Moab Saturday', true).done).toMatch(/Leaving takes you off it/);
   });
 
   it('Map Mode only asks while a recording is running', () => {
