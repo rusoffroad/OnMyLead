@@ -44,6 +44,7 @@ sources:
   - app/src/core/map-center.ts
   - app/src/core/route.ts
   - app/src/core/route-order.ts
+  - app/src/core/convoy-sync.ts
   - app/src/core/sharing.ts
   - app/src/lib/location.ts
 related: [location-sharing, status-buttons, ride-bubble, ride-chat, directions, offline-maps, follow-me]
@@ -278,6 +279,10 @@ Every rider who is sharing has a dot on the leader line, strung out in running o
 - Tap a dot to see who it is and their place, such as "Mia · 3rd of 6 · 0.4 mi behind the leader".
 - Riders who aren't sharing their location aren't on the line.
 - With a big group, the dots get smaller to fit the line.
+
+:::release 3.2
+- The distances on the line hold steady. Your phone compares every rider at the same moment, using the speed and direction their phone sent with their last spot, and eases the dots between updates. A friend riding right beside the leader stays **with the leader** instead of flicking out to a couple hundred feet and back, and a rider only shows as apart once they've really dropped back.
+:::
 
 :::release 2.1
 ### See How Spread Out the Group Is

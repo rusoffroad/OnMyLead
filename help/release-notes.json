@@ -2,14 +2,18 @@
   {
     "version": "3.2",
     "title": "End the Ride from Ride Mode",
-    "intro": "OnMyLead 3.2 lets the organizer end a ride for everyone right from Ride Mode's Exit button, next to Leave Ride.",
-    "whatsNew": "What's new in 3.2:\n\n• Organizers can end the ride for everyone from Ride Mode: tap Exit, then End Ride for Everyone. Leave Ride is right there too.",
+    "intro": "OnMyLead 3.2 lets the organizer end a ride for everyone right from Ride Mode's Exit button, next to Leave Ride, and keeps the distances on the rider line steady in Ride Mode and on CarPlay.",
+    "whatsNew": "What's new in 3.2:\n\n\u2022 Organizers can end the ride for everyone from Ride Mode: tap Exit, then End Ride for Everyone. Leave Ride is right there too.\n\u2022 Steadier rider line: a rider right beside the leader no longer flicks between a few yards and 200 ft, in Ride Mode and on CarPlay.",
     "apple": null,
     "google": null,
     "notes": [
       {
         "kind": "new",
         "text": "End Ride for Everyone in Ride Mode: when the ride is over, the organizer and co-organizers tap ‹ Exit and pick End Ride for Everyone under Ride over?, then confirm. The ride ends for the whole group, everyone's location sharing stops and Ride Mode closes. It needs service. Riders still find Leave Ride in the same place."
+        },
+        {
+        "kind": "fixed",
+        "text": "The rider line in Ride Mode and on CarPlay holds steady. A friend riding right beside the leader no longer jumps between a few yards and about 200 feet over and over: every rider is compared at the same moment, and dots ease between updates."
       }
     ]
   },
