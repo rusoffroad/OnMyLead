@@ -79,23 +79,36 @@ export function ActionTiles({ quota, onStart }: { quota: Quota | null; onStart: 
   );
 }
 
-/** One of the two action tiles: an icon chip on top, a condensed title and one line at the bottom. */
+/**
+ * One of the two action tiles (3.1 restyle, Chris 2026-11-16: the old tile had a big empty middle,
+ * a lone icon up top and the words squeezed into the bottom). Now the icon chip and an arrow share
+ * the top row, the title and line sit right under them, a soft wash of the tile's colour comes in
+ * from the top-left and a large faint copy of the icon fills the bottom-right corner.
+ */
 function Tile({
   icon, title, detail, onPress, tone, lines = 1,
 }: { icon: IconName; title: string; detail: string; onPress: () => void; tone: 'red' | 'gold'; lines?: 1 | 2 }) {
+  const ink = tone === 'red' ? '#FF4A51' : Colors.gold;
+  const wash = tone === 'red' ? 'rgba(229,38,46,0.2)' : withAlpha(Colors.gold, 0.16);
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={`${title}. ${detail}`}
       onPress={onPress}
       style={({ pressed }) => [styles.tile, { transform: [{ scale: pressed ? 0.98 : 1 }] }]}>
-      <View style={[styles.tileIcon, tone === 'red' ? styles.tileIconRed : styles.tileIconGold]}>
-        <Icon name={icon} size={21} color={tone === 'red' ? '#FF4A51' : Colors.gold} strokeWidth={2.1} />
+      <Gradient colors={[wash, withAlpha('#000000', 0)]} angle="diagonal" radius={20} overlay />
+      <View pointerEvents="none" style={styles.tileMark}>
+        <Icon name={icon} size={96} color={withAlpha(ink, 0.09)} strokeWidth={1.6} />
       </View>
-      <View>
-        <Text style={styles.tileTitle} numberOfLines={lines} adjustsFontSizeToFit minimumFontScale={0.8}>{title}</Text>
-        <Text style={styles.tileDetail} numberOfLines={1}>{detail}</Text>
+      <View style={[styles.tileEdge, { backgroundColor: ink }]} />
+      <View style={styles.tileTop}>
+        <View style={[styles.tileIcon, tone === 'red' ? styles.tileIconRed : styles.tileIconGold]}>
+          <Icon name={icon} size={20} color={ink} strokeWidth={2.1} />
+        </View>
+        <Icon name="chevron" size={18} color={Colors.textSecondary} strokeWidth={2.2} />
       </View>
+      <Text style={styles.tileTitle} numberOfLines={lines} adjustsFontSizeToFit minimumFontScale={0.8}>{title}</Text>
+      <Text style={styles.tileDetail} numberOfLines={1}>{detail}</Text>
     </Pressable>
   );
 }
@@ -120,10 +133,13 @@ const styles = themedStyles(() => ({
   codeGo: { backgroundColor: '#fff', borderRadius: 14, paddingHorizontal: 24, minHeight: 54, justifyContent: 'center' },
   codeGoText: { color: '#B81C23', fontFamily: font(700), fontSize: 17 },
   pair: { flexDirection: 'row', alignItems: 'stretch', gap: 12 },
-  tile: { flex: 1, minHeight: 132, borderRadius: 20, padding: 16, overflow: 'hidden', justifyContent: 'space-between', ...TileSurface },
-  tileIcon: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.backgroundSelected },
-  tileIconRed: { backgroundColor: 'rgba(229,38,46,0.14)' },
-  tileIconGold: { backgroundColor: withAlpha(Colors.gold, 0.14) },
-  tileTitle: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 24, lineHeight: 26, marginTop: Spacing.three },
-  tileDetail: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 13.5, lineHeight: 18, marginTop: 2 },
+  tile: { flex: 1, borderRadius: 20, paddingHorizontal: 16, paddingTop: 16, paddingBottom: 16, overflow: 'hidden', ...TileSurface },
+  tileEdge: { position: 'absolute', top: 0, left: 16, width: 28, height: 3, borderBottomLeftRadius: 2, borderBottomRightRadius: 2 },
+  tileMark: { position: 'absolute', right: -14, bottom: -16, transform: [{ rotate: '-8deg' }] },
+  tileTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 },
+  tileIcon: { width: 38, height: 38, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: Colors.backgroundSelected },
+  tileIconRed: { backgroundColor: 'rgba(229,38,46,0.16)' },
+  tileIconGold: { backgroundColor: withAlpha(Colors.gold, 0.16) },
+  tileTitle: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 22, lineHeight: 24 },
+  tileDetail: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 13.5, lineHeight: 18, marginTop: 4 },
 }));

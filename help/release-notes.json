@@ -94,6 +94,10 @@
       {
         "kind": "improved",
         "text": "A calmer Ride Mode with no service: the no-service banner is one small line with a small Bluetooth On/Off button (tap the line for the full sentence), the No Signal tag no longer sits on top of it, the card after an everyday tap like On My Way clears after 15 seconds (Need Help, EMERGENCY and Crash Alerts stay up for 10 minutes), and the Tilt tile is a small round button until you calibrate it."
+      },
+      {
+        "kind": "improved",
+        "text": "A cleaner look for the Start a Ride and Events and Group Rides cards on Home: the icon, title and line sit together at the top, with a touch of red or gold."
       }
     ]
   },
