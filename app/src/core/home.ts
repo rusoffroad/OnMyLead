@@ -129,3 +129,45 @@ export function startRideDetail(q: Quota | null): string {
   if (!q || q.tone === 'pro') return tc('Lead your group');
   return q.tone === 'out' ? tc('None left this month') : q.text;
 }
+
+/** A point in a tile's little picture, in points from its top-left corner. */
+export type ArtPoint = { x: number; y: number };
+
+/**
+ * The Start a Ride tile's lead line: a gentle S from the left edge to the go button on the right
+ * (the last point sits at mid-height, where the button is). The points between the ends are
+ * where the follower dots go.
+ */
+export function leadLinePoints(width: number, height: number): ArtPoint[] {
+  const w = Math.max(0, width);
+  return [
+    { x: 2, y: height * 0.72 },
+    { x: w * 0.26, y: height * 0.78 },
+    { x: w * 0.52, y: height * 0.3 },
+    { x: w * 0.78, y: height * 0.34 },
+    { x: w, y: height * 0.5 },
+  ];
+}
+
+/** An SVG path that runs smoothly through every point (Catmull-Rom turned into cubic curves). */
+export function smoothPath(pts: ArtPoint[]): string {
+  if (pts.length < 2) return '';
+  const n = (v: number) => Math.round(v * 10) / 10;
+  let d = `M${n(pts[0].x)} ${n(pts[0].y)}`;
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p0 = pts[Math.max(0, i - 1)], p1 = pts[i], p2 = pts[i + 1], p3 = pts[Math.min(pts.length - 1, i + 2)];
+    d += ` C${n(p1.x + (p2.x - p0.x) / 6)} ${n(p1.y + (p2.y - p0.y) / 6)} ${n(p2.x - (p3.x - p1.x) / 6)} ${n(p2.y - (p3.y - p1.y) / 6)} ${n(p2.x)} ${n(p2.y)}`;
+  }
+  return d;
+}
+
+/**
+ * The Events and Group Rides tile's week: as many calendar days as fit the width (2 to 5), packed
+ * against the right, with a gap before the go button.
+ */
+export function weekCells(width: number, height: number): { x: number; y: number; w: number; h: number }[] {
+  const cw = 22, gap = 6, end = 10, ch = Math.min(28, height - 4);
+  const count = Math.max(2, Math.min(5, Math.floor((width - end + gap) / (cw + gap))));
+  const left = Math.max(0, width - end - count * cw - (count - 1) * gap);
+  return Array.from({ length: count }, (_, i) => ({ x: left + i * (cw + gap), y: (height - ch) / 2, w: cw, h: ch }));
+}
