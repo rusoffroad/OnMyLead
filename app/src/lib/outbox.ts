@@ -37,7 +37,7 @@ async function read(): Promise<Item[]> {
 }
 
 /** Runs a send, or fails with 'timed out' when there is no answer within SEND_TIMEOUT_MS. */
-async function withTimeout<T>(run: Promise<T>): Promise<T> {
+export async function withTimeout<T>(run: Promise<T>): Promise<T> {
   let timer: ReturnType<typeof setTimeout> | undefined;
   const timeout = new Promise<never>((_, reject) => {
     timer = setTimeout(() => reject(new Error('timed out')), SEND_TIMEOUT_MS);
@@ -155,7 +155,10 @@ export async function flushOutbox(): Promise<number> {
   const done: Item[] = [];
   for (const item of items) {
     try {
-      await deliver(item);
+      // Each send gets the same no-answer cap as a live tap: one request left hanging when the
+      // signal dropped must not hold every later tap, start and leave in the queue (3.1 build 20
+      // test: a hung flush kept a queued start from ever going out until the app was killed).
+      await withTimeout(deliver(item));
       done.push(item);
     } catch (e) {
       const age = Date.now() - Date.parse(item.tappedAt);
