@@ -97,6 +97,10 @@
       },
       {
         "kind": "improved",
+        "text": "Offline map downloads are much faster. Satellite, topo and every trail layer now download at the same time, so a slow government map server no longer holds up the whole download."
+      },
+      {
+        "kind": "improved",
         "text": "A cleaner look for the Start a Ride and Events and Group Rides cards on Home: each has its line and big title at the top, a small picture along the bottom (riders on a lead line, a week of days) and a round arrow button."
       }
     ]

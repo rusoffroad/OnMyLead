@@ -86,6 +86,34 @@ const AREA_MIN_DETAIL: Record<OfflineLayer, number> = { imagery: 14, topo: 14, m
 /** Average size of one saved square, measured on western public land. Used for estimates only. */
 export const AVG_TILE_BYTES: Record<OfflineLayer, number> = { imagery: 25_000, topo: 20_000, mvum: 10_000, blm: 3_000, fsclosed: 3_000, fstrails: 2_000, osm: 12_000 };
 
+/**
+ * Which map service each layer's squares come from. Every service downloads at the same time in
+ * its own lane, so a slow agency server only slows its own layers, never the whole download.
+ * USGS serves the photo and topo; the Forest Service serves its three trail layers from one server.
+ */
+export type DownloadLane = 'usgs' | 'forestService' | 'blm' | 'osm';
+export const LAYER_LANE: Record<OfflineLayer, DownloadLane> = {
+  imagery: 'usgs', topo: 'usgs', mvum: 'forestService', fsclosed: 'forestService', fstrails: 'forestService', blm: 'blm', osm: 'osm',
+};
+
+/**
+ * Squares fetched at once from one service: what a web browser opens to one server, so each
+ * agency sees no more than a rider panning its map in a browser.
+ */
+export const FETCHES_PER_LANE = 6;
+
+/** Split a download's squares into one list per service, keeping each list's order (wide zooms first). */
+export function downloadLanes<T extends { layer: OfflineLayer }>(jobs: T[]): T[][] {
+  const lanes = new Map<DownloadLane, T[]>();
+  for (const j of jobs) {
+    const lane = LAYER_LANE[j.layer];
+    const list = lanes.get(lane);
+    if (list) list.push(j);
+    else lanes.set(lane, [j]);
+  }
+  return [...lanes.values()];
+}
+
 export type LayerPlan = { layer: OfflineLayer; tiles: Tile[]; maxZ: number };
 
 /**
