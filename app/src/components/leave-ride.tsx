@@ -18,7 +18,7 @@ import { leaveWorksOffline } from '@/core/offline-ride';
 import { ROLE_LABEL } from '@/core/roles';
 import { cancelRide, handOffRide, leaveRide } from '@/lib/api';
 import { confirmAsync, showNotice } from '@/lib/confirm';
-import { leaveRideReliably } from '@/lib/outbox';
+import { leaveRideReliably, withTimeout } from '@/lib/outbox';
 import { stopSendingLocationFor } from '@/lib/location';
 import type { Ride, RideMember } from '@/lib/types';
 
@@ -72,7 +72,7 @@ export function LeaveRide({ ride, members, me, sharing, onLeft, look = 'bar', sk
     if (kind === 'handOff') return setPicking(true);
     if (kind === 'cancel') {
       const p = leaveAloneCancelPrompt(ride.name, ridersToTell(members, me));
-      if (await confirmAsync(p.title, p.message, p.confirm, t('Keep Ride'))) run(() => cancelRide(ride.id), 'cancelled');
+      if (await confirmAsync(p.title, p.message, p.confirm, t('Keep Ride'))) run(() => withTimeout(cancelRide(ride.id)), 'cancelled');
       return;
     }
     const p = leaveConfirm(kind, ride.name, ride.status, {
@@ -83,7 +83,7 @@ export function LeaveRide({ ride, members, me, sharing, onLeft, look = 'bar', sk
     // Leaving yourself works with no service: off the ride on this phone now, the server hears
     // once there is signal (lib/outbox). Handing over and cancelling still need service.
     if (await confirmAsync(p.title, p.message, p.confirm, t('Stay'))) {
-      run(() => (me && leaveWorksOffline(kind) ? leaveRideReliably(ride.id, me) : leaveRide(ride.id)), 'left');
+      run(() => (me && leaveWorksOffline(kind) ? leaveRideReliably(ride.id, me) : withTimeout(leaveRide(ride.id))), 'left');
     }
   }
 
@@ -116,13 +116,14 @@ export function LeaveRide({ ride, members, me, sharing, onLeft, look = 'bar', sk
             const p = handOffAndLeavePrompt(ride.name, name);
             if (!(await confirmAsync(p.title, p.message, p.confirm, t('Back')))) return;
             run(async () => {
-              await handOffRide(ride.id, m.user_id);
-              await leaveRide(ride.id);
+              // Each call is capped, so with no answer the button says No service instead of spinning.
+              await withTimeout(handOffRide(ride.id, m.user_id));
+              await withTimeout(leaveRide(ride.id));
             }, 'left');
           }}
           onCancelInstead={async () => {
             const p = leaveAloneCancelPrompt(ride.name, ridersToTell(members, me), false);
-            if (await confirmAsync(p.title, p.message, p.confirm, t('Keep Ride'))) run(() => cancelRide(ride.id), 'cancelled');
+            if (await confirmAsync(p.title, p.message, p.confirm, t('Keep Ride'))) run(() => withTimeout(cancelRide(ride.id)), 'cancelled');
           }}
         />
       ) : null}
