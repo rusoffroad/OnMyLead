@@ -15,6 +15,7 @@ import { Linking, Platform } from 'react-native';
 import { MOVING_SPEED_MPS } from '@/core/bubble';
 import { guessState, normalizeState } from '@/core/discovery';
 import { shareStillOn, shouldSendFix } from '@/core/freshness';
+import { sharingRefused } from '@/core/share-refused';
 import { distanceM } from '@/core/geo';
 import { capTrackQueue, isTrackRefused, shouldFlushTrack } from '@/core/live-costs';
 import { foregroundPermission as askOnlyIfNeeded } from '@/core/location-permission';
@@ -156,6 +157,12 @@ export async function handleLocations(locations: Location.LocationObject[]) {
       last_moved_at: ctx.lastMovedAt ? new Date(ctx.lastMovedAt).toISOString() : null,
       recorded_at: new Date(next.at).toISOString(),
     });
+    // The ride ended (or the share was stopped) somewhere else while this phone was outside Ride
+    // Mode: the server refuses every fix from now on, so stop instead of retrying every few seconds.
+    if (sharingRefused(error)) {
+      await stopSendingLocation();
+      return;
+    }
     // The track goes up in batches (each upload carries the whole track, so per-fix uploads
     // multiplied server traffic); stopping the share sends whatever is left.
     if (!error) {
