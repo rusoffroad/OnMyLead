@@ -4,7 +4,7 @@ summary: The live group map for ride day. See every rider, who is live and who w
 category: ride-mode
 order: 10
 release: "1.0"
-updated: 2026-11-16
+updated: 2026-11-17
 sources:
   - app/src/core/offline-ride.ts
   - app/src/lib/ride-cache.ts
