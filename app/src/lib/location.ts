@@ -23,6 +23,7 @@ import type { BatteryPlan } from '@/core/battery';
 import { batteryPlan } from './battery';
 import { supabase } from './supabase';
 import { nearbyOwnFix } from './nearby';
+import { singleFlight } from './single-flight';
 import { recordTrackFixes } from './track-line';
 
 export const LOCATION_TASK = 'ride-location-updates';
@@ -422,10 +423,20 @@ export async function applyBatteryPlan() {
 /** Whether this app launch has started (or restarted) the location task itself. */
 let startedThisLaunch = false;
 
-export async function stopSendingLocation() {
+/**
+ * Stop sending location. Several screens can call this at the same moment (End Ride for Everyone
+ * stops sharing, and Ride Mode stops it again when the share goes away), so stops run one at a
+ * time: two at once both saw the task running and the second failed with "Task not found".
+ */
+export const stopSendingLocation = singleFlight(stopSendingLocationNow);
+
+async function stopSendingLocationNow() {
   if (Platform.OS === 'web') return stopWebWatch();
   if (await Location.hasStartedLocationUpdatesAsync(LOCATION_TASK)) {
-    await Location.stopLocationUpdatesAsync(LOCATION_TASK);
+    // Already stopped by the time it got here is fine; only a task that is still running is a failure.
+    await Location.stopLocationUpdatesAsync(LOCATION_TASK).catch(async (e) => {
+      if (await Location.hasStartedLocationUpdatesAsync(LOCATION_TASK)) throw e;
+    });
   }
   startedThisLaunch = false;
   const { data } = await supabase.auth.getSession();
