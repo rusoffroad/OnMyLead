@@ -36,36 +36,80 @@ fi
 
 say "2/4  Downloading the web build ($WEB_BRANCH)…"
 rm -rf site.new
-git clone -q --depth 1 --branch "$WEB_BRANCH" "$REPO" site.new 2>/dev/null \
-  || fail "no web build yet. Check the 'Build web' run under the repo's Actions tab"
+timeout 300 git clone -q --depth 1 --branch "$WEB_BRANCH" "$REPO" site.new 2>/dev/null \
+  || fail "couldn't download the web build. Check the 'Build web' run under the repo's Actions tab"
 [ -f site.new/index.html ] || fail "the web build has no index.html"
 build=$(git -C site.new log -1 --format=%s)
-rm -rf site.new/.git site.old
-[ -d site ] && mv site site.old
-mv site.new site
-rm -rf site.old
+rm -rf site.new/.git
+# Which build this is (help/status.json builtAt), to check below that the site really serves it.
+built() { grep -o '"builtAt": *"[^"]*"' 2>/dev/null | head -1 | sed 's/.*"\([^"]*\)"$/\1/'; }
+want=$(built < site.new/help/status.json)
+[ -n "$want" ] || fail "the web build has no help/status.json"
 echo "$build"
 
+# The web container mounts the site folder itself, so the folder is never replaced while it
+# serves: the new files are copied into it (hashed build files first, then the pages that point
+# at them), then files the new build no longer has are removed. The site never goes blank, and
+# a failed try leaves the old site up. (Swapping the folder used to leave the container serving
+# a deleted folder, all 404s, until the restart; a failed try then retried every minute and
+# took the site down again each time, 2026-11-17.)
+restart=""
+if [ ! -d site ]; then
+  mv site.new site
+  restart=1
+else
+  copy() {  # copy one file over its old copy without a half-written moment
+    mkdir -p "site/$(dirname "$1")" && cp -p "site.new/$1" "site/$1.oml-new" && mv -f "site/$1.oml-new" "site/$1"
+  }
+  (cd site.new && find . -type f ! -name '*.html' ! -name '*.json' ! -name '*.xml' ! -name '*.txt' ! -name '*.webmanifest' | sed 's|^\./||') \
+    | while IFS= read -r f; do copy "$f" || exit 1; done || fail "couldn't copy the new build (is the disk full? df -h)"
+  (cd site.new && find . -type f \( -name '*.html' -o -name '*.json' -o -name '*.xml' -o -name '*.txt' -o -name '*.webmanifest' \) | sed 's|^\./||') \
+    | while IFS= read -r f; do copy "$f" || exit 1; done || fail "couldn't copy the new build (is the disk full? df -h)"
+  (cd site && find . -type f | sed 's|^\./||') | while IFS= read -r f; do
+    [ "$f" = deploy-status.json ] && continue
+    [ -e "site.new/$f" ] || rm -f "site/$f"
+  done
+  find site -mindepth 1 -type d -empty -delete 2>/dev/null || true
+  rm -rf site.new
+fi
+
 say "3/4  Starting OnMyLead…"
-if ! out=$($SUDO docker compose up -d 2>&1); then
+if ! out=$(timeout 300 $SUDO docker compose up -d 2>&1); then
   echo "$out" | tail -20
   fail "the containers didn't start (see above)"
 fi
-# The web container mounts the site folder itself, so after the swap above it still sees the old
-# copy until it restarts.
-$SUDO docker compose restart web >/dev/null 2>&1 || fail "the web server didn't restart"
+# The web server's settings files are mounted one by one, so after an update changes them it
+# only reads them again on a restart. Unchanged settings: no restart, so no blip.
+conf=$(cat docker-compose.yml nginx.conf security-headers.conf | sha256sum | cut -c1-16)
+[ -f .config-hash ] && [ "$(cat .config-hash)" != "$conf" ] && restart=1
+if [ -n "$restart" ]; then
+  timeout 120 $SUDO docker compose restart web >/dev/null 2>&1 || fail "the web server didn't restart"
+fi
 
 say "4/4  Checking…"
-ok=""
+serving() { timeout 20 $SUDO docker compose exec -T web wget -q -O - http://127.0.0.1:8080/help/status.json 2>/dev/null | built; }
+got=""
 for _ in $(seq 1 20); do
-  if $SUDO docker compose exec -T web wget -q -O /dev/null http://127.0.0.1:8080/r/TEST 2>/dev/null; then ok=1; break; fi
+  got=$(serving)
+  [ "$got" = "$want" ] && break
   sleep 2
 done
-[ -n "$ok" ] || fail "the web server isn't answering. Send Claude the output of: cd ~/onmylead/deploy && sudo docker compose logs --tail 40"
+if [ "$got" != "$want" ]; then
+  # The container may still hold an old copy of the folder; one restart picks up the right one.
+  echo "Serving ${got:-nothing} instead of $want; restarting the web server once."
+  timeout 120 $SUDO docker compose restart web >/dev/null 2>&1 || fail "the web server didn't restart"
+  for _ in $(seq 1 20); do
+    got=$(serving)
+    [ "$got" = "$want" ] && break
+    sleep 2
+  done
+fi
+[ "$got" = "$want" ] || fail "the web server serves ${got:-nothing} instead of the new build $want. Send Claude the output of: cd ~/onmylead/deploy && sudo docker compose logs --tail 40"
+echo "$conf" > .config-hash
 # Ride QR codes and links open the iPhone app only while Apple can read this file.
-$SUDO docker compose exec -T web wget -q -O - http://127.0.0.1:8080/.well-known/apple-app-site-association 2>/dev/null | grep -q applinks \
+timeout 20 $SUDO docker compose exec -T web wget -q -O - http://127.0.0.1:8080/.well-known/apple-app-site-association 2>/dev/null | grep -q applinks \
   || echo "Warning: the app link file isn't being served, so ride links will open the website instead of the app."
-$SUDO docker compose ps --status running --services | grep -qx cloudflared \
+timeout 30 $SUDO docker compose ps --status running --services | grep -qx cloudflared \
   || fail "the tunnel isn't running. Send Claude the output of: cd ~/onmylead/deploy && sudo docker compose logs --tail 40 cloudflared"
 
 printf '\n\033[1;32mDEPLOYED: %s\033[0m\n' "$build"

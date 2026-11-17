@@ -19,6 +19,7 @@ want=$(timeout 30 git ls-remote "$REPO" refs/heads/web-live 2>/dev/null | cut -f
 have=$(cat .live-build 2>/dev/null || true)
 [ "$want" = "$have" ] && exit 0
 
+tmp=$(mktemp)
 {
   echo "=== $(date -u +%FT%TZ) web build ${want:0:7} (serving ${have:0:7}) ==="
   if WEB_BRANCH=web-live bash ./deploy.sh </dev/null; then
@@ -27,4 +28,16 @@ have=$(cat .live-build 2>/dev/null || true)
     # Try again in a minute; the workflow reports the failure to Chris if it lasts.
     echo "deploy failed; will retry"
   fi
-} >> "$LOG" 2>&1
+} 2>&1 | tee "$tmp" >> "$LOG"
+result=$(grep -q '^deploy failed; will retry$' "$tmp" && echo failed || echo deployed)
+
+# What the last try did, at onmylead.com/deploy-status.json, so the "Update server" run can say
+# why a build didn't go live without anyone opening the server. Only the deploy's own messages.
+if [ -d site ]; then
+  why=$(sed 's/\x1b\[[0-9;]*m//g' "$tmp" | grep -m1 'DEPLOY FAILED' | sed 's/^DEPLOY FAILED: //' | tr -d '"\\' | cut -c1-300)
+  disk=$(df -Pm . 2>/dev/null | awk 'NR==2 {print $4}')
+  printf '{"at":"%s","build":"%s","result":"%s","error":"%s","diskFreeMB":"%s"}\n' \
+    "$(date -u +%FT%TZ)" "$want" "$result" "$why" "$disk" > site/deploy-status.json.tmp \
+    && mv -f site/deploy-status.json.tmp site/deploy-status.json
+fi
+rm -f "$tmp"

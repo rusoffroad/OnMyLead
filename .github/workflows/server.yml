@@ -121,7 +121,10 @@ jobs:
             if [ "$got" = "$want" ]; then echo "onmylead.com is serving it."; exit 0; fi
             sleep 15
           done
-          echo "::error::onmylead.com didn't switch to the new build within 10 minutes. On the server: tail ~/onmylead/deploy/auto-update.log"
+          # The server's last try (deploy/auto-update.sh writes it), so the reason shows here.
+          last=$(curl -fsS "https://onmylead.com/deploy-status.json?t=$(date +%s)" 2>/dev/null || true)
+          [ -n "$last" ] && echo "Server's last try: $last"
+          echo "::error::onmylead.com didn't switch to the new build within 10 minutes. $(jq -r '.error // empty' <<<"$last" 2>/dev/null) (server log: ~/onmylead/deploy/auto-update.log)"
           exit 1
 
       - name: Remember what's live
