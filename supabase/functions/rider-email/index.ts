@@ -3,6 +3,8 @@
 // POST from the dashboard (the caller must be an admin signed in with an authenticator code; the
 // function asks the database with the caller's own token, like admin-api):
 //   {"action":"test","subject":"...","body":"..."}   one copy to the admin's own email
+//   {"action":"list"}   every rider in the audience with their own unsubscribe link, for sending
+//       the same email from the owner's own mailbox (Outlook) instead of Resend
 //   {"action":"send","subject":"...","body":"...","expect":123}
 //       every rider in email_audience() (migration 20261116500000), one email each through Resend.
 //       "expect" is the count the admin saw; if the audience changed since, nothing is sent and the
@@ -93,6 +95,16 @@ Deno.serve(async (req) => {
   // deno-lint-ignore no-explicit-any
   const input: any = await req.json().catch(() => ({}));
   const action = String(input?.action ?? '');
+  if (action === 'list') {
+    const { data, error } = await service.rpc('email_audience');
+    if (error) return reply({ error: error.message }, 500);
+    const base = env('SUPABASE_URL');
+    const riders = await Promise.all(((data ?? []) as Recipient[]).map(async (r) => ({
+      email: r.email, first_name: r.first_name, unsubscribe: unsubscribeUrl(base, r.user_id, await unsubscribeToken(SECRET(), r.user_id)),
+    })));
+    await service.from('admin_audit_log').insert({ actor_id: who.user.id, action: 'email.list', target_type: 'email', after: { riders: riders.length } });
+    return reply({ riders });
+  }
   if (action !== 'test' && action !== 'send') return reply({ error: 'unknown action' }, 400);
   const draft = checkDraft(input?.subject, input?.body);
   if (!draft) return reply({ error: 'Subject needs 3 to 150 characters and the message 10 to 10,000.' }, 400);

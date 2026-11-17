@@ -3,17 +3,21 @@
     "version": "3.2",
     "title": "End the Ride from Ride Mode",
     "intro": "OnMyLead 3.2 lets the organizer end a ride for everyone right from Ride Mode's Exit button, next to Leave Ride, and keeps the distances on the rider line steady in Ride Mode and on CarPlay.",
-    "whatsNew": "What's new in 3.2:\n\n\u2022 Organizers can end the ride for everyone from Ride Mode: tap Exit, then End Ride for Everyone. Leave Ride is right there too.\n\u2022 Steadier rider line: a rider right beside the leader no longer flicks between a few yards and 200 ft, in Ride Mode and on CarPlay.",
+    "whatsNew": "What's new in 3.2:\n\n• Organizers can end the ride for everyone from Ride Mode: tap Exit, then End Ride for Everyone. Leave Ride is right there too.\n• Steadier rider line: a rider right beside the leader no longer flicks between a few yards and 200 ft, in Ride Mode and on CarPlay.\n• Location sharing stops as soon as the ride ends, even if you left Ride Mode.",
     "apple": null,
     "google": null,
     "notes": [
       {
         "kind": "new",
         "text": "End Ride for Everyone in Ride Mode: when the ride is over, the organizer and co-organizers tap ‹ Exit and pick End Ride for Everyone under Ride over?, then confirm. The ride ends for the whole group, everyone's location sharing stops and Ride Mode closes. It needs service. Riders still find Leave Ride in the same place."
-        },
-        {
+      },
+      {
         "kind": "fixed",
         "text": "The rider line in Ride Mode and on CarPlay holds steady. A friend riding right beside the leader no longer jumps between a few yards and about 200 feet over and over: every rider is compared at the same moment, and dots ease between updates."
+      },
+      {
+        "kind": "fixed",
+        "text": "Location sharing stops as soon as the ride ends. If you left Ride Mode with Exit and Keep Sharing and the organizer ended the ride from the ride page or another phone, your phone kept trying to send your location every few seconds. It now stops right away."
       }
     ]
   },
@@ -22,8 +26,8 @@
     "title": "The Map on CarPlay",
     "intro": "OnMyLead 3.1 puts the map on your car's CarPlay screen, with turn-by-turn for the trail ahead, shows your trails and roads there with a Layers button to pick them, brings your ride's messages and group chats to the car, adds an Exit button to Map Mode and Ride Mode, makes Leave Ride easy to find, and turns Create a Ride into one short screen that opens already filled in. CarPlay is part of OnMyLead Pro.",
     "whatsNew": "What's new in 3.1:\n\n• The map on CarPlay: trails, your route, your group and turn-by-turn (Pro).\n• Ride messages and group chats on CarPlay, with one-tap replies (Pro).\n• Create a Ride is one short screen that starts on today, now and where you are.\n• An Exit button in Map Mode and Ride Mode. Exit never leaves the ride.\n• Leave Ride now sits right under the ride's name.\n• Fixed a crash in Ride Mode. Zoom In at Intersections is now off unless you turn it on.",
-    "apple": null,
-    "google": null,
+    "apple": "2026-11-16",
+    "google": "2026-11-16",
     "notes": [
       {
         "kind": "new",

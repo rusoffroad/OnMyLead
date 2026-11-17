@@ -50,6 +50,7 @@ import { currentNotificationSettings } from '@/lib/notification-settings';
 import { requirePro, requireTripSlot } from '@/lib/pro';
 import { syncRideReminders } from '@/lib/push';
 import { prefetchNearbyKeys } from '@/lib/nearby';
+import { stopSendingLocationFor } from '@/lib/location';
 import { dropQueuedLeave, onRideActionSent, startRideReliably } from '@/lib/outbox';
 import { cachedRide, rememberRide } from '@/lib/ride-cache';
 import { openStore } from '@/lib/rus';
@@ -407,7 +408,7 @@ export default function RidePage() {
             />
           ) : null}
           {ride.status === 'live' ? (
-            <Button title={tr('End Ride for Everyone')} kind="danger" loading={busy === 'end'} onPress={() => act('end', () => setRideStatus(ride.id, 'ended'))} />
+            <Button title={tr('End Ride for Everyone')} kind="danger" loading={busy === 'end'} onPress={() => act('end', async () => { await setRideStatus(ride.id, 'ended'); await stopSendingLocationFor(ride.id).catch(() => {}); })} />
           ) : null}
           {isOrganizer ? (
             <Button

@@ -4,7 +4,7 @@ summary: Your location is never public. See what strangers, riders on your ride 
 category: safety-privacy
 order: 30
 release: "1.0"
-updated: 2026-11-16
+updated: 2026-11-17
 sources:
   - app/src/lib/usage.ts
   - app/src/core/usage.ts

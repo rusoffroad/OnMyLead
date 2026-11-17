@@ -15,6 +15,7 @@ import { Linking, Platform } from 'react-native';
 import { MOVING_SPEED_MPS } from '@/core/bubble';
 import { guessState, normalizeState } from '@/core/discovery';
 import { shareStillOn, shouldSendFix } from '@/core/freshness';
+import { sharingRefused } from '@/core/share-refused';
 import { distanceM } from '@/core/geo';
 import { capTrackQueue, isTrackRefused, shouldFlushTrack } from '@/core/live-costs';
 import { foregroundPermission as askOnlyIfNeeded } from '@/core/location-permission';
@@ -23,6 +24,7 @@ import type { BatteryPlan } from '@/core/battery';
 import { batteryPlan } from './battery';
 import { supabase } from './supabase';
 import { nearbyOwnFix } from './nearby';
+import { singleFlight } from './single-flight';
 import { recordTrackFixes } from './track-line';
 
 export const LOCATION_TASK = 'ride-location-updates';
@@ -155,6 +157,12 @@ export async function handleLocations(locations: Location.LocationObject[]) {
       last_moved_at: ctx.lastMovedAt ? new Date(ctx.lastMovedAt).toISOString() : null,
       recorded_at: new Date(next.at).toISOString(),
     });
+    // The ride ended (or the share was stopped) somewhere else while this phone was outside Ride
+    // Mode: the server refuses every fix from now on, so stop instead of retrying every few seconds.
+    if (sharingRefused(error)) {
+      await stopSendingLocation();
+      return;
+    }
     // The track goes up in batches (each upload carries the whole track, so per-fix uploads
     // multiplied server traffic); stopping the share sends whatever is left.
     if (!error) {
@@ -422,10 +430,20 @@ export async function applyBatteryPlan() {
 /** Whether this app launch has started (or restarted) the location task itself. */
 let startedThisLaunch = false;
 
-export async function stopSendingLocation() {
+/**
+ * Stop sending location. Several screens can call this at the same moment (End Ride for Everyone
+ * stops sharing, and Ride Mode stops it again when the share goes away), so stops run one at a
+ * time: two at once both saw the task running and the second failed with "Task not found".
+ */
+export const stopSendingLocation = singleFlight(stopSendingLocationNow);
+
+async function stopSendingLocationNow() {
   if (Platform.OS === 'web') return stopWebWatch();
   if (await Location.hasStartedLocationUpdatesAsync(LOCATION_TASK)) {
-    await Location.stopLocationUpdatesAsync(LOCATION_TASK);
+    // Already stopped by the time it got here is fine; only a task that is still running is a failure.
+    await Location.stopLocationUpdatesAsync(LOCATION_TASK).catch(async (e) => {
+      if (await Location.hasStartedLocationUpdatesAsync(LOCATION_TASK)) throw e;
+    });
   }
   startedThisLaunch = false;
   const { data } = await supabase.auth.getSession();
