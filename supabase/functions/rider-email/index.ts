@@ -14,7 +14,8 @@
 // Deploy:  supabase functions deploy rider-email --no-verify-jwt   (the unsubscribe link has no
 //          sign-in; the dashboard actions check the admin themselves)
 // Secrets: RESEND_API_KEY   (already set for ride emails)
-//          NEWS_FROM        optional, default "Chris at OnMyLead <chris@onmylead.com>"
+//          NEWS_FROM        optional, default "Chris Morelock <chris@rusoffroad.com>" (falls back
+//                           to "Chris at OnMyLead <chris@onmylead.com>" if Resend refuses the domain)
 //          NEWS_REPLY_TO    optional, default chris@rusoffroad.com
 //          ADMIN_ORIGINS    optional, extra origins allowed to call it (default https://onmylead.com)
 // SUPABASE_URL, SUPABASE_ANON_KEY and SUPABASE_SERVICE_ROLE_KEY are provided by Supabase; the
@@ -29,7 +30,10 @@ const service = createClient(env('SUPABASE_URL'), env('SUPABASE_SERVICE_ROLE_KEY
 const ORIGINS = new Set(['https://onmylead.com', 'https://www.onmylead.com', ...env('ADMIN_ORIGINS').split(',').map((s) => s.trim()).filter(Boolean)]);
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const SECRET = () => env('SUPABASE_SERVICE_ROLE_KEY');
-const FROM = () => env('NEWS_FROM') || 'Chris at OnMyLead <chris@onmylead.com>';
+// Chris's own address; rusoffroad.com has Resend's DKIM record. If Resend refuses it (the domain
+// isn't on this Resend account), the send falls back to OnMyLead's own verified domain.
+const FROM = () => env('NEWS_FROM') || 'Chris Morelock <chris@rusoffroad.com>';
+const FALLBACK_FROM = 'Chris at OnMyLead <chris@onmylead.com>';
 const REPLY_TO = () => env('NEWS_REPLY_TO') || 'chris@rusoffroad.com';
 
 function cors(origin: string | null): Record<string, string> {
@@ -52,26 +56,36 @@ async function unsubscribe(url: URL): Promise<Response> {
   return new Response(unsubscribePage(ok), { status: ok ? 200 : 400, headers: { 'content-type': 'text/html; charset=utf-8' } });
 }
 
-async function sendBatch(key: string, subject: string, body: string, rows: Recipient[]): Promise<{ sent: number; note?: string }> {
+async function sendBatch(key: string, subject: string, body: string, rows: Recipient[]): Promise<{ sent: number; from: string; note?: string }> {
   let sent = 0;
+  let from = FROM();
   const base = env('SUPABASE_URL');
   // Resend takes up to 100 emails per batch call.
   for (let i = 0; i < rows.length; i += 100) {
-    const chunk = await Promise.all(rows.slice(i, i + 100).map(async (r) => ({
-      from: FROM(),
+    const emails = await Promise.all(rows.slice(i, i + 100).map(async (r) => ({
       to: [r.email],
       reply_to: REPLY_TO(),
       ...buildEmail(subject, body, r, unsubscribeUrl(base, r.user_id, await unsubscribeToken(SECRET(), r.user_id))),
     })));
-    const res = await fetch('https://api.resend.com/emails/batch', {
+    const post = (f: string) => fetch('https://api.resend.com/emails/batch', {
       method: 'POST',
       headers: { authorization: `Bearer ${key}`, 'content-type': 'application/json' },
-      body: JSON.stringify(chunk),
+      body: JSON.stringify(emails.map((e) => ({ from: f, ...e }))),
     }).catch(() => null);
-    if (!res?.ok) return { sent, note: `Resend said ${res?.status ?? 'nothing'}${res ? `: ${(await res.text().catch(() => '')).slice(0, 200)}` : ''}` };
-    sent += chunk.length;
+    let res = await post(from);
+    // The first batch only: Resend refuses a domain this account hasn't verified (403/422) before
+    // sending anything, so switching to OnMyLead's own domain never sends twice.
+    if (i === 0 && res && (res.status === 403 || res.status === 422) && from !== FALLBACK_FROM) {
+      const why = await res.text().catch(() => '');
+      if (/domain/i.test(why)) {
+        from = FALLBACK_FROM;
+        res = await post(from);
+      }
+    }
+    if (!res?.ok) return { sent, from, note: `Resend said ${res?.status ?? 'nothing'}${res ? `: ${(await res.text().catch(() => '')).slice(0, 200)}` : ''}` };
+    sent += emails.length;
   }
-  return { sent };
+  return { sent, from };
 }
 
 Deno.serve(async (req) => {
@@ -133,7 +147,7 @@ Deno.serve(async (req) => {
 
   const result = await sendBatch(key, draft.subject, draft.body, rows);
   await service.from('email_broadcasts').update({
-    sent: result.sent, status: result.note ? 'failed' : 'sent', note: result.note ?? null, finished_at: new Date().toISOString(),
+    sent: result.sent, status: result.note ? 'failed' : 'sent', note: result.note ?? (result.from === FROM() ? null : `Sent from ${result.from}`), finished_at: new Date().toISOString(),
   }).eq('id', log.id);
   if (action === 'send') {
     await service.from('admin_audit_log').insert({
@@ -141,5 +155,5 @@ Deno.serve(async (req) => {
       after: { subject: draft.subject, recipients: rows.length, sent: result.sent },
     });
   }
-  return reply({ ok: !result.note, recipients: rows.length, sent: result.sent, note: result.note ?? null, to: action === 'test' ? rows[0].email : undefined });
+  return reply({ ok: !result.note, recipients: rows.length, sent: result.sent, from: result.from, note: result.note ?? null, to: action === 'test' ? rows[0].email : undefined });
 });

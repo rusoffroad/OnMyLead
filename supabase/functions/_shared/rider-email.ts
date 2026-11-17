@@ -19,14 +19,47 @@ export function personalize(text: string, firstName: string | null): string {
 /** The unsubscribe line, the same in every email. */
 export const FOOTER = 'You’re getting this because you have an OnMyLead account.';
 
+const IMAGE_LINE = /^!\[([^\]]*)\]\((https:\/\/[^\s)]+)\)$/;
+const BUTTON_LINE = /^\[([^\]]+)\]\((https:\/\/[^\s)]+)\)$/;
+const LOGO = 'https://onmylead.com/email/logo.png';
+
+/**
+ * One paragraph of the message as email HTML. A paragraph that is only ![words](https://...) is a
+ * full-width picture; one that is only [Words](https://...) is a red button; anything else is text.
+ */
+function block(p: string): string {
+  const img = IMAGE_LINE.exec(p);
+  if (img) {
+    return `<tr><td style="padding:0 0 20px"><img src="${escapeHtml(img[2])}" alt="${escapeHtml(img[1])}" width="560" style="display:block;width:100%;max-width:560px;height:auto;border:0;border-radius:14px"></td></tr>`;
+  }
+  const btn = BUTTON_LINE.exec(p);
+  if (btn) {
+    return `<tr><td style="padding:4px 0 24px"><a href="${escapeHtml(btn[2])}" style="display:inline-block;background:#e5262e;color:#ffffff;font-weight:700;font-size:17px;text-decoration:none;padding:14px 28px;border-radius:12px">${escapeHtml(btn[1])}</a></td></tr>`;
+  }
+  return `<tr><td style="padding:0 0 16px;font-size:16px;line-height:1.55;color:#1b1f24">${linkify(escapeHtml(p)).replace(/\n/g, '<br>')}</td></tr>`;
+}
+
+/** The text version: a picture becomes nothing, a button becomes "Words: link". */
+function textBlock(p: string): string | null {
+  if (IMAGE_LINE.test(p)) return null;
+  const btn = BUTTON_LINE.exec(p);
+  return btn ? `${btn[1]}: ${btn[2]}` : p;
+}
+
 export function buildEmail(subject: string, body: string, r: Recipient, unsubscribeUrl: string) {
-  const text = personalize(body, r.first_name).replace(/\r\n/g, '\n').trim();
-  const paragraphs = text.split(/\n{2,}/).map((p) => `<p style="margin:0 0 16px">${linkify(escapeHtml(p)).replace(/\n/g, '<br>')}</p>`);
+  const paras = personalize(body, r.first_name).replace(/\r\n/g, '\n').trim().split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
+  const text = paras.map(textBlock).filter((p): p is string => p !== null).join('\n\n');
   const html = [
-    '<div style="font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.5;color:#1b1f24;max-width:560px">',
-    ...paragraphs,
-    `<p style="margin:32px 0 0;font-size:12px;color:#6b7280">${escapeHtml(FOOTER)} <a href="${escapeHtml(unsubscribeUrl)}" style="color:#6b7280">Unsubscribe</a></p>`,
-    '</div>',
+    '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>',
+    '<body style="margin:0;padding:0;background:#eef1f4">',
+    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#eef1f4"><tr><td align="center" style="padding:24px 12px">',
+    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:18px;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif">',
+    `<tr><td style="background:#0b0f14;padding:18px 20px" align="left"><img src="${LOGO}" alt="OnMyLead" height="40" style="display:block;height:40px;width:auto;border:0"></td></tr>`,
+    '<tr><td style="padding:28px 20px 8px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0">',
+    ...paras.map(block),
+    '</table></td></tr>',
+    `<tr><td style="padding:16px 20px 24px;border-top:1px solid #e3e7eb;font-size:12px;line-height:1.5;color:#6b7280">${escapeHtml(FOOTER)} <a href="${escapeHtml(unsubscribeUrl)}" style="color:#6b7280">Unsubscribe</a></td></tr>`,
+    '</table></td></tr></table></body></html>',
   ].join('');
   return {
     subject: personalize(subject, r.first_name).trim(),

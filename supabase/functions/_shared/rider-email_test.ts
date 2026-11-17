@@ -27,11 +27,19 @@ test('builds text and HTML with the unsubscribe link and one-click headers', () 
   assert.equal(e.subject, 'News for Rex');
   assert.match(e.text, /^Hey Rex,/);
   assert.match(e.text, /Unsubscribe: https:\/\/x\.supabase\.co/);
-  assert.match(e.html, /<p[^>]*>Hey Rex,<\/p>/);
+  assert.match(e.html, />Hey Rex,<\/td>/);
   assert.match(e.html, /Line &lt;b&gt;one&lt;\/b&gt;<br>see <a href="https:\/\/onmylead.com"/);
   assert.ok(!e.html.includes('<b>one'));
   assert.equal(e.headers['List-Unsubscribe'], `<${url}>`);
   assert.equal(e.headers['List-Unsubscribe-Post'], 'List-Unsubscribe=One-Click');
+});
+
+test('pictures and buttons on their own line', () => {
+  const e = buildEmail('S', 'Hi\n\n![The map](https://onmylead.com/a.jpg)\n\n[Update OnMyLead](https://onmylead.com)\n\n![x](http://bad.example/a.jpg)', rider, 'https://u');
+  assert.match(e.html, /<img src="https:\/\/onmylead.com\/a.jpg" alt="The map"/);
+  assert.match(e.html, /<a href="https:\/\/onmylead.com" style="display:inline-block;background:#e5262e[^>]*>Update OnMyLead<\/a>/);
+  assert.ok(!e.html.includes('src="http://bad'), 'only https pictures');
+  assert.match(e.text, /^Hi\n\nUpdate OnMyLead: https:\/\/onmylead.com\n\n!\[x\]/);
 });
 
 test('unsubscribe links are signed per rider', async () => {

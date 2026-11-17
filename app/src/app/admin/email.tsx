@@ -11,7 +11,7 @@ import * as admin from '@/lib/admin';
 
 /**
  * Admin > Email Riders: one email to every rider with an email address, one copy each, from
- * "Chris at OnMyLead" with replies to chris@rusoffroad.com (edge function rider-email). Send Test
+ * chris@rusoffroad.com (replies come back there) (edge function rider-email). Send Test
  * Email first; Send to All asks once more with the exact count. Every email has an unsubscribe
  * link. Phones: one column. Wider windows: the email on the left, who gets it on the right.
  */
@@ -29,7 +29,7 @@ export default function EmailRiders() {
     setBusy('test');
     try {
       const r = await admin.sendTestEmail(subject, body);
-      toast(r.ok ? `Test sent to ${r.to}.` : `Not sent: ${r.note}`, r.ok ? 'ok' : 'danger');
+      toast(r.ok ? `Test sent to ${r.to}, from ${r.from}.` : `Not sent: ${r.note}`, r.ok ? 'ok' : 'danger');
       data.reload();
     } catch (e) {
       toast((e as Error).message, 'danger');
@@ -68,7 +68,7 @@ export default function EmailRiders() {
   ];
 
   return (
-    <AdminPage title="Email Riders" subtitle="One email to every rider, from Chris at OnMyLead. Replies go to chris@rusoffroad.com. Send yourself a test first.">
+    <AdminPage title="Email Riders" subtitle="One email to every rider, from chris@rusoffroad.com. Replies go to that inbox. Send yourself a test first.">
       {data.error ? <ErrorNote error={data.error} onRetry={data.reload} /> : null}
       {!d ? (data.error ? null : <Loading />) : (
         <>
@@ -88,7 +88,7 @@ export default function EmailRiders() {
                 style={[styles.input, { minHeight: 260, textAlignVertical: 'top' }]} accessibilityLabel="Message"
               />
               <Text style={[styles.dim, { marginTop: 8 }]}>
-                {'{first name} becomes each rider’s first name, or “there”. Leave a blank line between paragraphs; links starting with https:// can be tapped. The unsubscribe line is added at the bottom.'}
+                {'{first name} becomes each rider’s first name, or “there”. Leave a blank line between paragraphs; links starting with https:// can be tapped. A line that is only ![words](https://…) is a picture, and only [Words](https://…) is a red button. The OnMyLead header and the unsubscribe line are added for you.'}
               </Text>
               <View style={styles.actions}>
                 <AdminButton title="Send Test Email" onPress={test} loading={busy === 'test'} disabled={!ready || !!busy} />

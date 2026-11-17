@@ -112,7 +112,7 @@ Messages riders type in Ride Mode with **✎ Message** follow the **Rider Status
 :::
 - **Email Me Too**: the same Pro Trial reminders by email.
 
-Now and then OnMyLead emails riders news, like a new app version or an offer, from Chris at OnMyLead. To stop those, tap **Unsubscribe** at the bottom of any of them. Ride cancellation emails and Pro Trial reminders keep their own switches here.
+Now and then OnMyLead emails riders news, like a new app version or an offer, from Chris (chris@rusoffroad.com). To stop those, tap **Unsubscribe** at the bottom of any of them. Ride cancellation emails and Pro Trial reminders keep their own switches here.
 
 ## Tapping a Notification
 
