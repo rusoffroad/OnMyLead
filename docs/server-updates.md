@@ -52,7 +52,11 @@ Fewer emails: GitHub Settings → Notifications → Actions → "Only notify for
 ## When something goes wrong
 
 - The run's log says which step failed; nothing after it ran. Re-run the job after a fix.
-- Website didn't switch: on the server, `tail ~/onmylead/deploy/auto-update.log`.
+- Website didn't switch: the run prints the server's last try from
+  https://onmylead.com/deploy-status.json (time, build, result, error, free disk). The full log is
+  `~/onmylead/deploy/auto-update.log` on the server. A failed try keeps the old site up: the new
+  files are copied into the served folder, which is never swapped out, and the web server only
+  restarts when its settings change (until 2026-11-17 a failed try left the site serving 404s).
 - Turn it off: set `SERVER_UPDATES` to `off`. The old commands still work from the Mac:
   `npx supabase db push --linked`, `npx supabase functions deploy <name>` (with `--no-verify-jwt`
   where the function's `// Deploy:` line says so), `ssh rus 'bash ~/onmylead/deploy/deploy.sh'`.
