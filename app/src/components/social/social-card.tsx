@@ -20,6 +20,7 @@ import { ProTag, Social } from './parts';
 import { ShareSheet } from './share-sheet';
 
 import { t } from '@/lib/i18n';
+import { FounderTag } from '@/components/founder-tag';
 const OPEN_LABEL: Partial<Record<SocialItem['kind'], string>> = { trail: 'Open Trail', group: 'Open Ride', out: 'See Who’s Out' };
 
 /**
@@ -103,6 +104,7 @@ export function SocialCard({
           accessibilityLabel={`${item.actorName}’s profile`}>
           <View style={styles.nameRow}>
             <Text style={styles.name} numberOfLines={1}>{item.mine ? t('You') : item.actorName}</Text>
+            <FounderTag userId={item.actorId} />
             {item.actorPro ? <ProTag /> : null}
           </View>
           <Text style={styles.when}>
@@ -151,7 +153,9 @@ export function SocialCard({
           ) : null}
           {item.comments.map((c) => (
             <Text key={c.id} style={styles.preview} numberOfLines={2}>
-              <Text style={{ fontFamily: font(700), color: Colors.text }}>{c.authorName}  </Text>
+              <Text style={{ fontFamily: font(700), color: Colors.text }}>{c.authorName} </Text>
+              <FounderTag userId={c.authorId} inline />
+              {' '}
               {c.body}
             </Text>
           ))}

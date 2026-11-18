@@ -21,6 +21,7 @@ import { clearDmThread, riderName, setDmMuted, setOpenDm } from '@/lib/out-ridin
 import { useSession } from '@/lib/session';
 
 import { t as tr } from '@/lib/i18n';
+import { FounderTag } from '@/components/founder-tag';
 const clock = (iso: string) => new Date(iso).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
 
 const STARTERS = ['Where are you parked?', 'Which trail are you on?', 'Want to ride together?'];
@@ -113,7 +114,10 @@ export default function Conversation() {
           </Pressable>
           <RiderDot userId={id} name={who} size={40} zoom />
           <View style={{ flex: 1 }}>
-            <Text style={styles.title} numberOfLines={1}>{who}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <Text style={[styles.title, { flexShrink: 1 }]} numberOfLines={1}>{who}</Text>
+              <FounderTag userId={id} />
+            </View>
             <Text style={styles.sub} numberOfLines={1}>{blocked ? tr('Blocked') : muted ? tr('Muted') : tr('Direct Message')}</Text>
           </View>
           {chat.threadId ? (

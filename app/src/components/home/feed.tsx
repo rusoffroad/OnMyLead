@@ -17,6 +17,7 @@ import { setLike } from '@/lib/social';
 import { faceColor, Home, homeStyles, HomeCard, Initial } from './parts';
 
 import { t } from '@/lib/i18n';
+import { FounderTag } from '@/components/founder-tag';
 /** Opens an item inside Social: Social first, then the item on top, so Back lands in Social. */
 export function openInSocial(key: string | null) {
   router.push('/social');
@@ -70,6 +71,7 @@ export function FeedList({ items, emptyText, onChange }: { items: SocialItem[]; 
                 style={({ pressed }) => [{ flex: 1, gap: 3 }, pressed && { opacity: 0.7 }]}>
                 <Text style={styles.line} numberOfLines={item.kind === 'post' ? 3 : undefined}>
                   <Text style={{ fontFamily: font(700) }}>{item.actorName} </Text>
+                  <FounderTag userId={item.actorId} inline />
                   {item.kind === 'post' ? item.body ?? t('posted a photo') : feedLine(item)}
                 </Text>
                 <Text style={[homeStyles.muted, { fontSize: 12 }]}>

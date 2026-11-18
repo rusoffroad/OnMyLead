@@ -4,7 +4,7 @@ summary: What's on your home screen. Map Mode, joining and starting rides, event
 category: getting-started
 order: 15
 release: "2.0"
-updated: 2026-11-16
+updated: 2026-11-18
 sources:
   - app/src/components/found-us-card.tsx
   - app/src/lib/found-us.ts

@@ -25,6 +25,7 @@ import { useSocialProfiles } from '@/lib/social-profile';
 import type { Ride, RideMember } from '@/lib/types';
 
 import { t } from '@/lib/i18n';
+import { FounderTag } from './founder-tag';
 const ROLE_COLOR: Record<RideMember['role'], string> = {
   get organizer() { return Colors.accent; },
   get co_organizer() { return Colors.accent; },
@@ -169,6 +170,7 @@ export function RideRoster({
                         <BadgePatch badge={badges.get(m.user_id)!.badge} level={badges.get(m.user_id)!.level} size={18} />
                       </View>
                     ) : null}
+                    <FounderTag userId={m.user_id} />
                   </View>
                   {roleLine ? <ThemedText type="small" themeColor="textSecondary">{roleLine}</ThemedText> : null}
                   {social.get(m.user_id) ? <SocialTag profile={social.get(m.user_id)!} /> : null}

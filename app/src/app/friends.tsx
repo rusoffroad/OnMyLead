@@ -28,6 +28,7 @@ import {
 import { useSession } from '@/lib/session';
 import { setFriendCode } from '@/lib/share-codes';
 import { t } from '@/lib/i18n';
+import { FounderTag } from '@/components/founder-tag';
 
 const WEB_URL = process.env.EXPO_PUBLIC_WEB_URL ?? '';
 
@@ -216,7 +217,10 @@ export default function Friends() {
           {'out_now' in f && f.out_now ? <View style={styles.outBadge} /> : null}
         </View>
         <View style={{ flex: 1, gap: 1 }}>
-          <Text style={styles.name} numberOfLines={1}>{f.display_name}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+            <Text style={[styles.name, { flexShrink: 1 }]} numberOfLines={1}>{f.display_name}</Text>
+            <FounderTag userId={f.user_id} />
+          </View>
           <Text style={[styles.line, 'out_now' in f && f.out_now && { color: RideColors.green }]} numberOfLines={1}>{line}</Text>
         </View>
       </Pressable>
