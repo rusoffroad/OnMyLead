@@ -1,5 +1,35 @@
 [
   {
+    "version": "3.3",
+    "title": "Meet the Founder",
+    "intro": "OnMyLead 3.3 makes every rider friends with OnMyLead's founder, with an OnMyLead Founder tag beside the founder's name, and brings everything from 3.2: End Ride for Everyone in Ride Mode, a steadier rider line, and location sharing that stops as soon as the ride ends.",
+    "whatsNew": "What's new in 3.3:\n\n• Every rider is friends with OnMyLead's founder, marked OnMyLead Founder. Remove or block any time.\n• Organizers can end the ride for everyone from Ride Mode: tap Exit, then End Ride for Everyone.\n• Steadier rider line in Ride Mode and on CarPlay.\n• Location sharing stops as soon as the ride ends, even if you left Ride Mode.",
+    "apple": null,
+    "google": null,
+    "notes": [
+      {
+        "kind": "new",
+        "text": "Every rider is friends with OnMyLead's founder, new riders too. The founder's posts and rides show in your Feed and Social, and yours in the founder's, as your Who Sees Your Activity setting allows. It never shows where you are: the founder only sees you in Out Riding under the usual rules. Remove the founder like any friend, or block, and you stay removed."
+      },
+      {
+        "kind": "new",
+        "text": "An OnMyLead Founder tag beside the founder's name in the Feed, Social, comments, profiles, Friends, Messages and a ride's Going list."
+      },
+      {
+        "kind": "new",
+        "text": "End Ride for Everyone in Ride Mode: when the ride is over, the organizer and co-organizers tap ‹ Exit and pick End Ride for Everyone under Ride over?, then confirm. The ride ends for the whole group, everyone's location sharing stops and Ride Mode closes. It needs service. Riders still find Leave Ride in the same place."
+      },
+      {
+        "kind": "fixed",
+        "text": "The rider line in Ride Mode and on CarPlay holds steady. A friend riding right beside the leader no longer jumps between a few yards and about 200 feet over and over: every rider is compared at the same moment, and dots ease between updates."
+      },
+      {
+        "kind": "fixed",
+        "text": "Location sharing stops as soon as the ride ends. If you left Ride Mode with Exit and Keep Sharing and the organizer ended the ride from the ride page or another phone, your phone kept trying to send your location every few seconds. It now stops right away."
+      }
+    ]
+  },
+  {
     "version": "3.2",
     "title": "End the Ride from Ride Mode",
     "intro": "OnMyLead 3.2 lets the organizer end a ride for everyone right from Ride Mode's Exit button, next to Leave Ride, and keeps the distances on the rider line steady in Ride Mode and on CarPlay.",

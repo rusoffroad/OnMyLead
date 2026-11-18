@@ -4,7 +4,7 @@ summary: Add riders as friends so you see each other when you're out riding near
 category: groups
 order: 26
 release: "1.0.3"
-updated: 2026-11-15
+updated: 2026-11-18
 sources:
   - app/src/app/friends.tsx
   - app/src/app/friend/[code].tsx
@@ -14,9 +14,11 @@ sources:
   - app/src/core/friends.ts
   - app/src/lib/friends.ts
   - supabase/migrations/20261101800000_friends.sql
+  - supabase/migrations/20261118100000_founder_friends.sql
+  - app/src/components/founder-tag.tsx
   - app/src/components/share-code-editor.tsx
 related: [out-riding, report-and-block, privacy, notification-settings, riding-groups]
-keywords: [friends, add friend, friend request, friend link, friend code, buddy, riding buddy, who's riding, message a friend, dm, remove friend, tablet]
+keywords: [founder, onmylead founder, chris, friends, add friend, friend request, friend link, friend code, buddy, riding buddy, who's riding, message a friend, dm, remove friend, tablet]
 ---
 
 Add the riders you ride with as **friends**. Friends see each other in [Out Riding](/help/out-riding) when they're out near each other, and can message each other any time.
@@ -79,6 +81,18 @@ Tap the blue message button next to a friend. You can message a friend any time,
 
 - Under **Requests You Sent**, tap **Cancel**.
 - Next to a friend, tap **✕**, then **Remove**. They aren't told.
+
+## The OnMyLead Founder
+
+Every rider is friends with OnMyLead's founder from the start, including new riders as soon as they sign up. The founder's posts and rides show in your Feed and Social, and yours show in the founder's, the same as any friend. Your **Who Sees Your Activity** setting still decides what the founder sees: choose **Nobody** and nothing of yours shows.
+
+This friendship never shows where you are. Unlike other friends, the founder doesn't see you in Out Riding unless you've ridden together, share a riding group, or you've both picked **Everyone Nearby**.
+
+Don't want it? Remove the founder like any friend, or block. You aren't added back, even if you unblock later. You can still send the founder a friend request yourself any time.
+
+:::release 3.3
+The founder's name carries an **OnMyLead Founder** tag in the Feed, Social, comments, his profile, Friends, Messages and a ride's Going list, so you know who it is.
+:::
 
 ## Limits
 

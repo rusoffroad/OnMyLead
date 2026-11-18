@@ -10,6 +10,7 @@ import { faceColor, Initial } from '../home/parts';
 import { Social } from './parts';
 
 import { t } from '@/lib/i18n';
+import { FounderTag } from '@/components/founder-tag';
 
 type Actions = {
   /** Comment likes and replies are on the server (false: plain comments, no Like or Reply). */
@@ -52,6 +53,7 @@ function CommentRow({ c, reply = false, replies, onLike, onReply, onDelete, onRe
             <Pressable onPress={() => router.push(profileHref(c.authorId) as never)} accessibilityRole="link" style={{ flexShrink: 1 }}>
               <Text style={styles.name} numberOfLines={1}>{c.mine ? t('You') : c.authorName}</Text>
             </Pressable>
+            <FounderTag userId={c.authorId} />
             <Text style={styles.when}>{timeAgo(c.at)}</Text>
           </View>
           <Text style={styles.body} selectable>

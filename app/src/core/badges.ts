@@ -201,3 +201,19 @@ export const badgeTitle = (b: { badge: BadgeKey; level: BadgeLevel }) =>
 export function unseen(mine: MyBadges): EarnedBadge[] {
   return mine.badges.filter((b) => !b.seen).sort((a, b) => b.level - a.level);
 }
+
+/**
+ * Who holds the OnMyLead Founder honor, from rider_badges rows ({ user_id, badge }). Their name
+ * carries an "OnMyLead Founder" tag wherever riders see it (Chris 2026-11-18: "add OnMyLead Founder
+ * next to my name so people know who I am").
+ */
+export function founderIdsFrom(rows: unknown): Set<string> {
+  const out = new Set<string>();
+  if (!Array.isArray(rows)) return out;
+  for (const row of rows) {
+    if (!row || typeof row !== 'object') continue;
+    const { user_id, badge } = row as Record<string, unknown>;
+    if (badge === 'founder' && typeof user_id === 'string' && user_id) out.add(user_id);
+  }
+  return out;
+}
