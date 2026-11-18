@@ -146,3 +146,20 @@ export function appleDaysToFetch(today: string, start: string, done: Set<string>
   if (earliest > last) return [];
   return daysBetween(earliest, last).filter((d) => !done.has(d)).reverse().slice(0, maxCalls);
 }
+
+export type AscKey = { issuerId: string; keyId: string; privateKey: string };
+
+/**
+ * The App Store Connect API key for Sales and Trends. Apple only lets a key with the Admin, Finance
+ * or Sales role read sales reports, so the downloads import can have its own key
+ * (ASC_SALES_KEY_ID + ASC_SALES_PRIVATE_KEY, issuer ASC_SALES_ISSUER_ID or else ASC_ISSUER_ID)
+ * without changing the shared ASC_* key that offer codes, reviews and releases use. Without a
+ * complete sales key it falls back to the shared key. null when neither is complete.
+ */
+export function appleSalesKey(env: (k: string) => string | undefined): AscKey | null {
+  const get = (k: string) => (env(k) ?? '').trim();
+  const sales = { issuerId: get('ASC_SALES_ISSUER_ID') || get('ASC_ISSUER_ID'), keyId: get('ASC_SALES_KEY_ID'), privateKey: get('ASC_SALES_PRIVATE_KEY') };
+  if (sales.issuerId && sales.keyId && sales.privateKey) return sales;
+  const shared = { issuerId: get('ASC_ISSUER_ID'), keyId: get('ASC_KEY_ID'), privateKey: get('ASC_PRIVATE_KEY') };
+  return shared.issuerId && shared.keyId && shared.privateKey ? shared : null;
+}
