@@ -104,12 +104,12 @@ export const SHOWCASE_EASY_LEAVE: boolean = true;
  * True once 3.2 is in the stores: the organizer ends the ride for everyone from Ride Mode's Exit
  * sheet (End Ride for Everyone). Until then the showcase doesn't mention it.
  */
-export const SHOWCASE_END_RIDE_IN_MODE: boolean = false;
+export const SHOWCASE_END_RIDE_IN_MODE: boolean = true;
 /**
  * True once 3.3 is in the stores: every rider starts out friends with OnMyLead's founder, whose
  * name carries an OnMyLead Founder tag. Until then the showcase's Friends line doesn't mention it.
  */
-export const SHOWCASE_FOUNDER_FRIENDS: boolean = false;
+export const SHOWCASE_FOUNDER_FRIENDS: boolean = true;
 /**
  * The showcase's Create a Ride step in its 3.1 words (one short screen that starts on today, now
  * and where you are; everything else under More Options). Off until the app version with it (3.1)
