@@ -34,14 +34,16 @@ function load(): Promise<void> {
 
 /** Is this rider the OnMyLead Founder? */
 export function useIsFounder(userId: string | null | undefined): boolean {
-  const [, setVersion] = useState(0);
+  // Kept in state (not read from the module) so the React Compiler re-renders when it loads.
+  const [ids, setIds] = useState<Set<string> | null>(founders);
   useEffect(() => {
-    const fn = () => setVersion((v) => v + 1);
+    const fn = () => setIds(founders);
     listeners.add(fn);
-    if (!founders) void load();
+    if (founders) fn();
+    else void load();
     return () => {
       listeners.delete(fn);
     };
   }, []);
-  return !!userId && !!founders?.has(userId);
+  return !!userId && !!ids?.has(userId);
 }
