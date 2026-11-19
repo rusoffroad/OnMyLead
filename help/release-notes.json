@@ -1,5 +1,19 @@
 [
   {
+    "version": "3.4",
+    "title": "A Shorter Founder Tag",
+    "intro": "OnMyLead 3.4 shortens the tag beside the founder's name to App Founder, so the founder's whole name fits in Friends, Social and everywhere else the tag shows.",
+    "whatsNew": "What's new in 3.4:\n\n• The tag beside the founder's name now reads App Founder, so the whole name fits in Friends, Social and the Feed.",
+    "apple": null,
+    "google": null,
+    "notes": [
+      {
+        "kind": "improved",
+        "text": "The tag beside the founder's name now reads App Founder instead of OnMyLead Founder, so the founder's name no longer gets cut off in Friends, Social and other lists."
+      }
+    ]
+  },
+  {
     "version": "3.3",
     "title": "Meet the Founder",
     "intro": "OnMyLead 3.3 makes every rider friends with OnMyLead's founder, with an OnMyLead Founder tag beside the founder's name, and brings everything from 3.2: End Ride for Everyone in Ride Mode, a steadier rider line, and location sharing that stops as soon as the ride ends.",
