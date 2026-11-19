@@ -6,7 +6,7 @@
  * The search distance starts at 250 miles and the rider slides it from 10 to 1,000; the choice is
  * remembered on the device. Pure functions here; lib/spots.ts talks to the server.
  */
-import { stateByCode } from './discovery';
+import { boundsAround, stateByCode, type Bounds } from './discovery';
 import type { LatLng } from './geo';
 
 export type SpotKind = 'park' | 'ohv_area' | 'trail_system' | 'trailhead' | 'track';
@@ -248,7 +248,7 @@ export type SpotReview = { id: string; stars: number; body: string | null; photo
 export type MyReview = { id: string; stars: number; body: string | null; photos: string[]; hidden: boolean; at: string };
 export type SpotReviews = { count: number; average: number | null; photos: string[]; list: SpotReview[]; mine: MyReview | null };
 
-export type SpotPage = { spot: SpotDetail & SpotDetails; trails: SpotTrails | null; reviews: SpotReviews };
+export type SpotPage = { spot: SpotDetail & SpotDetails; trails: SpotTrails | null; reviews: SpotReviews; favorite: boolean };
 
 const int = (v: unknown) => Math.max(0, Math.floor(num(v) || 0));
 const strings = (v: unknown) => (Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string' && !!x.trim()) : []);
@@ -327,6 +327,7 @@ export function parseSpotPage(j: unknown): SpotPage | null {
         ? { id: String(mineRaw.id), stars: mineStars, body: str(mineRaw.body), photos: strings(mineRaw.photos).slice(0, 4), hidden: mineRaw.hidden === true, at: str(mineRaw.at) ?? '' }
         : null,
     },
+    favorite: o.favorite === true,
   };
 }
 
@@ -390,4 +391,25 @@ export function parseMapAt(v: string | string[] | undefined): LatLng | null {
   const lng = Number(m[2]);
   if (Math.abs(lat) > 90 || Math.abs(lng) > 180) return null;
   return { lat, lng };
+}
+
+/**
+ * A map frame around a rider's favorite places: all of them with a margin, at least `minMiles`
+ * across so one favorite isn't zoomed in to the gate. Null with no favorites.
+ */
+export function boundsOfSpots(spots: Pick<Spot, 'lat' | 'lng'>[], minMiles = 15): Bounds | null {
+  if (!spots.length) return null;
+  const lats = spots.map((s) => s.lat);
+  const lngs = spots.map((s) => s.lng);
+  const b = { minLat: Math.min(...lats), maxLat: Math.max(...lats), minLng: Math.min(...lngs), maxLng: Math.max(...lngs) };
+  const mid = { lat: (b.minLat + b.maxLat) / 2, lng: (b.minLng + b.maxLng) / 2 };
+  const least = boundsAround(mid, minMiles);
+  const padLat = (b.maxLat - b.minLat) * 0.12;
+  const padLng = (b.maxLng - b.minLng) * 0.12;
+  return {
+    minLat: Math.min(b.minLat - padLat, least.minLat),
+    maxLat: Math.max(b.maxLat + padLat, least.maxLat),
+    minLng: Math.min(b.minLng - padLng, least.minLng),
+    maxLng: Math.max(b.maxLng + padLng, least.maxLng),
+  };
 }
