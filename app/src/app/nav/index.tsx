@@ -18,6 +18,7 @@ import { NavMap, RECORD_INK, type NavMapHandle } from '@/components/nav-map';
 import { PanelHandle } from '@/components/panel-handle';
 import { CompassSpot } from '@/components/compass-spot';
 import { TrailMapOverlay } from '@/components/trail-map-overlay';
+import { ImportDoneBar, ImportWaypointsSheet } from '@/components/import-waypoints';
 import { WaypointSheet, type WaypointSheetTarget } from '@/components/waypoint-sheet';
 import { Colors, font, Glass, GlassSurface, Radius, RideColors, Spacing, themedStyles } from '@/constants/theme';
 import { followCamActive, followMeStatus, followMeTap, nearFollowedTrail } from '@/core/follow-camera';
@@ -53,6 +54,7 @@ import { useRememberedToggle } from '@/hooks/use-remembered-toggle';
 import { useRouteDraft } from '@/hooks/use-route-draft';
 import { useTilt } from '@/hooks/use-tilt';
 import { useTrailMap } from '@/hooks/use-trail-map';
+import { useWaypointImport } from '@/hooks/use-waypoint-import';
 import { confirmAsync, showNotice } from '@/lib/confirm';
 import { openDirections } from '@/lib/directions';
 import { useMapWaypoints } from '@/lib/map-waypoints';
@@ -99,7 +101,7 @@ const MPS_TO_MPH = 2.23694;
  * The screen stays on while recording or following. Trails saved here work as group ride routes.
  */
 export default function NavMode() {
-  const params = useLocalSearchParams<{ follow?: string; trail?: string; draw?: string; at?: string }>();
+  const params = useLocalSearchParams<{ follow?: string; trail?: string; draw?: string; at?: string; import?: string }>();
   // Opened from a place to ride (Open in Map Mode, 4.0): the map opens on the place, not the rider.
   const placeAt = useMemo(() => parseMapAt(params.at), [params.at]);
   const trackLinePro = useCan('track_line');
@@ -161,6 +163,14 @@ export default function NavMode() {
     setWpOnRide(!!w.ride_id);
     setWpTarget({ type: 'view', waypoint: w });
   }, []);
+
+  // Import Waypoints (4.0): pins from a GPX, KML or KMZ file the rider exported from another map app.
+  // ?import= is a file opened in OnMyLead from the share sheet or Files; the website also takes a drop.
+  const wpImport = useWaypointImport({
+    incoming: typeof params.import === 'string' ? params.import : null,
+    onIncomingTaken: () => router.setParams({ import: undefined }),
+    drop: true,
+  });
 
   // --- Where the rider is -------------------------------------------------------
   const [me, setMe] = useState<LatLng | null>(null);
@@ -860,6 +870,8 @@ export default function NavMode() {
               onRate={() => followed?.publicTrail && trail.pick(followed.publicTrail)}
               onStop={() => setFollowed(null)}
               onMyTrails={() => router.push('/nav/trails')}
+              onImportWaypoints={wpImport.offered ? wpImport.pick : undefined}
+              importing={wpImport.busy}
               trackOn={trackOn}
               onTrack={switchTrack}
               onClearTrack={clearTrack}
@@ -935,6 +947,32 @@ export default function NavMode() {
         onChanged={(c) => wpOnRide && groupRide.wp.apply(c)}
         onClose={() => setWpTarget(null)}
       />
+      <ImportWaypointsSheet
+        file={wpImport.file}
+        mapExisting={mapWaypoints}
+        ride={groupRide.rideId && groupRide.wp.switchedOn
+          ? { id: groupRide.rideId, canShare: groupRide.canShare, live: true, existing: groupRide.wp.waypoints, me: groupRide.me }
+          : null}
+        onDone={(d) => {
+          wpImport.close();
+          wpImport.setDone(d);
+          if (d.where === 'ride') void groupRide.wp.reload();
+          const pts = d.waypoints.map((w) => ({ lat: w.lat, lng: w.lng }));
+          if (pts.length) {
+            // Show them: the map stops following the rider, like a drag does.
+            camEvent('pan');
+            setTimeout(() => map.current?.fit(pts.length > 1 ? pts : [pts[0], { lat: pts[0].lat + 0.002, lng: pts[0].lng + 0.002 }]), 50);
+          }
+        }}
+        onClose={wpImport.close}
+      />
+      <ImportDoneBar
+        done={wpImport.done}
+        // Clear of Center on Me, Follow Me and Music, which sit just above the panel.
+        bottom={wide ? 24 : locatePos.bottom + 120}
+        onUndone={(d) => d.where === 'ride' && void groupRide.wp.reload()}
+        onGone={() => wpImport.setDone(null)}
+      />
     </View>
   );
 }
@@ -1003,7 +1041,7 @@ function Gauge({ value, unit, label, big, small, inCell }: { value: string; unit
 }
 
 function ExplorePanel({
-  open, followed, progress, speed, altitude, heading, trip, onResetTrip, noLocation, rateable, onRate, onStop, onMyTrails, trackOn, onTrack, onClearTrack, hasTrack,
+  open, followed, progress, speed, altitude, heading, trip, onResetTrip, noLocation, rateable, onRate, onStop, onMyTrails, onImportWaypoints, importing, trackOn, onTrack, onClearTrack, hasTrack,
 }: {
   open: boolean;
   followed: Followed | null;
@@ -1018,6 +1056,9 @@ function ExplorePanel({
   onRate: () => void;
   onStop: () => void;
   onMyTrails: () => void;
+  /** Import Waypoints; left out when the owner switched it off. */
+  onImportWaypoints?: () => void;
+  importing?: boolean;
   trackOn: boolean;
   onTrack: (on: boolean) => void;
   onClearTrack: () => void;
@@ -1094,6 +1135,20 @@ function ExplorePanel({
               <Text style={styles.wideBtnText}>{tr('My Trails')}</Text>
               <Icon name="chevron" size={18} color={Colors.textSecondary} />
             </Pressable>
+            {onImportWaypoints ? (
+              <Pressable
+                accessibilityRole="button"
+                accessibilityHint={tr('Bring in waypoints from a GPX, KML or KMZ file')}
+                disabled={importing}
+                onPress={onImportWaypoints}
+                style={({ pressed }) => [styles.wideBtn, (pressed || importing) && { opacity: 0.85 }]}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flexShrink: 1 }}>
+                  <Text style={styles.wideBtnText} numberOfLines={1}>{tr('Import Waypoints')}</Text>
+                  <ProTag feature="waypoints" style={{ alignSelf: 'auto' }} />
+                </View>
+                {importing ? <ActivityIndicator color={Colors.textSecondary} /> : <Icon name="chevron" size={18} color={Colors.textSecondary} />}
+              </Pressable>
+            ) : null}
           </View>
         ) : null
       ) : null}

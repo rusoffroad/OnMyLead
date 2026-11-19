@@ -3,7 +3,7 @@ import Head from 'expo-router/head';
 import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from 'react';
 
 import { storeLink } from '@/lib/found-us';
-import { APP_STORE_URL, COMPANY, PLAY_STORE_URL, PRO_PRICES, RUS_URL, SHOWCASE_3D_TERRAIN, SHOWCASE_COMMENT_REPLIES, SHOWCASE_EMERGENCY_SIREN, SHOWCASE_GROUP_PHOTOS, SHOWCASE_INTERSECTION_ZOOM, SHOWCASE_LEADER_TRACKLINE, SHOWCASE_MAP_FEATURES, SHOWCASE_NO_SERVICE, SHOWCASE_PARK_TRAILS, SHOWCASE_PHOTO_CROP, SHOWCASE_REDESIGN_3, SHOWCASE_EASY_LEAVE, SHOWCASE_END_RIDE_IN_MODE, SHOWCASE_FOUNDER_FRIENDS, SHOWCASE_QUICK_CREATE, SHOWCASE_EVENTS_AND_RIDES, SHOWCASE_PLACES_TO_RIDE, SHOWCASE_RADIO_SHARING, SHOWCASE_ROUTE_ETA, SHOWCASE_PRO_PLAN_4, SHOWCASE_WEATHER, SHOWCASE_ACTIVITIES, SHOWCASE_SPREAD_RULER, TRIAL_DAYS } from '@/constants/site';
+import { APP_STORE_URL, COMPANY, PLAY_STORE_URL, PRO_PRICES, RUS_URL, SHOWCASE_3D_TERRAIN, SHOWCASE_COMMENT_REPLIES, SHOWCASE_EMERGENCY_SIREN, SHOWCASE_GROUP_PHOTOS, SHOWCASE_IMPORT_WAYPOINTS, SHOWCASE_INTERSECTION_ZOOM, SHOWCASE_LEADER_TRACKLINE, SHOWCASE_MAP_FEATURES, SHOWCASE_NO_SERVICE, SHOWCASE_PARK_TRAILS, SHOWCASE_PHOTO_CROP, SHOWCASE_REDESIGN_3, SHOWCASE_EASY_LEAVE, SHOWCASE_END_RIDE_IN_MODE, SHOWCASE_FOUNDER_FRIENDS, SHOWCASE_QUICK_CREATE, SHOWCASE_EVENTS_AND_RIDES, SHOWCASE_PLACES_TO_RIDE, SHOWCASE_RADIO_SHARING, SHOWCASE_ROUTE_ETA, SHOWCASE_PRO_PLAN_4, SHOWCASE_WEATHER, SHOWCASE_ACTIVITIES, SHOWCASE_SPREAD_RULER, TRIAL_DAYS } from '@/constants/site';
 import type { SocialProvider } from '@/core/auth-link';
 import { FREE_MAP_HOURS, FREE_MAP_HOURS_4 } from '@/core/pro';
 import { REFERRAL_PRICE, referralsSwitchedOn } from '@/core/referrals';
@@ -317,6 +317,9 @@ export function Showcase() {
               ) : null}
               {SHOWCASE_PARK_TRAILS ? (
                 <li><b>Offroad Park Trails.</b> The trails of Hidden Falls, Katemcy Rocks, Hollister Hills, Hungry Valley, Ocotillo Wells, Interlake, SMORR and about fifty more parks and OHV areas, drawn on every map in the park’s own levels: green for 1 and 2, blue 3, white 4, red 5, with the park’s name from far out and trail names up close. Tap one for its level and length.</li>
+              ) : null}
+              {SHOWCASE_IMPORT_WAYPOINTS ? (
+                <li><b>Import Waypoints.</b> Bring your camps, fuel stops and trailheads with you. Export them from another map app as a GPX, KML or KMZ file (apps like onX, Gaia GPS and Google Earth all make them), open the file in OnMyLead, and they land on your map with a symbol for each. Keep them to yourself in Map Mode or put them on a ride for the whole group. Included with Pro.</li>
               ) : null}
               {SHOWCASE_WEATHER ? (
                 <li><b>Weather Radar and Forecast.</b> Turn on Weather Radar (Pro) in Map Settings to see rain and snow moving over the map in Ride Mode and Map Mode, from NOAA radar, fresh every 5 minutes. The free forecast button shows the temperature where you are; tap it for the next 12 hours, 7 days and any National Weather Service alerts, kept on your phone for when signal drops.</li>
@@ -827,6 +830,7 @@ const PRO_4 = [
   'Create Unlimited Rides and Unlimited Map Mode',
   'iPad, Android Tablets and the Website',
   'Draw Routes, Waypoints and Directions',
+  'Import Waypoints From Other Map Apps',
   'Places to Ride',
   'Bluetooth Sharing With No Service',
   'CarPlay',

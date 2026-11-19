@@ -147,6 +147,7 @@ This is the same comparison as the **Free and Pro** table on the Pro screen.
 | Map Mode | 5 Hours a Month | Unlimited |
 | Create Rides | No | Unlimited |
 | Draw Routes, Waypoints and Directions | No | Yes |
+| Import Waypoints From Other Map Apps | No | Yes |
 | Places to Ride | No | Yes |
 | Bluetooth Sharing With No Service | No | Yes |
 | CarPlay | No | Yes |

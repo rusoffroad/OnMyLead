@@ -3,7 +3,7 @@
     "version": "4.0",
     "title": "Activities and Places to Ride",
     "intro": "OnMyLead 4.0 is for more than offroad: switch between Offroad, Motorcycle, Road Trip and Snowmobile from the button on Home, each with its own colors, map, Ride Mode buttons, rides, events and places. Snowmobile shows snow on the ground, sled trails and avalanche danger; Motorcycle finds twisty roads; Road Trip shows scenic byways and campgrounds. It also adds Places to Ride for your activity, with rider reviews and favorites, and weather radar and the forecast where you are on the map. Every Home card now fits on one screen.",
-    "whatsNew": "What's new in 4.0:\n\n• Activities: Offroad, Motorcycle, Road Trip and Snowmobile, each with its own colors, map, buttons, rides and places.\n• Snowmobile: snow on the ground, sled trails, avalanche danger. Motorcycle: twisty roads. Road Trip: byways, campgrounds.\n• Places to Ride near you.\n• Weather radar and the forecast where you are on the map.\n• Route builder: estimated time from your average speed.\n• Home fits on one screen; Start a Ride is now Create a Ride.\n• New Free and Pro plans.",
+    "whatsNew": "What's new in 4.0:\n\n• Activities: Offroad, Motorcycle, Road Trip and Snowmobile, each with its own colors, map, rides and places.\n• Snowmobile: snow on the ground, sled trails, avalanche danger. Motorcycle: twisty roads. Road Trip: byways, campgrounds.\n• Places to Ride near you.\n• Weather radar and forecast on the map.\n• Import waypoints from other apps.\n• Route builder: estimated time from your speed.\n• Home fits on one screen; Start a Ride is now Create a Ride.\n• New Free and Pro plans.",
     "apple": null,
     "google": null,
     "notes": [
@@ -78,6 +78,14 @@
       {
         "kind": "new",
         "text": "Welcome Tour: new riders get a quick tour of the app the first time they open it, and riders updating from an earlier version see a What's New card. Take it again any time from You > Help > Take the Tour."
+      },
+      {
+        "kind": "new",
+        "text": "Import Waypoints (Pro): bring your pins over from another map app. Export them as a GPX, KML or KMZ file, then pick OnMyLead in the share sheet or tap Import Waypoints in Map Mode."
+      },
+      {
+        "kind": "new",
+        "text": "Check the list before anything is saved: untick any you don't want, add them to your own map or to a ride, and Undo right after. Each one gets a symbol from its name."
       },
       {
         "kind": "improved",

@@ -301,6 +301,7 @@
       ],
       "./plugins/with-sentry",
       "./plugins/with-android-setup",
+      "./plugins/with-open-files",
       "./plugins/with-scene-lifecycle",
       [
         "./plugins/with-push-entitlement",

@@ -11,6 +11,7 @@ sources:
   - app/src/app/r/[code].tsx
   - app/src/app/ride/[id]/live.tsx
   - app/src/components/waypoint-sheet.tsx
+  - app/src/components/import-waypoints.tsx
   - app/src/components/time-picker.tsx
   - app/src/components/waypoint-row.tsx
   - app/src/components/waypoint-map.tsx
@@ -84,6 +85,12 @@ To find a spot by name, tap **Search** at the top of the waypoints map and type 
 In Ride Mode, tap **Add Waypoint** to drop one where you are, or press and hold the map. See [Ride Mode](/help/ride-mode).
 
 :::release 2.1
+:::release 4.0
+## Import From Another App
+
+Have waypoints saved in another map app? Tap **Import Waypoints** on the Waypoints page (or in Map Mode) to bring them in from a GPX, KML or KMZ file. See [Import Waypoints From Another App](/help/import-waypoints).
+:::
+
 ## Press and Hold the Map
 
 In Ride Mode and Map Mode, press and hold anywhere on the map. The **New Waypoint** sheet opens for that spot: pick a symbol, change the name if you like, add a note and tap **Save Waypoint**. On onmylead.com, right-click the map in Map Mode instead (or press and hold on a touch screen).

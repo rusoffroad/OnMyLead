@@ -139,6 +139,11 @@ export const SHOWCASE_RADIO_SHARING: boolean = false;
  */
 export const SHOWCASE_ROUTE_ETA: boolean = false;
 /**
+ * Import Waypoints (Pro): pins from a GPX, KML or KMZ file exported from another map app, into Map
+ * Mode or onto a ride. Off until the app version with it (4.0) is live in the stores.
+ */
+export const SHOWCASE_IMPORT_WAYPOINTS: boolean = false;
+/**
  * The 4.0 Free and Pro plan (Chris, 2026-11-19) in the homepage's Free vs Pro table: Free joins,
  * follows and talks to the group with 5 Map Mode hours a month; creating rides and the rest is Pro.
  * Off until 4.0 is live in both stores, flipped in the same go-live pull request that turns on the

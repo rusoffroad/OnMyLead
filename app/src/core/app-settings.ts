@@ -71,6 +71,12 @@ export const APP_FLAGS = {
     hint: 'The forecast button on Ride Mode and Map Mode (free): the temperature, the next hours, 7 days and official weather alerts from the National Weather Service (app 4.0). Off hides it; Ride Day weather on ride pages is not affected.',
     since: '4.0',
   },
+  waypoint_import: {
+    group: 'maps',
+    label: 'Import Waypoints',
+    hint: 'The Import Waypoints button in Map Mode and on a ride’s Waypoints page (Pro), and opening GPX, KML and KMZ files from other map apps in OnMyLead (app 4.0). Off hides the buttons; waypoints already imported stay.',
+    since: '4.0',
+  },
   trail_ratings: {
     group: 'maps',
     label: 'Rate Trails',

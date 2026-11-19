@@ -141,6 +141,7 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
 - Import GPX **[Pro]**. No GPX export.
 - Waypoints (shared or only you, press and hold, at my location) and numbered Planned Stops. 15 waypoint symbols, color-blind friendly, shown on planned stops too (2.0).
 - 2.1: press and hold in Map Mode too (private Map Mode waypoints on the device, backed up with Sync; the live ride's when sharing location with one), and New Waypoint Alerts: riders' phones ding when the leader shares a waypoint or planned stop during a live ride.
+- 4.0: Import Waypoints (Pro): pins from a GPX, KML, KMZ or GeoJSON file exported from another map app, into Map Mode's own waypoints or onto a ride, from the Import Waypoints button, the share sheet / Files, or a file dropped on the website's map. Symbols guessed from names, repeats skipped, Undo.
 - Directions to the meeting point, a rider or a waypoint in Apple Maps or Google Maps.
 - Fuel range on the ride (route length vs each rider's machine range).
 

@@ -280,6 +280,7 @@ export const COMPARISON_4: ComparisonRow[] = [
   { label: 'Map Mode', free: `${FREE_MAP_HOURS_4} Hours a Month`, pro: 'Unlimited' },
   { label: 'Create Rides', free: false, pro: 'Unlimited' },
   { label: 'Draw Routes, Waypoints and Directions', free: false, pro: true },
+  { label: 'Import Waypoints From Other Map Apps', free: false, pro: true },
   { label: 'Places to Ride', free: false, pro: true },
   { label: 'Bluetooth Sharing With No Service', free: false, pro: true },
   { label: 'CarPlay', free: false, pro: true },

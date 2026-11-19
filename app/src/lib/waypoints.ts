@@ -116,3 +116,31 @@ export async function removeWaypoint(id: string): Promise<void> {
   check(error);
   if (!data?.length) throw new Error('That waypoint was already removed, or isn’t yours to remove.');
 }
+
+/** A rider's waypoints on one ride stop at this many (the database enforces it). */
+export const RIDE_WAYPOINT_MAX = 100;
+
+/** Add many at once (Import Waypoints): one request. The database refuses the lot if it passes the rider's limit. */
+export async function addWaypoints(rideId: string, list: WaypointDraft[]): Promise<Waypoint[]> {
+  if (!list.length) return [];
+  const data = await withSymbolFallback((withSymbol) =>
+    supabase
+      .from('ride_waypoints')
+      .insert(
+        list.map((w) => ({
+          ride_id: rideId, name: cleanWaypointName(w.name), ...symbolFields(w.symbol, withSymbol), note: w.note?.trim() || null,
+          lat: w.lat, lng: w.lng, shared: w.shared,
+        })),
+      )
+      .select('*'),
+  );
+  track('waypoints_imported', { count: list.length, where: 'ride', shared: list[0].shared });
+  return (data ?? []) as Waypoint[];
+}
+
+/** Take several off at once (Undo after an import). */
+export async function removeWaypoints(ids: string[]): Promise<void> {
+  if (!ids.length) return;
+  const { error } = await supabase.from('ride_waypoints').delete().in('id', ids);
+  check(error);
+}

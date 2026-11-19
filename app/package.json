@@ -47,6 +47,7 @@
     "expo-task-manager": "~57.0.21",
     "expo-tracking-transparency": "~57.0.2",
     "expo-web-browser": "~57.0.3",
+    "fflate": "0.8.2",
     "leaflet": "1.9.4",
     "mapbox-gl": "2.15.0",
     "pbf": "4.0.2",
