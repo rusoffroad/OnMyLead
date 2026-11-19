@@ -131,7 +131,7 @@ export function WeatherCorner({ trail, forecast }: { trail: TrailMap; forecast: 
   const temp = hour?.tempF ?? spot?.days[0]?.tempF ?? null;
   return (
     <>
-      {w.radar ? (
+      {w.radar && trail.mapbox ? (
         <View style={styles.radarKey} accessible accessibilityLabel={tr('Weather Radar. Light rain or snow is blue, heavy is red.')}>
           <Text style={styles.radarTitle}>{tr('Weather Radar')}</Text>
           <Svg width={104} height={6} style={{ borderRadius: 3 }}>
@@ -281,7 +281,7 @@ const styles = themedStyles(() => ({
   chipAlert: { borderColor: RideColors.yellow, borderWidth: 1.5 },
   chipTemp: { color: Colors.text, fontFamily: font(800, 'display'), fontSize: 17, lineHeight: 19 },
   chipChance: { color: Colors.sky, fontFamily: font(700), fontSize: 11, lineHeight: 13 },
-  alertDot: { position: 'absolute', top: 6, right: 6, width: 8, height: 8, borderRadius: 4, backgroundColor: RideColors.yellow },
+  alertDot: { position: 'absolute', top: 1, right: 1, width: 8, height: 8, borderRadius: 4, backgroundColor: RideColors.yellow },
   sheetRoot: { backgroundColor: 'rgba(4,10,20,0.28)' },
   sheetRootSide: { flexDirection: 'row' },
   sheetScrim: { flex: 1, alignSelf: 'stretch', outlineWidth: 0 },

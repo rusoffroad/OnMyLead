@@ -93,7 +93,7 @@ export function TrailMapOverlay({
   const credit = [
     trail.base === 'topo' ? TOPO_ATTRIBUTION : trail.offline ? IMAGERY_ATTRIBUTION : null,
     ...trail.agencyLayers.map((a) => a.attribution),
-    trail.weather.radar ? RADAR_ATTRIBUTION : null,
+    trail.weather.radar && trail.mapbox ? RADAR_ATTRIBUTION : null,
     osmOn ? OSM_ATTRIBUTION : trail.parkTrailsOn ? PARK_TRAILS_ATTRIBUTION : null,
   ]
     .filter(Boolean)
