@@ -146,6 +146,10 @@ Each style has a small picture of how it looks; the one you're using has a blue 
 :::release 2.1
 ## Map Features
 
+:::release 4.0
+In Motorcycle, Road Trip and Snowmobile, your activity's own features are at the top of Map Features: Snow on the Ground, Sled Trails, Avalanche Danger, Snow Depth Stations and Falling Snow for Snowmobile, Twisty Roads for Motorcycle, and Scenic Byways and Campgrounds for Road Trip. See [Switch Activities](/help/activities#your-activitys-map). Offroad's Map Features are unchanged, and none of these show on CarPlay.
+:::
+
 **Map Features** lists every kind of line and land the map can show, in three groups: **Roads**, **Trails** and **Land**. Each row has a small picture of exactly how it looks on the map, its name and a line about what it is. Tap a row to turn it on or off; a blue check means it's showing. **Show All** and **Hide All** next to a group's name turn the whole group on or off.
 
 ### Roads

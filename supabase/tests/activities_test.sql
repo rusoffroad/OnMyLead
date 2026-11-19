@@ -81,3 +81,38 @@ begin
   if not exists (select 1 from riding_spots_near_for('offroad', 30.6079, -98.1582, 50) where id = '00000000-0000-0000-0000-00000000d001') then raise exception 'FAIL: still offroad'; end if;
 end $$;
 reset role;
+
+-- Places for the other activities (20261121550000_activity_places.sql): a Snowmobile Area lists for
+-- Snowmobile only, never through the old function (builds before 4.0 don't know the kind), and a
+-- rider's suggestion is filed under their activity.
+reset role;
+insert into riding_spots (id, source, source_id, name, kind, lat, lng, activities)
+values ('00000000-0000-0000-0000-00000000d0a1', 'onmylead', 'test-sled-area', 'Test Sled Area', 'snow_area', 30.61, -98.16, array['snowmobile']);
+select expect_refused($q$insert into riding_spots (source, source_id, name, kind, lat, lng) values ('onmylead', 'bad-kind', 'Bad Kind', 'ski_hill', 30.6, -98.1)$q$, 'unknown place kind');
+select as_user(null);
+set role anon;
+do $$
+begin
+  if not exists (select 1 from riding_spots_near_for('snowmobile', 30.6079, -98.1582, 50) where id = '00000000-0000-0000-0000-00000000d0a1') then raise exception 'FAIL: sled area missing'; end if;
+  if exists (select 1 from riding_spots_near_for('offroad', 30.6079, -98.1582, 50) where id = '00000000-0000-0000-0000-00000000d0a1') then raise exception 'FAIL: sled area in offroad'; end if;
+  if exists (select 1 from riding_spots_near(30.6079, -98.1582, 50) where kind not in ('park', 'ohv_area', 'trail_system', 'trailhead', 'track')) then raise exception 'FAIL: old function sent a new kind'; end if;
+end $$;
+reset role;
+do $$
+begin
+  if exists (select 1 from riding_spots_near(30.6079, -98.1582, 1000) n join riding_spots s on s.id = n.id where not ('offroad' = any (s.activities))) then raise exception 'FAIL: old function sent a non-offroad place'; end if;
+end $$;
+
+select as_user('00000000-0000-0000-0000-0000000e0e03');
+set role authenticated;
+do $$
+declare v uuid;
+begin
+  v := suggest_riding_spot_for('road_trip', 'Lakeside RV Park', 'campground', 30.62, -98.17, null, null, 'TX');
+  if (select activities from riding_spots where id = v) <> array['road_trip'] then raise exception 'FAIL: suggestion activity'; end if;
+  if (select status from riding_spots where id = v) <> 'pending' then raise exception 'FAIL: suggestion not pending'; end if;
+  v := suggest_riding_spot('Old Build Park', 'park', 30.63, -98.18);
+  if (select activities from riding_spots where id = v) <> array['offroad'] then raise exception 'FAIL: old suggestion not offroad'; end if;
+end $$;
+select expect_refused($q$select suggest_riding_spot_for('road_trip', 'Nope', 'ski_hill', 30.62, -98.17)$q$, 'suggest unknown kind');
+reset role;

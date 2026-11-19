@@ -36,6 +36,7 @@ export const SYNCED_SETTINGS: Record<string, string> = {
   'map.layers.v1': 'Base map (Satellite, Topo, ...) and the trail layer switch',
   'map.riderTrails.v1': 'Show trails other riders shared',
   'map.parkTrails.v1': 'Show the trails of offroad parks',
+  'map.activityLayers.v1': "Map Features for the rider's activity (Snow on the Ground, Twisty Roads, ...)",
   'map.followMe.v1': 'Follow Me on live maps',
   'map.intersectionZoom.v1': 'Zoom In at Intersections on live maps',
   'map.edgeZoomOut.v1': 'Zoom Out at the Edge on live maps',

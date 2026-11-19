@@ -47,9 +47,11 @@ export async function fetchSpot(id: string): Promise<SpotDetail | null> {
 }
 
 /** Sends a missing place to the admin; it shows once approved. */
-export async function suggestSpot(s: SpotSuggestion, state: string | null): Promise<void> {
+export async function suggestSpot(s: SpotSuggestion, state: string | null, activity?: ActivityId): Promise<void> {
   if (!s.kind || !s.at) throw new Error('Pick what kind of place it is and where it is.');
-  const { error } = await supabase.rpc('suggest_riding_spot', {
+  // Activities (4.0): filed under the rider's activity; left out, Offroad (as before).
+  const { error } = await supabase.rpc(activity ? 'suggest_riding_spot_for' : 'suggest_riding_spot', {
+    ...(activity ? { p_activity: activity } : {}),
     p_name: s.name.trim(),
     p_kind: s.kind,
     p_lat: s.at.lat,

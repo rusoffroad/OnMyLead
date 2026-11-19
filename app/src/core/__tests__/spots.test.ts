@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   createRideHref, filterKinds, fractionToMiles, kindCounts, milesToFraction, nearestStepIndex, parseSavedMiles,
   parseSpotDetail, parseSpots, placeLine, safeWebsite, SCOUT_DEFAULT_MILES, SCOUT_MILE_STEPS, sourceCredit, spotFromParams,
-  stepMiles, suggestionProblem, toggleKind, websiteHost,
+  stepMiles, suggestionProblem, toggleKind, spotKindsFor, websiteHost,
 } from '../spots';
 // The import's rules live beside the import script (plain JavaScript, run by hand).
 import { classifyOsm, cleanText, kindFromName, spotKey, stateCode } from '../../../scripts/spots/classify.mjs';
@@ -167,4 +167,18 @@ describe('import rules (scripts/spots)', () => {
     expect(stateCode('UT')).toBe('UT');
     expect(spotKey({ name: 'Rasor OHV Area', lat: 35.0799, lng: -116.1937 })).toBe(spotKey({ name: 'rasor ohv area', lat: 35.081, lng: -116.194 }));
   });
+
+describe('places for each activity', () => {
+  it('gives each activity its own kinds of place, Offroad the same five as before', () => {
+    expect(spotKindsFor('offroad').map((k) => k.kind)).toEqual(['park', 'ohv_area', 'trail_system', 'trailhead', 'track']);
+    expect(spotKindsFor(undefined).map((k) => k.kind)).toEqual(['park', 'ohv_area', 'trail_system', 'trailhead', 'track']);
+    expect(spotKindsFor('snowmobile').map((k) => k.kind)).toContain('snow_area');
+    expect(spotKindsFor('road_trip').map((k) => k.kind)).toEqual(['scenic_drive', 'campground']);
+  });
+
+  it('treats every kind on screen picked as none picked', () => {
+    expect(toggleKind(['scenic_drive'], 'campground', ['scenic_drive', 'campground'])).toEqual([]);
+    expect(toggleKind([], 'campground', ['scenic_drive', 'campground'])).toEqual(['campground']);
+  });
+});
 });

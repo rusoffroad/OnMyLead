@@ -8,7 +8,8 @@ import { ThemedText } from '@/components/themed-text';
 import { Button, Card, Choice, ErrorText, Field, Screen } from '@/components/ui';
 import { Spacing } from '@/constants/theme';
 import type { LatLng } from '@/core/geo';
-import { SPOT_KINDS, suggestionProblem, type SpotKind } from '@/core/spots';
+import { spotKindsFor, suggestionProblem, type SpotKind } from '@/core/spots';
+import { useDiscoverActivity } from '@/lib/activity';
 import { track } from '@/lib/analytics';
 import { t } from '@/lib/i18n';
 import { currentPosition, stateAt } from '@/lib/location';
@@ -24,6 +25,8 @@ export default function SuggestSpotScreen() {
   const { session, loading } = useSession();
   const [name, setName] = useState('');
   const [kind, setKind] = useState<SpotKind | null>(null);
+  // Activities (4.0): the kinds of place for the rider's activity; the suggestion is filed under it.
+  const activity = useDiscoverActivity();
   const [at, setAt] = useState<LatLng | null>(null);
   const [atLabel, setAtLabel] = useState<string | null>(null);
   const [state, setState] = useState<string | null>(null);
@@ -50,7 +53,7 @@ export default function SuggestSpotScreen() {
     setBusy(true);
     setError(null);
     try {
-      await suggestSpot({ name, kind, at, website, note }, state);
+      await suggestSpot({ name, kind, at, website, note }, state, activity);
       track('spot_suggested', { kind });
       setSent(true);
     } catch (e) {
@@ -78,7 +81,7 @@ export default function SuggestSpotScreen() {
       <Stack.Screen options={{ title: t('Suggest a Place') }} />
       <ThemedText themeColor="textSecondary">{t('Know an off-road park, OHV area or trail system that isn’t in Scout? Tell us where it is.')}</ThemedText>
       <Field label={t('Name')} value={name} onChangeText={setName} placeholder="Hidden Falls Adventure Park" maxLength={120} />
-      <Choice<SpotKind | null> label={t('What Kind of Place')} value={kind} onChange={setKind} options={SPOT_KINDS.map((k) => ({ value: k.kind, label: k.one }))} />
+      <Choice<SpotKind | null> label={t('What Kind of Place')} value={kind} onChange={setKind} options={spotKindsFor(activity).map((k) => ({ value: k.kind, label: k.one }))} />
 
       <View style={{ gap: Spacing.two }}>
         <ThemedText type="heading">{t('Where It Is')}</ThemedText>

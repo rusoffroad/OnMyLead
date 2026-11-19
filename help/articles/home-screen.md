@@ -75,6 +75,8 @@ From 3.1 the second tile is **Events and Group Rides**: it opens rallies, poker 
 ## Places to Ride
 
 The card under those two tiles, with pins on a satellite map. Tap it to find off-road parks, national forests, OHV areas, trails and motocross tracks near you, see each place's address, phone, hours and rider reviews, and save your Favorite Places. It says **New** until you open it the first time. See [Find Places to Ride With Scout](/help/scout).
+
+In Snowmobile, a **Snow Near You** card shows the snow where you are and today's avalanche danger. See [Switch Activities](/help/activities#snow-near-you).
 :::
 
 When one of your rides is live, a card under them says **Your ride is live. Tap to open Ride Mode**.
