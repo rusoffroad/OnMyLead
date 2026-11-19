@@ -32,6 +32,7 @@ import { startAdTracking } from '@/lib/ad-tracking';
 import { startFoundUs } from '@/lib/found-us';
 import { startOutboxSync } from '@/lib/outbox';
 import { startAppSettings } from '@/lib/app-settings';
+import { startRadio } from '@/lib/radio';
 import { startEntitlements } from '@/lib/entitlements';
 import { startUsageCounts } from '@/lib/usage';
 import { currentEntitlements, useCan } from '@/lib/pro';
@@ -121,6 +122,8 @@ function RootLayout() {
   useEffect(() => startUsageCounts(), []);
   // The owner's announcement, maintenance notice, feature flags and release controls.
   useEffect(() => startAppSettings(), []);
+  // Radio Sharing: does nothing unless the Admin switch is on and the rider paired a radio.
+  useEffect(() => startRadio(), []);
   // Phones stay upright, tablets turn (Android; the Apple app does this in its Info.plist).
   useEffect(() => startOrientationRule(), []);
   // Who has agreed to the Rider Safety and Liability Agreement, and sending each record to the server.
@@ -206,6 +209,7 @@ function RootLayout() {
         <Stack.Screen name="blocked" options={{ title: tr('Blocked Riders') }} />
         <Stack.Screen name="report-rider" options={{ title: tr('Report a Rider') }} />
         <Stack.Screen name="battery" options={{ title: tr('Battery Saver') }} />
+        <Stack.Screen name="radio" options={{ title: tr('Radio Sharing') }} />
         <Stack.Screen name="permissions" options={{ title: tr('Permissions') }} />
         <Stack.Screen name="appearance" options={{ title: tr('Appearance') }} />
         <Stack.Screen name="language" options={{ title: tr('Language') }} />

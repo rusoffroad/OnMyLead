@@ -1,0 +1,9 @@
+{
+  "platforms": ["apple", "android"],
+  "apple": {
+    "modules": ["OnMyLeadMeshRadioModule"]
+  },
+  "android": {
+    "modules": ["com.rusoffroad.onmylead.meshradio.OnMyLeadMeshRadioModule"]
+  }
+}

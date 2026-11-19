@@ -120,6 +120,11 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
   `modules/onmylead-nearby` (Swift + Kotlin), migrations `20261104060000_bluetooth_sharing.sql`,
   `20261104100000_bluetooth_mesh.sql`. You > Bluetooth Sharing switch; **[flag]**
   `bluetooth_sharing`. Apps only (not the website).
+- Radio Sharing (4.0, not yet tested with real radios): You > Radio Sharing pairs the rider's own
+  Meshtastic radio; in Ride Mode the same sealed Bluetooth Sharing packets also go over it on
+  private port 287, and packets heard from it join the mesh. `core/meshtastic.ts`,
+  `core/radio-share.ts`, `lib/radio.ts`, `modules/onmylead-mesh-radio` (Swift + Kotlin). No
+  migration. **[flag]** `radio_sharing` (off). Apps only (not the website).
 
 ### Chat and Polls
 - Ride chat to everyone or to the leader only, in-app pop-ups, resolve / clear messages.
