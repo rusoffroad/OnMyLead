@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { APP_FLAG_KEYS, flagOn, liveNotice, NO_SETTINGS, noticeKey, parseAppSettings } from '../app-settings';
+import { APP_FLAG_KEYS, FLAG_GROUPS, flagChanges, flagOn, flagsInGroup, flagSince, liveNotice, NO_SETTINGS, noticeKey, parseAppSettings } from '../app-settings';
 
 describe('parseAppSettings', () => {
   it('reads notices and boolean flags', () => {
@@ -57,5 +57,40 @@ describe('noticeKey', () => {
     expect(noticeKey({ text: 'a' })).toBe(noticeKey({ text: 'a' }));
     expect(noticeKey({ text: 'a' })).not.toBe(noticeKey({ text: 'b' }));
     expect(noticeKey({ text: 'a' })).not.toBe(noticeKey({ text: 'a', until: '2026-11-01T00:00:00Z' }));
+  });
+});
+
+describe('Admin Features page', () => {
+  it('puts every flag in exactly one group, and no group is empty', () => {
+    const grouped = FLAG_GROUPS.flatMap((g) => flagsInGroup(g.key));
+    expect([...grouped].sort()).toEqual([...APP_FLAG_KEYS].sort());
+    for (const g of FLAG_GROUPS) expect(flagsInGroup(g.key).length).toBeGreaterThan(0);
+  });
+
+  it('keeps the 4.0 switches on until the owner turns them off', () => {
+    for (const k of ['route_eta', 'trail_ratings', 'ride_cards', 'social_posting', 'leaderboard', 'founder_tag'] as const) {
+      expect(flagOn(NO_SETTINGS, k)).toBe(true);
+      expect(flagSince(k)).toBe('4.0');
+      expect(flagOn({ ...NO_SETTINGS, flags: { [k]: false } }, k)).toBe(false);
+    }
+  });
+
+  it('only the flag that needs setup first starts off', () => {
+    expect(APP_FLAG_KEYS.filter((k) => !flagOn(NO_SETTINGS, k)).sort()).toEqual(['apple_web_sign_in']);
+  });
+
+  it('lists only real changes, by what the app does', () => {
+    expect(flagChanges({}, { starlink: true, apple_web_sign_in: false })).toEqual([]);
+    expect(flagChanges({}, { starlink: false, radio_sharing: false })).toEqual([
+      { flag: 'radio_sharing', on: false },
+      { flag: 'starlink', on: false },
+    ]);
+    expect(flagChanges({ route_eta: false }, {})).toEqual([{ flag: 'route_eta', on: true }]);
+  });
+
+  it('never offers a switch for safety or core riding', () => {
+    for (const k of ['ride_mode', 'emergency', 'sos', 'need_help', 'location_sharing', 'navigation', 'chat', 'join', 'carplay']) {
+      expect(APP_FLAG_KEYS as string[]).not.toContain(k);
+    }
   });
 });

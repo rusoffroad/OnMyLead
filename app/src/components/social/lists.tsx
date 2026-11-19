@@ -8,6 +8,7 @@ import { Button } from '@/components/ui';
 import { Colors, font, themedStyles } from '@/constants/theme';
 import { splitFriends, type Friend } from '@/core/friends';
 import { profileHref, type SocialItem } from '@/core/social';
+import { useFlag } from '@/lib/app-settings';
 import { requirePro } from '@/lib/pro';
 import { faceColor, Initial } from '../home/parts';
 import { ProTag, Social } from './parts';
@@ -53,6 +54,8 @@ export function ItemList({
 
 /** "What's the ride report?": opens the composer (Pro), with the rider's own picture. */
 export function ComposePrompt({ userId, name, pro }: { userId: string; name: string; pro: boolean }) {
+  // Admin can switch new posts off (Features: Social Posts); what's shared still shows.
+  if (!useFlag('social_posting')) return null;
   return (
     <Pressable
       onPress={() => {

@@ -24,7 +24,7 @@ the server, and ship the last good code again as a new, higher version.
 1. **Stop it spreading.** Admin > Releases: **Halt Release** on Google Play, **Pause Phased
    Release** on the App Store.
 2. **Switch off the broken part**, if it is an extra with a switch (Find a Ride, Trip Planner,
-   Starlink, RUS Gear, Ride Polls): Admin > Settings > Feature Flags. Phones pick it up within
+   Starlink, RUS Gear, Ride Polls): Admin > Features. Phones pick it up within
    minutes. Safety features never get a switch.
 3. **Tell riders on that version.** Admin > Releases > Version Notice: an amber "About This
    Version" card on the home screen, shown only on the versions listed (1.0.3 and newer builds read

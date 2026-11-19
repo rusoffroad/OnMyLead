@@ -35,6 +35,7 @@ import { usePanelFold } from '@/hooks/use-panel-fold';
 import { useRouteDraft } from '@/hooks/use-route-draft';
 import { useTrailMap } from '@/hooks/use-trail-map';
 import { getPrivateDetails, getRide, getRideRoute, saveRideRoute } from '@/lib/api';
+import { useFlag } from '@/lib/app-settings';
 import { confirmAsync } from '@/lib/confirm';
 import { handleProError, requirePro, useCan, useEntitlements } from '@/lib/pro';
 import { readPickedText } from '@/lib/read-text';
@@ -98,6 +99,7 @@ export default function RouteBuilder() {
   // (a panel hanging from the top on a wide tablet is already clear of it), but never up over the
   // Map Settings button, the bar with the ride's name or the status bar (core/route-eta panelLift).
   const [typingSpeed, setTypingSpeed] = useState(false);
+  const etaOn = useFlag('route_eta');
   const [panelH, setPanelH] = useState(0);
   const keyboard = useKeyboardHeight();
   const windowH = useWindowDimensions().height;
@@ -310,7 +312,7 @@ export default function RouteBuilder() {
                 {draft.finding ? tr('Finding the trail…') : hint}
               </Text>
             </View>
-            <RouteEta lengthM={route?.lengthM ?? null} onTyping={setTypingSpeed} />
+            {etaOn ? <RouteEta lengthM={route?.lengthM ?? null} onTyping={setTypingSpeed} /> : null}
             <View style={styles.row}>
               <Button title={tr('Undo')} kind="secondary" style={styles.flex} disabled={!!imported || !taps.length} onPress={draft.undo} />
               <Button title={tr('Clear')} kind="secondary" style={styles.flex} disabled={!route && !taps.length} onPress={clear} />

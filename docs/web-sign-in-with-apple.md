@@ -4,7 +4,7 @@ The iPhone and iPad app uses Apple's own sign-in sheet, which only needs the app
 Supabase's Apple provider. onmylead.com and the Android app can't show that sheet; they use Apple's
 web sign-in (OAuth) through Supabase, which needs a **Services ID** and a **secret** from the Apple
 Developer site. The code is in place; the button shows once the owner switches it on in Admin >
-Settings > Feature Flags > **Sign in with Apple on the Website and Android** (`apple_web_sign_in`,
+Features > **Sign in with Apple on the Website and Android** (`apple_web_sign_in`,
 off until set). Until then the website and Android show Google and Facebook only, as today.
 
 Only Chris can do the Apple Developer and Supabase steps (logins). None of them change the iPhone
@@ -57,7 +57,7 @@ them); nothing to add.
 
 ## 5. Switch it on and check it
 
-1. onmylead.com/admin > Settings > Feature Flags > **Sign in with Apple on the Website and
+1. onmylead.com/admin > Features > **Sign in with Apple on the Website and
    Android** > On > Save Flags.
 2. Open onmylead.com/sign-in in a private window: **Continue with Apple** is first. Sign in with the
    test Apple Account; the page goes to appleid.apple.com and comes back signed in.

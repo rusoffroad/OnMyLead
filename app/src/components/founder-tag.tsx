@@ -3,6 +3,7 @@ import Svg, { Path } from 'react-native-svg';
 
 import { FOUNDER_COLORS } from '@/components/badge-patch';
 import { Colors, font, themedStyles } from '@/constants/theme';
+import { useFlag } from '@/lib/app-settings';
 import { useIsFounder } from '@/lib/founders';
 import { t } from '@/lib/i18n';
 
@@ -16,7 +17,8 @@ import { t } from '@/lib/i18n';
  */
 export function FounderTag({ userId, inline, style }: { userId: string | null | undefined; inline?: boolean; style?: StyleProp<ViewStyle> }) {
   const founder = useIsFounder(userId);
-  if (!founder) return null;
+  const on = useFlag('founder_tag');
+  if (!founder || !on) return null;
   if (inline) return <FounderInline />;
   return <FounderChip style={style} />;
 }

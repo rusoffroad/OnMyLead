@@ -15,6 +15,7 @@ import { track } from '@/lib/analytics';
 import { groupSummary, myTrack, type GroupSummary } from '@/lib/api';
 import { useEntitlements } from '@/lib/entitlements';
 import { requirePro } from '@/lib/pro';
+import { useFlag } from '@/lib/app-settings';
 import { shareRideCard } from '@/lib/share-card';
 import type { Ride, RideMember } from '@/lib/types';
 
@@ -38,6 +39,7 @@ export function RideSummary({ ride, members }: { ride: Ride; members: RideMember
   const { can } = useEntitlements();
   const advanced = can('advanced_stats');
   const premium = can('premium_ride_cards');
+  const cardsOn = useFlag('ride_cards');
 
   useEffect(() => {
     let live = true;
@@ -133,6 +135,7 @@ export function RideSummary({ ride, members }: { ride: Ride; members: RideMember
         ) : null}
       </Card>
 
+      {cardsOn ? (
       <Card>
         <ThemedText type="heading">{t('Ride Card')}</ThemedText>
         <Segmented
@@ -146,6 +149,9 @@ export function RideSummary({ ride, members }: { ride: Ride; members: RideMember
         {note ? <ThemedText type="small" themeColor="textSecondary">{note}</ThemedText> : null}
         <ErrorText error={error} />
       </Card>
+      ) : (
+        <ErrorText error={error} />
+      )}
     </View>
   );
 }
