@@ -120,6 +120,12 @@ export const APP_FLAGS = {
   starlink: { group: 'extras', label: 'Starlink', hint: 'The Starlink page in the home screen toolkit.' },
   starlink_mount_ad: { group: 'extras', label: 'Starlink Mount Ad', hint: 'The RUS Starlink Mini Mount V2 ad on the Starlink page.' },
   rus_gear: { group: 'extras', label: 'RUS Gear Suggestions', hint: 'Product suggestions in the Garage and on trip checklists.' },
+  welcome_tour: {
+    group: 'account',
+    label: 'Welcome Tour',
+    hint: 'The short tour of the app that shows once on Home: the whole tour for new riders, a What’s New card for riders who had the app before (app 4.0). Off stops it showing by itself; You > Help > Take the Tour still works.',
+    since: '4.0',
+  },
   referrals: { group: 'account', label: 'Refer a Friend', hint: 'Invite Friends and the 50% off Pro Annual reward. Turn on only once the Apple offer codes and the Google Play referral-50 offer exist. Rewards already earned can still be claimed when it is off.' },
   apple_web_sign_in: {
     group: 'account',

@@ -67,6 +67,7 @@ export const SYNCED_SETTINGS: Record<string, string> = {
   'starlink.autoConnect.v1': 'Starlink page connects by itself',
   'onmylead.dismissedNotices': 'Announcements the rider closed',
   'promo.inviteFriends.v1': 'The one-time Invite Friends pop-up was seen',
+  'tour.welcome.v1': 'The Welcome Tour (or What’s New) was shown',
   // Appearance (themes thread; lib/appearance applies a change from another device)
   'onmylead.appearance': 'Theme, Dark/Light/Match Phone and Color Blind Mode',
   // Activities (lib/activity applies a change from another device at launch)

@@ -24,6 +24,7 @@ import { HelpRow, Toolkit } from '@/components/home/toolkit';
 import { Icon } from '@/components/icon';
 import { InboxBell } from '@/components/inbox-bell';
 import { InvitePromo } from '@/components/invite-promo';
+import { WelcomeTour } from '@/components/welcome-tour';
 import { LanguageButton } from '@/components/language-button';
 import { Logo } from '@/components/logo';
 import { ProLock } from '@/components/pro-gate';
@@ -68,6 +69,7 @@ import { useSession } from '@/lib/session';
 import { isBackendConfigured } from '@/lib/supabase';
 import { askForTracking } from '@/lib/ad-tracking';
 import { FoundUsCard } from '@/components/found-us-card';
+import { useWelcomeTour } from '@/lib/welcome-tour';
 import { useNeedsRiderAgreement } from '@/lib/rider-agreement';
 import type { Ride, RideMember } from '@/lib/types';
 import { currentLocale, t } from '@/lib/i18n';
@@ -136,6 +138,8 @@ export default function HomeScreen() {
     setFocused(true);
     return () => setFocused(false);
   }, []));
+  // The Welcome Tour (4.0) shows once, first; the Invite Friends pop-up waits until it's settled.
+  const tour = useWelcomeTour(focused && !!session);
   // One satellite picture for the map header and the Map Mode tile (cached on the phone).
   const heroUrl = useHeroMap(Math.min(layout.width, 1200), head.hero + insets.top);
 
@@ -542,7 +546,8 @@ export default function HomeScreen() {
           }}
         />
       ) : null}
-      {session ? <InvitePromo active={focused} /> : null}
+      {session ? <InvitePromo active={focused && tour.checked && !tour.mode} /> : null}
+      <WelcomeTour mode={tour.mode} onClose={tour.hide} />
     </>
   );
 

@@ -76,6 +76,10 @@
         "text": "Forecast Where You Are (free): a temperature button on Ride Mode and Map Mode. Tap it for the next 12 hours, 7 days and official weather alerts from the National Weather Service."
       },
       {
+        "kind": "new",
+        "text": "Welcome Tour: new riders get a quick tour of the app the first time they open it, and riders updating from an earlier version see a What's New card. Take it again any time from You > Help > Take the Tour."
+      },
+      {
         "kind": "improved",
         "text": "Ride Day weather on the ride page now comes from the National Weather Service. It shows about a week before the ride, for rides in the United States."
       },
