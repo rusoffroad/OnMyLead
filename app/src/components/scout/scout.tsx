@@ -1,11 +1,11 @@
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Icon } from '@/components/icon';
 import { PlaceSearch } from '@/components/place-search';
-import { awayText, SpotPin } from '@/components/rides-map-chrome';
+import { awayText, mapFrameStyle, SpotPin } from '@/components/rides-map-chrome';
 import { RidesMap } from '@/components/rides-map';
 import { SPOT_INK } from '@/components/spot-pin-art';
 import { RowGroup } from '@/components/ride-row';
@@ -22,7 +22,7 @@ import { useFullMap } from '@/hooks/use-full-map';
 import { useLayout } from '@/hooks/use-layout';
 import { track } from '@/lib/analytics';
 import { t } from '@/lib/i18n';
-import { currentPosition } from '@/lib/location';
+import { quickPosition } from '@/lib/location';
 import { useSession } from '@/lib/session';
 import { favoriteSpots, readScoutMiles, saveScoutMiles, spotsNear } from '@/lib/spots';
 import { MileSlider } from './mile-slider';
@@ -71,8 +71,9 @@ export function Scout({ top, start = 'near' }: { top: React.ReactNode; start?: '
     readScoutMiles().then(setSavedMiles).catch(() => setSavedMiles(SCOUT_DEFAULT_MILES));
   }, []);
 
+  // The phone's recent fix opens the map at once; a fresh High fix could take 10 seconds (Chris, build 27).
   const findHere = () =>
-    currentPosition()
+    quickPosition()
       .then(setHere)
       // Only our own words reach the rider; a phone error (kCLErrorDomain, no fix yet) gets the plain line.
       .catch((e) => setLocError(e instanceof Error && /^Allow location access/.test(e.message) ? t(e.message) : t('Could not get your location.')))
@@ -151,7 +152,14 @@ export function Scout({ top, start = 'near' }: { top: React.ReactNode; start?: '
       height={layout.wide || fullMap.full ? '100%' : 340}
       full={fullMap.full}
       onToggleFull={fullMap.full ? fullMap.exit : fullMap.enter}
+      cover
     />
+  ) : (locating || origin) && !onlyFavs ? (
+    // Holds the map's place while the phone finds the rider, so the page doesn't sit half empty.
+    <View style={[mapFrameStyle(layout.wide ? '100%' : 340), styles.waiting]} accessibilityLiveRegion="polite">
+      <ActivityIndicator color={Colors.text} />
+      <ThemedText themeColor="textSecondary">{t('Finding where you are…')}</ThemedText>
+    </View>
   ) : null;
 
   const controls = (
@@ -164,11 +172,11 @@ export function Scout({ top, start = 'near' }: { top: React.ReactNode; start?: '
           <Button title={here ? t('Back to Near Me') : t('Clear')} kind="ghost" onPress={() => setPlace(null)} />
         </View>
       ) : null}
-      {!origin && !onlyFavs ? (
+      {!origin && !onlyFavs && !locating ? (
         <Card>
-          <ThemedText>{locating ? t('Finding where you are…') : t('Turn on location to see places to ride near you, or search a town or park above.')}</ThemedText>
-          {!locating && locError ? <ThemedText type="small" themeColor="textSecondary">{locError}</ThemedText> : null}
-          {!locating ? <Button title={t('Use My Location')} onPress={locate} /> : null}
+          <ThemedText>{t('Turn on location to see places to ride near you, or search a town or park above.')}</ThemedText>
+          {locError ? <ThemedText type="small" themeColor="textSecondary">{locError}</ThemedText> : null}
+          <Button title={t('Use My Location')} onPress={locate} />
         </Card>
       ) : null}
       {onlyFavs ? null : <MileSlider miles={miles} onChange={changeMiles} />}
@@ -305,6 +313,7 @@ export function SpotRow({ spot, onPress, away = true }: { spot: Spot; onPress: (
 
 const styles = themedStyles(() => ({
   placeRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.two },
+  waiting: { alignItems: 'center', justifyContent: 'center', gap: Spacing.two },
   // The chips scroll sideways in one row so the map stays near the top on a phone.
   kindScroll: { marginHorizontal: -Spacing.three, flexGrow: 0 },
   kinds: { flexDirection: 'row', gap: 8, paddingHorizontal: Spacing.three },
