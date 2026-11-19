@@ -40,6 +40,9 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
 - Phone code sign-in exists in `lib/session.ts` but has no screen (not a feature).
 - `/auth-callback` finishes email links (Open in the App / Continue on the Website).
 - Delete Account (in-app, `delete-account` function), Sign Out.
+- Welcome Tour (4.0): up to 12 cards shown once on Home to a new account, a What's New card to riders
+  who had the app before, You > Help > Take the Tour any time; Admin flag `welcome_tour`.
+  `core/welcome-tour.ts`, `lib/welcome-tour.ts`, `components/welcome-tour.tsx`, `app/tour.tsx`.
 
 ### Profile and Settings (You tab)
 - Ride name (`/ride-name`) with live preview; opt-in social profile (name/photo from Apple, Google

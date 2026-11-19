@@ -22,7 +22,7 @@ sources:
   - app/src/components/message-alerts.tsx
   - app/src/app/notifications.tsx
   - app/app.json
-related: [home-screen, sign-in, ride-name-and-profile, create-a-ride, join-a-ride, find-a-ride, riding-groups, notification-settings, location-sharing, pro-trial, free-vs-pro]
+related: [welcome-tour, home-screen, sign-in, ride-name-and-profile, create-a-ride, join-a-ride, find-a-ride, riding-groups, notification-settings, location-sharing, pro-trial, free-vs-pro]
 keywords: [install, download, new, start, tabs, home, first time, setup, permissions, website, iphone, ipad]
 ---
 
@@ -36,6 +36,12 @@ OnMyLead runs on iPhone, iPad, Android phones and Android tablets. Download **On
 ## Agree Before You Ride
 
 The first time you open the app, the **Before You Ride** screen shows the Rider Safety and Liability Agreement. Read it, tick the box and tap **I Agree**. On onmylead.com it shows after you sign in. See [The Rider Safety and Liability Agreement](/help/rider-safety-agreement).
+:::
+
+:::release 4.0
+## Take the Welcome Tour
+
+After that, a short tour shows you around the app. Tap **Next** to move through it or **Skip** to close it. You can take it again any time from **You** > **Help** > **Take the Tour**. See [Take the Welcome Tour](/help/welcome-tour).
 :::
 
 ## Make Your Account

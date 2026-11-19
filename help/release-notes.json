@@ -48,6 +48,10 @@
         "text": "Estimated Time in the route builder: type the average speed you expect to ride and see about how long the route takes. It's moving time only, so plan extra for stops and terrain."
       },
       {
+        "kind": "new",
+        "text": "Welcome Tour: new riders get a quick tour of the app the first time they open it, and riders updating from an earlier version see a What's New card. Take it again any time from You > Help > Take the Tour."
+      },
+      {
         "kind": "improved",
         "text": "Every Home card now fits on one phone screen without scrolling, and Start a Ride is now Create a Ride, the same size as Events."
       },
