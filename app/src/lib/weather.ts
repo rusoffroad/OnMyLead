@@ -18,6 +18,24 @@ import { positionIfAllowed } from '@/lib/location';
 const POINT_KEY = (s: Spot) => `weather.point.v1.${s.lat.toFixed(2)},${s.lng.toFixed(2)}`;
 const LAST_KEY = 'weather.last.v1';
 const POINT_KEEP_MS = 30 * 86_400_000;
+/** How long to wait for the phone's own spot before using the middle of the map instead. */
+const SPOT_WAIT_MS = 6000;
+
+/**
+ * The phone's spot when location is allowed, but never waiting more than a few seconds: a phone
+ * (or the Simulator) with no fix yet can take minutes, and the forecast would never show.
+ */
+async function quickPosition(): Promise<Spot | null> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const late = new Promise<null>((done) => {
+    timer = setTimeout(() => done(null), SPOT_WAIT_MS);
+  });
+  try {
+    return await Promise.race([positionIfAllowed(), late]);
+  } finally {
+    clearTimeout(timer);
+  }
+}
 
 const points = new Map<string, NwsPoint | null>();
 
@@ -146,7 +164,7 @@ export function useSpotWeather(on: boolean, mapCenter: Spot | null): SpotWeather
     let live = true;
     const show = (v: SpotWeather | null) => live && setW(v);
     const refresh = async () => {
-      const where = (await positionIfAllowed()) ?? center.current;
+      const where = (await quickPosition()) ?? center.current;
       const saved = await lastSaved();
       if (!live) return;
       if (!where) return show(saved ?? null);

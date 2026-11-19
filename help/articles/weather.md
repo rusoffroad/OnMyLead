@@ -29,7 +29,7 @@ Both start off. Your choices are remembered and synced to your other devices, li
 
 ## Weather Radar
 
-Weather Radar paints rain and snow over the map, from light (blue) to heavy (red), with a small key under the Map Settings button. It shows on every map that has Map Settings: Ride Mode, Map Mode, the route builder and the waypoint map. Your route, the riders and the trails stay on top, so you can see which way a storm is moving compared to where you're headed.
+Weather Radar paints rain and snow over the map, from light (blue) to heavy (red), with a small key beside the Map Settings button. It shows on every map that has Map Settings: Ride Mode, Map Mode, the route builder and the waypoint map. Your route, the riders and the trails stay on top, so you can see which way a storm is moving compared to where you're headed.
 
 - It updates every 5 minutes while the map is open.
 - It needs service. With no signal the radar goes away, so old rain is never shown as now.
@@ -38,7 +38,7 @@ Weather Radar paints rain and snow over the map, from light (blue) to heavy (red
 
 ## Forecast Where You Are
 
-With the forecast on, a round button with the temperature sits under Map Settings in Ride Mode and Map Mode, with the chance of rain or snow this hour under it. A yellow edge and dot mean there's an official weather alert where you are.
+With the forecast on, a round button with the temperature sits beside Map Settings in Ride Mode and Map Mode, with the chance of rain or snow this hour under the temperature. A yellow edge and dot mean there's an official weather alert where you are. While the first forecast loads the button shows a spinner; outside the United States, or with no service and no saved forecast, it shows a dash, and tapping it says why.
 
 Tap it to open **Weather**:
 

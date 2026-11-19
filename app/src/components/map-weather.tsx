@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Platform, Pressable, ScrollView, Text, View } from 'react-native';
+import { ActivityIndicator, Platform, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Circle, Defs, LinearGradient, Path, Rect, Stop } from 'react-native-svg';
 
@@ -118,23 +118,58 @@ function ageText(at: number, now: number): string | null {
   return tr('From {d} Days Ago', { d: Math.round(min / 1440) });
 }
 
+/** Whether the corner shows anything beside Map Settings (the overlay moves its hint down then). */
+export function weatherCornerShows(trail: TrailMap, forecast: boolean): boolean {
+  return Boolean((trail.weather.radar && trail.mapbox) || (forecast && trail.weather.forecastOn));
+}
+
 /**
- * The map's corner, under Map Settings: the radar key while the radar shows, and the forecast
- * button (temperature now and the chance of rain or snow) where `forecast` is asked for.
+ * Beside Map Settings, in a row so the panels on the map never cover it: the forecast button
+ * (temperature now and the chance of rain or snow) where `forecast` is asked for, and the radar
+ * key while the radar shows. The button shows from the moment the switch is on: a dash while the
+ * first forecast loads or when there is none here, and a tap says why.
  */
 export function WeatherCorner({ trail, forecast }: { trail: TrailMap; forecast: boolean }) {
   const w = trail.weather;
-  const spot = useSpotWeather(forecast && w.forecastOn, trail.center);
+  const showForecast = forecast && w.forecastOn;
+  const spot = useSpotWeather(showForecast, trail.center);
   const [open, setOpen] = useState(false);
-  const now = useMinute(forecast && w.forecastOn);
+  const now = useMinute(showForecast);
   const hour = spot ? nextHours(spot.hours, now, 1)[0] ?? null : null;
   const temp = hour?.tempF ?? spot?.days[0]?.tempF ?? null;
+  const loading = spot === undefined;
   return (
     <>
+      {showForecast ? (
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={
+            spot && temp != null
+              ? tr('Forecast: {temp} degrees, {chance} percent chance of rain or snow. Opens the full forecast.', { temp, chance: hour?.precip ?? 0 })
+              : loading
+                ? tr('Loading the forecast')
+                : tr('No forecast here. Opens the reason.')
+          }
+          onPress={() => !loading && setOpen(true)}
+          hitSlop={4}
+          style={({ pressed }) => [styles.chip, spot && spot.alerts.length > 0 && styles.chipAlert, pressed && { opacity: 0.85 }]}>
+          {loading ? (
+            <ActivityIndicator size="small" color={Colors.textSecondary} />
+          ) : spot && temp != null ? (
+            <>
+              <Text style={styles.chipTemp}>{temp}°</Text>
+              {hour?.precip != null && hour.precip > 0 ? <Text style={styles.chipChance}>{hour.precip}%</Text> : null}
+            </>
+          ) : (
+            <Text style={[styles.chipTemp, { color: Colors.textSecondary }]}>--°</Text>
+          )}
+          {spot && spot.alerts.length ? <View style={styles.alertDot} /> : null}
+        </Pressable>
+      ) : null}
       {w.radar && trail.mapbox ? (
         <View style={styles.radarKey} accessible accessibilityLabel={tr('Weather Radar. Light rain or snow is blue, heavy is red.')}>
           <Text style={styles.radarTitle}>{tr('Weather Radar')}</Text>
-          <Svg width={104} height={6} style={{ borderRadius: 3 }}>
+          <Svg width={KEY_W} height={6} style={{ borderRadius: 3 }}>
             <Defs>
               <LinearGradient id="radar-key" x1="0" y1="0" x2="1" y2="0">
                 {RADAR_KEY_COLORS.map((c, i) => (
@@ -142,7 +177,7 @@ export function WeatherCorner({ trail, forecast }: { trail: TrailMap; forecast: 
                 ))}
               </LinearGradient>
             </Defs>
-            <Rect width={104} height={6} rx={3} fill="url(#radar-key)" />
+            <Rect width={KEY_W} height={6} rx={3} fill="url(#radar-key)" />
           </Svg>
           <View style={styles.radarScale}>
             <Text style={styles.radarScaleText}>{tr('Light')}</Text>
@@ -150,20 +185,43 @@ export function WeatherCorner({ trail, forecast }: { trail: TrailMap; forecast: 
           </View>
         </View>
       ) : null}
-      {forecast && w.forecastOn && spot && temp != null ? (
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel={tr('Forecast: {temp} degrees, {chance} percent chance of rain or snow. Opens the full forecast.', { temp, chance: hour?.precip ?? 0 })}
-          onPress={() => setOpen(true)}
-          hitSlop={4}
-          style={({ pressed }) => [styles.chip, spot.alerts.length > 0 && styles.chipAlert, pressed && { opacity: 0.85 }]}>
-          <Text style={styles.chipTemp}>{temp}°</Text>
-          {hour?.precip != null && hour.precip > 0 ? <Text style={styles.chipChance}>{hour.precip}%</Text> : null}
-          {spot.alerts.length ? <View style={styles.alertDot} /> : null}
-        </Pressable>
-      ) : null}
       {spot ? <WeatherSheet visible={open} onClose={() => setOpen(false)} w={spot} /> : null}
+      {showForecast && spot === null ? <NoForecastSheet visible={open} onClose={() => setOpen(false)} /> : null}
     </>
+  );
+}
+
+const KEY_W = 92;
+
+/** Why there's no forecast: outside the United States, or no service and nothing saved yet. */
+function NoForecastSheet({ visible, onClose }: { visible: boolean; onClose: () => void }) {
+  const insets = useSafeAreaInsets();
+  const layout = useLayout();
+  return (
+    <SheetModal visible={visible} transparent animationType="slide" onRequestClose={onClose} statusBarTranslucent>
+      <SheetRoot style={styles.sheetRoot}>
+        <Pressable style={styles.sheetScrim} onPress={onClose} accessibilityLabel={tr('Close')} accessibilityRole="button" />
+        <SwipeSheet
+          onClose={onClose}
+          accessibilityViewIsModal
+          style={[styles.sheet, layout.wide ? styles.sheetWide : null, { paddingBottom: Math.max(insets.bottom, 16) + 8 }]}>
+          <View style={styles.grip} />
+          <View style={styles.sheetHead}>
+            <Text style={styles.sheetTitle} accessibilityRole="header">{tr('No Forecast Here')}</Text>
+            <Pressable accessibilityRole="button" accessibilityLabel={tr('Close')} hitSlop={10} onPress={onClose} style={styles.sheetClose}>
+              <Svg width={14} height={14} viewBox="0 0 24 24" fill="none">
+                <Path d="M6 6l12 12M18 6L6 18" stroke={Colors.text} strokeWidth={2.8} strokeLinecap="round" />
+              </Svg>
+            </Pressable>
+          </View>
+          <View style={styles.sheetBody}>
+            <Text style={styles.nowSub}>
+              {tr('The forecast comes from the National Weather Service, so it covers the United States only. It also needs service the first time; after that the last forecast stays on your phone.')}
+            </Text>
+          </View>
+        </SwipeSheet>
+      </SheetRoot>
+    </SheetModal>
   );
 }
 
@@ -270,10 +328,10 @@ const styles = themedStyles(() => ({
   forecastSampleText: { color: Colors.text, fontFamily: font(800, 'display'), fontSize: 16 },
   tick: { width: 22, height: 22, borderRadius: 11, borderWidth: 1.5, borderColor: Colors.textSecondary, alignItems: 'center', justifyContent: 'center' },
   tickOn: { backgroundColor: Colors.sky, borderColor: Colors.sky },
-  radarKey: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 12, gap: 4, ...glass },
-  radarTitle: { color: Colors.text, fontFamily: font(700), fontSize: 12 },
-  radarScale: { flexDirection: 'row', justifyContent: 'space-between', width: 104 },
-  radarScaleText: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 10 },
+  radarKey: { height: 46, justifyContent: 'center', paddingHorizontal: 10, borderRadius: 14, gap: 3, ...glass },
+  radarTitle: { color: Colors.text, fontFamily: font(700), fontSize: 11, lineHeight: 13 },
+  radarScale: { flexDirection: 'row', justifyContent: 'space-between', width: KEY_W },
+  radarScaleText: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 10, lineHeight: 12 },
   chip: {
     minWidth: 46, height: 46, borderRadius: 23, paddingHorizontal: 10, alignItems: 'center', justifyContent: 'center', ...glass,
     shadowColor: '#000', shadowOpacity: 0.28, shadowRadius: 10, shadowOffset: { width: 0, height: 4 }, elevation: 6,
