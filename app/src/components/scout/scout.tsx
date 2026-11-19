@@ -156,6 +156,7 @@ export function Scout({ top, start = 'near' }: { top: React.ReactNode; start?: '
       full={fullMap.full}
       onToggleFull={fullMap.full ? fullMap.exit : fullMap.enter}
       cover
+      loading={onlyFavs ? favs === null : loading || spots === null}
     />
   ) : (locating || origin) && !onlyFavs ? (
     // Holds the map's place while the phone finds the rider, so the page doesn't sit half empty.
