@@ -104,12 +104,12 @@ export const SHOWCASE_EASY_LEAVE: boolean = true;
  * True once 3.2 is in the stores: the organizer ends the ride for everyone from Ride Mode's Exit
  * sheet (End Ride for Everyone). Until then the showcase doesn't mention it.
  */
-export const SHOWCASE_END_RIDE_IN_MODE: boolean = false;
+export const SHOWCASE_END_RIDE_IN_MODE: boolean = true;
 /**
  * True once 3.3 is in the stores: every rider starts out friends with OnMyLead's founder, whose
  * name carries an OnMyLead Founder tag. Until then the showcase's Friends line doesn't mention it.
  */
-export const SHOWCASE_FOUNDER_FRIENDS: boolean = false;
+export const SHOWCASE_FOUNDER_FRIENDS: boolean = true;
 /**
  * The showcase's Create a Ride step in its 3.1 words (one short screen that starts on today, now
  * and where you are; everything else under More Options). Off until the app version with it (3.1)
@@ -121,3 +121,21 @@ export const SHOWCASE_QUICK_CREATE: boolean = true;
  * near you and your own, under one switch). Off until the app version with it (3.1) is live in the stores.
  */
 export const SHOWCASE_EVENTS_AND_RIDES: boolean = true;
+/**
+ * The showcase's Places to Ride card in its 4.0 words (its own Home card, a profile for each park
+ * with address, phone, hours and rider reviews, Favorite Places, Open in Map Mode). Off until the
+ * app version with it (4.0) is live in the stores.
+ */
+export const SHOWCASE_PLACES_TO_RIDE: boolean = false;
+/**
+ * The Radio Sharing (Meshtastic) lines in the showcase's No Service section. Off until Radio
+ * Sharing is tested with real radios, the Admin switch radio_sharing is on, and Meshtastic has
+ * answered about using its name (docs/feature-parity.md F140).
+ */
+export const SHOWCASE_RADIO_SHARING: boolean = false;
+/**
+ * The showcase's Create a Ride step mentions the route builder's Estimated Time (type an average
+ * speed, see about how long the route takes). Off until the app version with it (4.0) is live in
+ * the stores.
+ */
+export const SHOWCASE_ROUTE_ETA: boolean = false;

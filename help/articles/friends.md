@@ -4,7 +4,7 @@ summary: Add riders as friends so you see each other when you're out riding near
 category: groups
 order: 26
 release: "1.0.3"
-updated: 2026-11-18
+updated: 2026-11-19
 sources:
   - app/src/app/friends.tsx
   - app/src/app/friend/[code].tsx
@@ -90,8 +90,12 @@ This friendship never shows where you are. Unlike other friends, the founder doe
 
 Don't want it? Remove the founder like any friend, or block. You aren't added back, even if you unblock later. You can still send the founder a friend request yourself any time.
 
-:::release 3.3
+:::until 4.0
 The founder's name carries an **OnMyLead Founder** tag in the Feed, Social, comments, his profile, Friends, Messages and a ride's Going list, so you know who it is.
+:::
+
+:::release 4.0
+The founder's name carries an **App Founder** tag in the Feed, Social, comments, his profile, Friends, Messages and a ride's Going list, so you know who it is.
 :::
 
 ## Limits

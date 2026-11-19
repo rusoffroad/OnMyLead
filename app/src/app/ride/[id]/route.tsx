@@ -2,7 +2,7 @@ import * as DocumentPicker from 'expo-document-picker';
 import * as Haptics from 'expo-haptics';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Animated, Platform, Pressable, Text, View } from 'react-native';
+import { ActivityIndicator, Animated, Platform, Pressable, Text, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BarChip, BarReadout, FullMapBar } from '@/components/full-map';
@@ -14,6 +14,7 @@ import { CompassSpot } from '@/components/compass-spot';
 import { TrailMapOverlay } from '@/components/trail-map-overlay';
 import { TrailPickerSheet } from '@/components/trail-picker-sheet';
 import { Button, ErrorText } from '@/components/ui';
+import { TextBox } from '@/components/keyboard';
 import Svg, { Path } from 'react-native-svg';
 import { Colors, font, Glass, Radius, Spacing, themedStyles } from '@/constants/theme';
 import { fullMapPadding } from '@/core/full-map';
@@ -22,10 +23,13 @@ import { OSM_ATTRIBUTION } from '@/core/osm-trails';
 import type { Place } from '@/core/places';
 import { miles, routeFromGpx, type RideRoute } from '@/core/route';
 import { routeFromLegs } from '@/core/route-legs';
+import { cleanSpeedText, formatEta, panelLift, parseSpeed } from '@/core/route-eta';
 import { trailAsRoute } from '@/core/nav-trails';
 import { loadTrails, trailLine } from '@/lib/nav-trails';
 import { useRememberedToggle } from '@/hooks/use-remembered-toggle';
 import { useFullMap } from '@/hooks/use-full-map';
+import { useKeyboardHeight } from '@/hooks/use-keyboard-height';
+import { useRememberedText } from '@/hooks/use-remembered-text';
 import { useLayout } from '@/hooks/use-layout';
 import { usePanelFold } from '@/hooks/use-panel-fold';
 import { useRouteDraft } from '@/hooks/use-route-draft';
@@ -43,7 +47,8 @@ import { t as tr } from '@/lib/i18n';
  * and the line between taps runs along it (core/trail-router); Straight Line draws straight
  * across ground nobody has mapped. Drag a point to move it. The search at the top moves the map
  * to a trailhead, park, forest or town before drawing. Swipe the panel down (or tap its handle)
- * to fold it to the miles and Undo and see more map.
+ * to fold it to the miles and Undo and see more map. Type an average speed under the tools to see
+ * about how long the route takes at it (core/route-eta).
  * On the website it's the same builder with a click instead of a tap, and on a wide screen the
  * panel sits beside the map instead of under it.
  */
@@ -89,6 +94,16 @@ export default function RouteBuilder() {
   const full = fullMap.full;
   const fold = usePanelFold('route.panelOpen.v1', true, wide ? 'up' : 'down', true, fullMap.enter);
   const open = fold.open;
+  // The time estimate's speed box: while it's being typed in, the panel rides up above the keyboard
+  // (a panel hanging from the top on a wide tablet is already clear of it), but never up over the
+  // Map Settings button, the bar with the ride's name or the status bar (core/route-eta panelLift).
+  const [typingSpeed, setTypingSpeed] = useState(false);
+  const [panelH, setPanelH] = useState(0);
+  const keyboard = useKeyboardHeight();
+  const windowH = useWindowDimensions().height;
+  const lift = typingSpeed && !wide
+    ? panelLift({ keyboard, panelH, windowH, topInset: insets.top, bottomInset: insets.bottom, bottomGap: floating ? 12 : 0 })
+    : 0;
 
   useEffect(() => {
     Promise.all([getRide(id), getPrivateDetails(id).catch(() => null), getRideRoute(id)])
@@ -259,7 +274,8 @@ export default function RouteBuilder() {
       {full ? null : (
       <Animated.View
         {...fold.panHandlers}
-        style={[styles.panel, wide && [styles.panelWide, { top: Math.max(88, insets.top + 72) }], floating && styles.panelFloating, { transform: [{ translateY: fold.drag }] }]}>
+        onLayout={(e) => setPanelH(e.nativeEvent.layout.height)}
+        style={[styles.panel, wide && [styles.panelWide, { top: Math.max(88, insets.top + 72) }], floating && styles.panelFloating, lift ? { bottom: (floating ? 12 : 0) + lift } : null, { transform: [{ translateY: fold.drag }] }]}>
       <SafeAreaView edges={['bottom']} style={[styles.panelInner, !open && styles.panelFolded]}>
         <PanelHandle open={open} onToggle={() => fold.setOpen(!open)} what="Route Tools" fromTop={wide} onFullMap={fullMap.enter} />
         <View style={styles.readout}>
@@ -294,6 +310,7 @@ export default function RouteBuilder() {
                 {draft.finding ? tr('Finding the trail…') : hint}
               </Text>
             </View>
+            <RouteEta lengthM={route?.lengthM ?? null} onTyping={setTypingSpeed} />
             <View style={styles.row}>
               <Button title={tr('Undo')} kind="secondary" style={styles.flex} disabled={!!imported || !taps.length} onPress={draft.undo} />
               <Button title={tr('Clear')} kind="secondary" style={styles.flex} disabled={!route && !taps.length} onPress={clear} />
@@ -379,6 +396,57 @@ function ModeSwitch({ follow, onChange }: { follow: boolean; onChange: (on: bool
   );
 }
 
+/**
+ * About how long the route takes: the rider types the average speed they expect to hold and the
+ * time shows beside it, with a line saying it's moving time only. The speed is remembered.
+ */
+function RouteEta({ lengthM, onTyping }: { lengthM: number | null; onTyping: (on: boolean) => void }) {
+  const [text, setText] = useRememberedText('route.etaSpeed.v1');
+  const mph = parseSpeed(text);
+  const eta = formatEta(lengthM, mph);
+  const value = eta ?? (!lengthM ? '–' : tr('Enter Your Speed'));
+  return (
+    <View style={styles.eta}>
+      <View style={styles.etaRow}>
+        <View style={styles.etaCol}>
+          <Text style={styles.etaLabel}>{tr('Average Speed')}</Text>
+          <View style={styles.speedBox}>
+            <TextBox
+              value={text}
+              onChangeText={(v) => setText(cleanSpeedText(v))}
+              keyboardType="decimal-pad"
+              returnKeyType="done"
+              placeholder="--"
+              placeholderTextColor={Colors.textSecondary}
+              maxLength={4}
+              selectTextOnFocus
+              onFocus={() => onTyping(true)}
+              onBlur={() => onTyping(false)}
+              accessibilityLabel={tr('Average speed in miles per hour')}
+              style={styles.speedInput}
+            />
+            <Text style={styles.speedUnit}>{tr('mph')}</Text>
+          </View>
+        </View>
+        <View style={[styles.etaCol, { alignItems: 'flex-end', flex: 1 }]}>
+          <Text style={styles.etaLabel}>{tr('Estimated Time')}</Text>
+          <Text
+            style={[styles.etaValue, !eta && styles.etaEmpty]}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            accessibilityLiveRegion="polite"
+            accessibilityLabel={eta ? tr('Estimated time {v}', { v: eta }) : undefined}>
+            {value}
+          </Text>
+        </View>
+      </View>
+      <Text style={styles.etaHelp}>
+        {tr('A rough guess of moving time at that average speed. Terrain, weather, stops and regroups all add time, so plan extra.')}
+      </Text>
+    </View>
+  );
+}
+
 const PANEL_W = 400;
 
 const styles = themedStyles(() => ({
@@ -423,5 +491,18 @@ const styles = themedStyles(() => ({
   credit: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 11, textAlign: 'center', opacity: 0.8 },
   row: { flexDirection: 'row', gap: Spacing.two },
   flex: { flex: 1 },
+  eta: { gap: 6 },
+  etaRow: { flexDirection: 'row', alignItems: 'flex-start', gap: Spacing.three },
+  etaCol: { gap: 4 },
+  etaLabel: { color: Colors.textSecondary, fontFamily: font(600), fontSize: 13 },
+  speedBox: {
+    flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start', height: 44, paddingHorizontal: 14, gap: 6,
+    borderRadius: Radius.control, backgroundColor: Colors.backgroundSelected, borderWidth: 1, borderColor: Colors.border,
+  },
+  speedInput: { width: 40, height: 44, color: Colors.text, fontFamily: font(700), fontSize: 18, padding: 0, textAlign: 'right' },
+  speedUnit: { color: Colors.textSecondary, fontFamily: font(700), fontSize: 15 },
+  etaValue: { color: SAND, fontFamily: font(800, 'display'), fontSize: 30, lineHeight: 44 },
+  etaEmpty: { color: Colors.textSecondary, fontFamily: font(700), fontSize: 16, lineHeight: 44 },
+  etaHelp: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 13, lineHeight: 17 },
   privacy: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 13, textAlign: 'center' },
 }));

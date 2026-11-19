@@ -17,7 +17,7 @@ const SHADE = 'rgba(8,14,24,';
  * offroaders"). "Ride Solo" says it needs no group; the trail count says what's near. Recording,
  * Track Line and offline maps live inside Map Mode, so the banner keeps to one big button.
  */
-export function MapModeBanner({ image, trailsNear }: { image: string | null; trailsNear: number | null }) {
+export function MapModeBanner({ image, trailsNear, compact, tight }: { image: string | null; trailsNear: number | null; compact?: boolean; tight?: boolean }) {
   const near = trailsNear
     ? trailsNear === 1 ? t('1 trail near you') : t('{n} trails near you', { n: trailsNear.toLocaleString(currentLocale()) })
     : null;
@@ -28,7 +28,7 @@ export function MapModeBanner({ image, trailsNear }: { image: string | null; tra
       accessibilityRole="button"
       accessibilityLabel={`${t('Open Map Mode')}. ${t('Ride Solo')}. ${sub}`}
       onPress={open}
-      style={({ pressed }) => [styles.card, { transform: [{ scale: pressed ? 0.99 : 1 }] }]}>
+      style={({ pressed }) => [styles.card, compact && styles.cardCompact, { transform: [{ scale: pressed ? 0.99 : 1 }] }]}>
       {image ? (
         <Image source={{ uri: image }} style={StyleSheet.absoluteFill} contentFit="cover" contentPosition="bottom" cachePolicy="disk" accessible={false} />
       ) : (
@@ -41,10 +41,10 @@ export function MapModeBanner({ image, trailsNear }: { image: string | null; tra
           <Icon name="map" size={15} color="#7FB2FF" strokeWidth={2.2} />
           <Text style={styles.kickerText}>{t('Ride Solo')}</Text>
         </View>
-        <Text style={styles.title} accessibilityRole="header" numberOfLines={1}>{t('Map Mode')}</Text>
-        <Text style={styles.sub} numberOfLines={2}>{sub}</Text>
+        <Text style={[styles.title, compact && styles.titleCompact, tight && styles.titleTight]} accessibilityRole="header" numberOfLines={1}>{t('Map Mode')}</Text>
+        <Text style={[styles.sub, compact && styles.subCompact]} numberOfLines={compact ? 1 : 2}>{sub}</Text>
       </View>
-      <View style={styles.button}>
+      <View style={[styles.button, compact && styles.buttonCompact, tight && styles.buttonTight]}>
         <Icon name="map" size={20} color="#fff" strokeWidth={2.2} />
         <Text style={styles.buttonText} numberOfLines={1}>{t('Open Map Mode')}</Text>
       </View>
@@ -57,6 +57,13 @@ const styles = themedStyles(() => ({
     minHeight: 224, borderRadius: 22, overflow: 'hidden', padding: 16, justifyContent: 'space-between', gap: 14, backgroundColor: '#0B1626',
     borderWidth: 1.5, borderColor: 'rgba(110,165,255,0.7)', boxShadow: '0px 18px 36px -14px rgba(0, 0, 0, 0.7)',
   },
+  // On a phone (4.0) the card sizes to what's in it, a little tighter, so every Home card fits on one screen.
+  cardCompact: { minHeight: 0, padding: 14, gap: 10 },
+  titleCompact: { fontSize: 38, lineHeight: 40 },
+  subCompact: { maxWidth: undefined },
+  buttonCompact: { minHeight: 48 },
+  titleTight: { fontSize: 33, lineHeight: 35 },
+  buttonTight: { minHeight: 44 },
   kicker: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   kickerText: { color: '#A9C9FF', fontFamily: font(600), fontSize: 13.5 },
   title: { color: '#fff', fontFamily: font(700, 'display'), fontSize: 40, lineHeight: 44, marginTop: 2 },

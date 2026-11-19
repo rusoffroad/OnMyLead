@@ -4,7 +4,7 @@ summary: Use Map Mode (called Navigate before 2.0) as your offroad map, map your
 category: routes-maps
 order: 15
 release: "1.0.3"
-updated: 2026-11-16
+updated: 2026-11-19
 sources:
   - app/src/core/mode-exit.ts
   - app/src/components/exit-mode.tsx
@@ -83,6 +83,10 @@ On a Free account, the top of Map Mode shows your time left, like **Free Map Mod
 From 3.0, Map Mode is the first card on Home, labelled **Ride Solo**: tap **Open Map Mode**. The blue round key in the middle of the tab bar opens it from anywhere. **Map a Custom Trail** and the **Track Line** switch are inside Map Mode.
 :::
 
+
+:::release 4.0
+- From a place in [Places to Ride](/help/scout), tap **Open in Map Mode**. Map Mode opens centred on that place, so you can look over its trails and terrain before you go.
+:::
 
 ## Leave Map Mode
 

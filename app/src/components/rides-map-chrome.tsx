@@ -7,6 +7,8 @@ import { spotKindInfo, type Spot } from '@/core/spots';
 import type { LatLng } from '@/core/geo';
 import type { Ride } from '@/lib/types';
 import { MarkerBody } from './marker-body';
+import { SpotPinArt } from './spot-pin';
+import { SPOT_INK } from './spot-pin-art';
 
 import { t } from '@/lib/i18n';
 /** What the Find a ride map needs, shared by the native map and the web one. */
@@ -70,18 +72,20 @@ export function RideBubble({ ride }: { ride: Ride & { distanceMi?: number } }) {
 }
 
 /**
- * A place to ride on the map: a Scout trail sign (a rounded square) with its kind drawn on it, so it
- * reads apart from ride dots (circles) and waypoints (diamonds) by shape as well as colour.
+ * A place to ride on the map: a teardrop pin in the kind's colour with a picture of what you ride
+ * there (components/spot-pin-art.ts), so it reads apart from ride dots (circles) and waypoints
+ * (diamonds). Its point is the place: anchor the marker at the bottom centre (SPOT_ANCHOR).
  */
 export function SpotPin({ spot }: { spot: Pick<Spot, 'kind'> }) {
   return (
-    <MarkerBody style={styles.spotWrap}>
-      <View style={styles.sign}>
-        <Icon name={spotKindInfo(spot.kind).icon} size={18} color={Colors.onScout} strokeWidth={2.2} />
-      </View>
+    <MarkerBody>
+      <SpotPinArt kind={spot.kind} scale={0.8} />
     </MarkerBody>
   );
 }
+
+/** Where a SpotPin marker hangs from its coordinate: the teardrop's point. */
+export const SPOT_ANCHOR = { x: 0.5, y: 0.97 } as const;
 
 /** "Under 1 mi", "42 mi away", in the rider's language. */
 export const awayText = (mi: number) => (mi < 1 ? t('Under 1 mi') : t('{n} mi away', { n: Math.round(mi).toLocaleString('en-US') }));
@@ -90,7 +94,7 @@ export const awayText = (mi: number) => (mi < 1 ? t('Under 1 mi') : t('{n} mi aw
 export function SpotBubble({ spot }: { spot: Spot }) {
   return (
     <View style={styles.bubble}>
-      <Text style={[styles.live, { color: Colors.scout }]}>{t(spotKindInfo(spot.kind).one)}</Text>
+      <Text style={[styles.live, { color: SPOT_INK[spot.kind] ?? Colors.accent }]}>{t(spotKindInfo(spot.kind).one)}</Text>
       <Text style={styles.bubbleTitle} numberOfLines={2}>{spot.name}</Text>
       <Text style={styles.bubbleText}>
         {awayText(spot.distanceMi)}
@@ -159,7 +163,7 @@ export function MapOverlay({
           </Pressable>
         ) : null}
         <View style={[styles.chip, styles.count]}>
-          <View style={[styles.countDot, { backgroundColor: places ? Colors.scout : Colors.sky }]} />
+          <View style={[styles.countDot, { backgroundColor: places ? Colors.accent : Colors.sky }]} />
           <Text style={styles.chipText}>
             {places
               ? count === 0 ? t('No places here yet') : count === 1 ? t('1 Place') : t('{n} Places', { n: count })
@@ -183,13 +187,7 @@ const glass = 'rgba(10, 22, 38, 0.86)';
 
 const styles = themedStyles(() => ({
   pinWrap: { width: 30, height: 30, alignItems: 'center', justifyContent: 'center' },
-  spotWrap: { width: 34, height: 34, alignItems: 'center', justifyContent: 'center' },
   halo: { position: 'absolute', width: 30, height: 30, borderRadius: 15, opacity: 0.3 },
-  sign: {
-    width: 30, height: 30, borderRadius: 9, alignItems: 'center', justifyContent: 'center',
-    backgroundColor: Colors.scout, borderWidth: 2, borderColor: Colors.background,
-    shadowColor: '#000', shadowOpacity: 0.45, shadowRadius: 3, shadowOffset: { width: 0, height: 1 }, elevation: 3,
-  },
   pin: { width: 18, height: 18, borderRadius: 9, borderWidth: 3, borderColor: Colors.background },
   bubble: {
     width: 220, padding: 12, gap: 2, borderRadius: 14, backgroundColor: Colors.backgroundElement,

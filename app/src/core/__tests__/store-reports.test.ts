@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  appleDaysToFetch, csvFields, daysBetween, decodeReport, isoDay, parseAppleSales, parsePlayInstalls, playInstallsObject,
+  appleDaysToFetch, appleSalesKey, csvFields, daysBetween, decodeReport, isoDay, parseAppleSales, parsePlayInstalls, playInstallsObject,
 } from '../../../../supabase/functions/_shared/store-reports';
 
 const APP = '6822352321';
@@ -76,5 +76,28 @@ describe('helpers', () => {
     expect(appleDaysToFetch('2026-10-16', '2026-10-13', done)).toEqual(['2026-10-15', '2026-10-13']);
     expect(appleDaysToFetch('2026-10-13', '2026-10-13', done)).toEqual([]);
     expect(appleDaysToFetch('2026-12-31', '2026-10-01', new Set(), 35, 3)).toEqual(['2026-12-30', '2026-12-29', '2026-12-28']);
+  });
+});
+
+describe('appleSalesKey', () => {
+  const shared = { ASC_ISSUER_ID: 'iss', ASC_KEY_ID: 'SHARED', ASC_PRIVATE_KEY: 'p8-shared' };
+  const from = (vars: Record<string, string>) => (k: string) => vars[k];
+
+  it('uses the sales key when it is complete, with the shared issuer by default', () => {
+    expect(appleSalesKey(from({ ...shared, ASC_SALES_KEY_ID: 'SALES', ASC_SALES_PRIVATE_KEY: 'p8-sales' })))
+      .toEqual({ issuerId: 'iss', keyId: 'SALES', privateKey: 'p8-sales' });
+    expect(appleSalesKey(from({ ...shared, ASC_SALES_ISSUER_ID: 'iss2', ASC_SALES_KEY_ID: 'SALES', ASC_SALES_PRIVATE_KEY: 'p8-sales' }))?.issuerId)
+      .toBe('iss2');
+  });
+
+  it('falls back to the shared key when the sales key is missing or partial', () => {
+    expect(appleSalesKey(from(shared))?.keyId).toBe('SHARED');
+    expect(appleSalesKey(from({ ...shared, ASC_SALES_KEY_ID: 'SALES' }))?.keyId).toBe('SHARED');
+    expect(appleSalesKey(from({ ...shared, ASC_SALES_KEY_ID: ' ', ASC_SALES_PRIVATE_KEY: 'x' }))?.keyId).toBe('SHARED');
+  });
+
+  it('is null when no key is complete', () => {
+    expect(appleSalesKey(from({}))).toBeNull();
+    expect(appleSalesKey(from({ ASC_SALES_KEY_ID: 'SALES', ASC_SALES_PRIVATE_KEY: 'p8' }))).toBeNull();
   });
 });

@@ -101,3 +101,13 @@ export function useAppSettings(): Snapshot {
 export function useFlag(flag: AppFlag): boolean {
   return flagOn(useAppSettings().settings, flag);
 }
+
+/** The same answer outside React (lib/radio.ts): whether the feature is on right now. */
+export function flagNow(flag: AppFlag): boolean {
+  return flagOn(current, flag);
+}
+
+/** Calls back whenever the owner's settings change. Returns the unsubscribe. */
+export function onAppSettingsChange(l: () => void): () => void {
+  return subscribe(l);
+}

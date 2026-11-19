@@ -12,8 +12,13 @@
 //              hour per store unless force)
 //
 // Deploy:  supabase functions deploy store-downloads
-// Secrets: ASC_ISSUER_ID, ASC_KEY_ID, ASC_PRIVATE_KEY   App Store Connect API key (the same key as
-//                                                       admin-integrations) with the Sales role
+// Secrets: ASC_SALES_KEY_ID, ASC_SALES_PRIVATE_KEY     App Store Connect Team API key with the Sales
+//                                                       (or Finance) role, just for these reports;
+//                                                       ASC_SALES_ISSUER_ID optional (default
+//                                                       ASC_ISSUER_ID). Without them it uses the
+//                                                       shared ASC_ISSUER_ID / ASC_KEY_ID /
+//                                                       ASC_PRIVATE_KEY, which must then have the
+//                                                       Admin, Finance or Sales role.
 //          ASC_VENDOR_NUMBER     Payments and Financial Reports > vendor number (8 digits)
 //          ASC_APP_ID            optional, default 6822352321 (OnMyLead's Apple ID)
 //          PLAY_SERVICE_ACCOUNT_JSON   the Play service account (same as play-verify); in Play
@@ -27,7 +32,7 @@ import { createClient } from 'npm:@supabase/supabase-js@2';
 import { importPKCS8, SignJWT } from 'npm:jose@5';
 
 import {
-  appleDaysToFetch, decodeReport, parseAppleSales, parsePlayInstalls, playInstallsObject, type DownloadRow,
+  appleDaysToFetch, appleSalesKey, decodeReport, parseAppleSales, parsePlayInstalls, playInstallsObject, type DownloadRow,
 } from '../_shared/store-reports.ts';
 
 const env = (k: string, fallback = '') => Deno.env.get(k) || fallback;
@@ -50,7 +55,7 @@ const service = createClient(env('SUPABASE_URL'), env('SUPABASE_SERVICE_ROLE_KEY
 type Store = 'apple' | 'google';
 
 const configured = () => ({
-  apple: !!(env('ASC_ISSUER_ID') && env('ASC_KEY_ID') && env('ASC_PRIVATE_KEY') && env('ASC_VENDOR_NUMBER')),
+  apple: !!(appleSalesKey((k) => Deno.env.get(k)) && env('ASC_VENDOR_NUMBER')),
   google: !!(playAccount() && env('PLAY_REPORTS_BUCKET')),
 });
 
@@ -121,11 +126,12 @@ let ascToken: { value: string; until: number } | null = null;
 
 async function ascJwt() {
   if (ascToken && ascToken.until > Date.now() + 60_000) return ascToken.value;
-  const key = await importPKCS8(env('ASC_PRIVATE_KEY').replace(/\\n/g, '\n'), 'ES256');
+  const asc = appleSalesKey((k) => Deno.env.get(k))!;
+  const key = await importPKCS8(asc.privateKey.replace(/\\n/g, '\n'), 'ES256');
   const now = Math.floor(Date.now() / 1000);
   const value = await new SignJWT({})
-    .setProtectedHeader({ alg: 'ES256', kid: env('ASC_KEY_ID'), typ: 'JWT' })
-    .setIssuer(env('ASC_ISSUER_ID'))
+    .setProtectedHeader({ alg: 'ES256', kid: asc.keyId, typ: 'JWT' })
+    .setIssuer(asc.issuerId)
     .setAudience('appstoreconnect-v1')
     .setIssuedAt(now)
     .setExpirationTime(now + 15 * 60)
@@ -155,6 +161,10 @@ async function readApple(): Promise<{ rows: DownloadRow[]; days: string[] }> {
       await res.body?.cancel();
       if (Date.parse(`${today}T00:00:00Z`) - Date.parse(`${day}T00:00:00Z`) >= 3 * 86_400_000) days.push(day);
       continue;
+    }
+    if (res.status === 403) {
+      await res.body?.cancel();
+      throw new Error('App Store Connect: this API key may not read sales reports. It needs a Team key with the Sales role (ASC_SALES_KEY_ID and ASC_SALES_PRIVATE_KEY)');
     }
     if (!res.ok) {
       // deno-lint-ignore no-explicit-any

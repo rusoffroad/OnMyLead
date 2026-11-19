@@ -3,7 +3,7 @@ import MapView, { Callout, Circle, Marker, type Region } from 'react-native-maps
 import { View } from 'react-native';
 
 import { TrailTiles } from '@/components/trail-tiles';
-import { mapFrameStyle, MapControls, MapOverlay, RideBubble, RidePin, SpotBubble, SpotPin, type RidesMapProps } from '@/components/rides-map-chrome';
+import { mapFrameStyle, MapControls, MapOverlay, RideBubble, RidePin, SpotBubble, SpotPin, SPOT_ANCHOR, type RidesMapProps } from '@/components/rides-map-chrome';
 import { boundsOfRegion, regionFor, regionMoved, zoomRegion } from '@/core/discovery';
 import { useTrailMap, type TrailMap } from '@/hooks/use-trail-map';
 import { RidesMapboxMap } from '@/components/rides-mapbox-map';
@@ -91,8 +91,8 @@ function FlatRidesMap({ rides, frame, frameKey, circle, title, onPressTitle, onO
           <Marker
             key={`spot-${s.id}`}
             coordinate={{ latitude: s.lat, longitude: s.lng }}
-            anchor={{ x: 0.5, y: 0.5 }}
-            calloutAnchor={{ x: 0.5, y: 0.1 }}
+            anchor={SPOT_ANCHOR}
+            calloutAnchor={{ x: 0.5, y: 0 }}
             tracksViewChanges={false}
             accessibilityLabel={s.name}>
             <SpotPin spot={s} />
