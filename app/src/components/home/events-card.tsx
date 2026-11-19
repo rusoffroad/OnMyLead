@@ -8,6 +8,7 @@ import { Colors, font, RideColors, themedStyles, TileSurface } from '@/constants
 import { withAlpha } from '@/core/color';
 import { eventDates, sortCards, type EventCard } from '@/core/events';
 import { myEvents, upcomingEvents } from '@/lib/events';
+import type { ActivityId } from '@/core/activities';
 import { positionIfAllowed } from '@/lib/location';
 import { Gradient, homeStyles } from './parts';
 import { t } from '@/lib/i18n';
@@ -18,7 +19,7 @@ import { t } from '@/lib/i18n';
  * event coming up, one quiet row opens the Events area. Never asks for location; with it, nearby
  * events count first.
  */
-export function EventsCard({ signedIn, radius }: { signedIn: boolean; radius: number | null }) {
+export function EventsCard({ signedIn, radius, activity }: { signedIn: boolean; radius: number | null; activity?: ActivityId }) {
   const [next, setNext] = useState<{ e: EventCard; yours: boolean } | null>(null);
 
   useFocusEffect(
@@ -29,7 +30,7 @@ export function EventsCard({ signedIn, radius }: { signedIn: boolean; radius: nu
         const at = await positionIfAllowed().catch(() => null);
         const [mine, near] = await Promise.all([
           signedIn ? myEvents().catch(() => []) : Promise.resolve([] as EventCard[]),
-          upcomingEvents(at, at && radius ? radius : null),
+          upcomingEvents(at, at && radius ? radius : null, activity),
         ]);
         if (gone) return;
         const yours = sortCards(mine).find((e) => Date.parse(e.ends_at) >= Date.now() && e.status === 'scheduled');
@@ -38,7 +39,7 @@ export function EventsCard({ signedIn, radius }: { signedIn: boolean; radius: nu
       return () => {
         gone = true;
       };
-    }, [signedIn, radius]),
+    }, [signedIn, radius, activity]),
   );
 
   const label = next

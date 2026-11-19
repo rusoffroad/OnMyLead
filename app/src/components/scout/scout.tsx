@@ -26,6 +26,7 @@ import { currentPosition } from '@/lib/location';
 import { useSession } from '@/lib/session';
 import { favoriteSpots, readScoutMiles, saveScoutMiles, spotsNear } from '@/lib/spots';
 import { MileSlider } from './mile-slider';
+import { useDiscoverActivity } from '@/lib/activity';
 
 /**
  * Scout (Find > Places to Ride): off-road parks, OHV areas, trail systems, trailheads and
@@ -38,6 +39,8 @@ import { MileSlider } from './mile-slider';
  * distance away); `start="favorites"` opens on them.
  */
 export function Scout({ top, start = 'near' }: { top: React.ReactNode; start?: 'near' | 'favorites' }) {
+  // Activities (4.0): only the rider's activity while the switcher is on.
+  const activity = useDiscoverActivity();
   const layout = useLayout();
   const insets = useSafeAreaInsets();
   const fullMap = useFullMap(null);
@@ -95,7 +98,7 @@ export function Scout({ top, start = 'near' }: { top: React.ReactNode; start?: '
       setLoading(true);
       setError(null);
       try {
-        const found = await spotsNear(origin, miles);
+        const found = await spotsNear(origin, miles, [], activity);
         if (!live) return;
         setNotYet(found === null);
         setSpots(found ?? []);
@@ -112,7 +115,7 @@ export function Scout({ top, start = 'near' }: { top: React.ReactNode; start?: '
     };
     // origin is a new object only when the rider or the searched place moves.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [origin, savedMiles]);
+  }, [origin, savedMiles, activity]);
 
   const changeMiles = (m: number) => {
     setMiles(m);

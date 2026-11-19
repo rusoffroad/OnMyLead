@@ -138,3 +138,10 @@ export const SHOWCASE_RADIO_SHARING: boolean = false;
  * the stores.
  */
 export const SHOWCASE_ROUTE_ETA: boolean = false;
+
+/**
+ * Activities (Offroad, Motorcycle, Road Trip, Snowmobile, each with its own colours, Ride Mode
+ * buttons, rides, events and places). Off until the app version with it (4.0) is live in the
+ * stores and the activities flag is switched on.
+ */
+export const SHOWCASE_ACTIVITIES: boolean = false;

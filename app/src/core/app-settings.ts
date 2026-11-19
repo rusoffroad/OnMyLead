@@ -44,6 +44,10 @@ export const APP_FLAGS = {
   },
   referrals: { label: 'Refer a Friend', hint: 'Invite Friends and the 50% off Pro Annual reward. Turn on only once the Apple offer codes and the Google Play referral-50 offer exist. Rewards already earned can still be claimed when it is off.' },
   home_feed: { label: 'Home Feed', hint: 'The Feed on the home screen (friends’ rides, badges and trails). Riders’ feed settings are kept.' },
+  activities: {
+    label: 'Activities',
+    hint: 'The activity switcher on Home (Offroad, Motorcycle, Road Trip, Snowmobile): each activity’s colours, Home words, Ride Mode buttons, and rides, events and places for that activity. Off: everyone sees Offroad, as before. On from 4.0 (Chris 2026-11-19).',
+  },
   apple_web_sign_in: {
     label: 'Sign in with Apple on the Website and Android',
     hint: 'Continue with Apple on onmylead.com and in the Android app, through Apple’s web sign-in. Off until the Apple Services ID and its secret are set up in Supabase (docs/web-sign-in-with-apple.md); on before that, the button fails.',
