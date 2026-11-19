@@ -130,7 +130,7 @@ export const SHOWCASE_PLACES_TO_RIDE: boolean = false;
 /**
  * The Radio Sharing (Meshtastic) lines in the showcase's No Service section. Off until Radio
  * Sharing is tested with real radios, the Admin switch radio_sharing is on, and Meshtastic has
- * answered about using its name (docs/feature-parity.md F139).
+ * answered about using its name (docs/feature-parity.md F140).
  */
 export const SHOWCASE_RADIO_SHARING: boolean = false;
 /**
