@@ -19,6 +19,7 @@ import { PublicRidesRail, RadiusChip, RadiusSheet } from '@/components/home/publ
 import { PlacesCard } from '@/components/home/places-card';
 import { ActionTiles, JoinHero } from '@/components/home/ride-actions';
 import { StarlinkHomeCard } from '@/components/home/starlink-card';
+import { SnowNearYouCard } from '@/components/home/snow-card';
 import { HelpRow, Toolkit } from '@/components/home/toolkit';
 import { Icon } from '@/components/icon';
 import { InboxBell } from '@/components/inbox-bell';
@@ -378,6 +379,8 @@ export default function HomeScreen() {
       ) : null}
       {/* Only there while the phone can see a Starlink dish (components/home/starlink-card). */}
       <StarlinkHomeCard />
+      {/* Activities (4.0): snow and avalanche danger where you are, in Snowmobile. */}
+      {activitiesOn && activity === 'snowmobile' ? <SnowNearYouCard /> : null}
     </>
   );
 

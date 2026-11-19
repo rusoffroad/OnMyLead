@@ -10,6 +10,9 @@ import type { SpotKind } from '@/core/spots';
  *   OHV area          blue    an ATV
  *   Trail system      green   a pine tree (mostly Forest Service trails)
  *   Trailhead         green   a trail sign
+ *   Snowmobile area   ice blue a snowflake
+ *   Scenic drive      orange  a road winding to a peak
+ *   Campground        brown   a tent
  *
  * Plain data, so the phone (react-native-svg, components/spot-pin.tsx) and the website (Leaflet
  * HTML, spotPinSvg below) draw the same pin. The pins sit on satellite and terrain maps, so the
@@ -23,6 +26,10 @@ export const SPOT_INK: Record<SpotKind, string> = {
   ohv_area: '#3B86F7',
   trail_system: '#2F9E5B',
   trailhead: '#2F9E5B',
+  // Activities (4.0): each in its activity's own colour family.
+  snow_area: '#3E8FD6',
+  scenic_drive: '#E8641C',
+  campground: '#8A5A2B',
 };
 
 /** One part of a picture, in a 24 x 24 box: white, a cut-out in the pin colour, or a white line. */
@@ -63,6 +70,21 @@ export const SPOT_GLYPHS: Record<SpotKind, GlyphPart[]> = {
     { d: 'M11 3h2v18.5h-2z', as: 'fill' },
     { d: 'M5 5h12.6l2.4 2.6-2.4 2.6H5z', as: 'fill' },
     { d: 'M19 12.2H6.4L4 14.8l2.4 2.6H19z', as: 'fill' },
+  ],
+  // A snowflake: three bars and their tips.
+  snow_area: [
+    { d: 'M12 2.5v19M3.8 7.25l16.4 9.5M3.8 16.75l16.4-9.5', as: 'line' },
+    { d: 'M9.4 3.8 12 6l2.6-2.2M9.4 20.2 12 18l2.6 2.2', as: 'line' },
+  ],
+  // A road winding toward a peak.
+  scenic_drive: [
+    { d: 'M2.5 12 8 5l3.6 4.2L14 6.4 21.5 12z', as: 'fill' },
+    { d: 'M9 21.5c0-3.5 6-3.4 6-6.4s-3.6-2.6-3.6-4', as: 'line' },
+  ],
+  // A tent with its door open.
+  campground: [
+    { d: 'M12 3.6 2.6 20.4h18.8z', as: 'fill' },
+    { d: 'M12 11.4 8.6 20.4h6.8z', as: 'hole' },
   ],
 };
 

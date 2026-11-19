@@ -100,7 +100,7 @@ type FillRenderer = {
   symbol: { type: 'esriSFS'; style: string; color: number[]; outline: Renderer['symbol'] };
 };
 
-type DynamicLayer = {
+export type DynamicLayer = {
   id: number;
   source: { type: 'mapLayer'; mapLayerId: number };
   /** Only the rows matching this (ArcGIS SQL), so one agency layer can be split by kind of route. */
@@ -114,7 +114,7 @@ type DynamicLayer = {
  * A cased line: the casing is listed after the line because ArcGIS draws the first layer on top.
  * `top` replaces the plain line renderer (BLM colors its closed routes from the same layer).
  */
-function cased(
+export function cased(
   baseId: number, mapLayerId: number, color: number[], width: number,
   { style, labelExpression, labelColor, top, where, feature, casing = true }: {
     style?: string; labelExpression?: string; labelColor?: number[]; top?: UniqueRenderer; where?: string; feature?: FeatureTag; casing?: boolean;

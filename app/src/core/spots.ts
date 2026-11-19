@@ -6,10 +6,11 @@
  * The search distance starts at 250 miles and the rider slides it from 10 to 1,000; the choice is
  * remembered on the device. Pure functions here; lib/spots.ts talks to the server.
  */
+import type { ActivityId } from './activities';
 import { boundsAround, stateByCode, type Bounds } from './discovery';
 import type { LatLng } from './geo';
 
-export type SpotKind = 'park' | 'ohv_area' | 'trail_system' | 'trailhead' | 'track';
+export type SpotKind = 'park' | 'ohv_area' | 'trail_system' | 'trailhead' | 'track' | 'snow_area' | 'scenic_drive' | 'campground';
 export type SpotSource = 'usfs' | 'blm' | 'osm' | 'onmylead' | 'rider';
 
 export type Spot = {
@@ -34,13 +35,36 @@ export type SpotDetail = Omit<Spot, 'distanceMi' | 'ridesComingUp'> & {
 };
 
 /** Kinds in the order the filter shows them, with a plural for the chips and a singular for a place. */
-export const SPOT_KINDS: { kind: SpotKind; label: string; one: string; icon: 'spotPark' | 'spotOhv' | 'spotTrails' | 'spotTrailhead' | 'spotTrack' }[] = [
+export const SPOT_KINDS: {
+  kind: SpotKind; label: string; one: string; icon: 'spotPark' | 'spotOhv' | 'spotTrails' | 'spotTrailhead' | 'spotTrack' | 'spotSnow' | 'spotDrive' | 'spotCamp';
+}[] = [
   { kind: 'park', label: 'Off-Road Parks', one: 'Off-Road Park', icon: 'spotPark' },
   { kind: 'ohv_area', label: 'OHV Areas', one: 'OHV Area', icon: 'spotOhv' },
   { kind: 'trail_system', label: 'Trail Systems', one: 'Trail System', icon: 'spotTrails' },
   { kind: 'trailhead', label: 'Trailheads', one: 'Trailhead', icon: 'spotTrailhead' },
   { kind: 'track', label: 'Motocross Tracks', one: 'Motocross Track', icon: 'spotTrack' },
+  // Activities (4.0): places for the other activities (supabase migration 20261121550000_activity_places.sql).
+  { kind: 'snow_area', label: 'Snowmobile Areas', one: 'Snowmobile Area', icon: 'spotSnow' },
+  { kind: 'scenic_drive', label: 'Scenic Drives', one: 'Scenic Drive', icon: 'spotDrive' },
+  { kind: 'campground', label: 'Campgrounds', one: 'Campground', icon: 'spotCamp' },
 ];
+
+/**
+ * The kinds of place each activity looks for, in the order its filter and Suggest a Place show
+ * them. Places to Ride searches only the activity's places (riding_spots_near_for), so this keeps
+ * the suggestion form to kinds that make sense for the rider's activity.
+ */
+export const ACTIVITY_SPOT_KINDS: Record<ActivityId, SpotKind[]> = {
+  offroad: ['park', 'ohv_area', 'trail_system', 'trailhead', 'track'],
+  motorcycle: ['scenic_drive', 'track', 'campground'],
+  road_trip: ['scenic_drive', 'campground'],
+  snowmobile: ['snow_area', 'trailhead', 'trail_system'],
+};
+
+export function spotKindsFor(activity: ActivityId | undefined): typeof SPOT_KINDS {
+  const want = ACTIVITY_SPOT_KINDS[activity ?? 'offroad'] ?? ACTIVITY_SPOT_KINDS.offroad;
+  return want.map((k) => SPOT_KINDS.find((x) => x.kind === k)!).filter(Boolean);
+}
 const KIND_SET = new Set<string>(SPOT_KINDS.map((k) => k.kind));
 export const isSpotKind = (v: unknown): v is SpotKind => typeof v === 'string' && KIND_SET.has(v);
 export const spotKindInfo = (k: SpotKind) => SPOT_KINDS.find((x) => x.kind === k) ?? SPOT_KINDS[0];
@@ -165,9 +189,10 @@ export function filterKinds<T extends Pick<Spot, 'kind'>>(spots: T[], kinds: Spo
 }
 
 /** Turn a kind on or off in the filter. Turning on every kind is the same as none. */
-export function toggleKind(kinds: SpotKind[], k: SpotKind): SpotKind[] {
+export function toggleKind(kinds: SpotKind[], k: SpotKind, among: readonly SpotKind[] = ACTIVITY_SPOT_KINDS.offroad): SpotKind[] {
   const next = kinds.includes(k) ? kinds.filter((x) => x !== k) : [...kinds, k];
-  return next.length === SPOT_KINDS.length ? [] : SPOT_KINDS.map((x) => x.kind).filter((x) => next.includes(x));
+  // Every kind on screen picked is the same as none picked (Activities: the activity's kinds, or those with places).
+  return among.every((x) => next.includes(x)) ? [] : SPOT_KINDS.map((x) => x.kind).filter((x) => next.includes(x));
 }
 
 /** Where a place is, for its row: "Ocala National Forest, FL" or "Burnet County, Texas". */

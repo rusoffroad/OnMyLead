@@ -29,6 +29,8 @@ import { useDotSizePref, useDotStylePref } from '@/hooks/use-dot-size';
 import { useOwnMoving } from '@/hooks/use-own-moving';
 import { compassMargins } from '@/core/map-corner';
 import { CompassSpot } from './compass-spot';
+import { ActivityOver, ActivityUnder, ACTIVITY_OSM_SOURCE } from './activity-map-layers';
+import { OSM_ROADS_LAYER, TWISTY_FILTER, TWISTY_MIN_Z, twistyGeoJSON, twistyPieces } from '@/core/activity-layers';
 
 export type { MapFill, MapIdle, MapLine, MapboxMapHandle, MapboxOwnFix } from './mapbox-map-types';
 
@@ -250,10 +252,31 @@ export function MapboxMap({
     if (s.gestures?.isGestureActive && (Date.now() - movedAt.current < 1000 || Date.now() > autoUntil.current)) onUserMove?.();
   }, [onCamera, onUserMove, shown, trail]);
 
+  // Twisty Roads (Motorcycle): the paved roads Mapbox has loaded, scored on the phone each time the map rests.
+  const twistyOn = trail.activityMap.twisty;
+  const [twisty, setTwisty] = useState<GeoJSON.FeatureCollection | null>(null);
+  const twistyKey = useRef('');
+  const scoreTwisty = useCallback(async (z: number) => {
+    if (!twistyOn || z < TWISTY_MIN_Z) return;
+    try {
+      const fc = await view.current?.querySourceFeatures(ACTIVITY_OSM_SOURCE, TWISTY_FILTER as never, [OSM_ROADS_LAYER]);
+      if (!fc) return;
+      const next = twistyGeoJSON(twistyPieces(fc.features as never));
+      // The map rests again once the new lines draw: only a different set of pieces is set.
+      const key = next.features.map((f) => f.properties?.key).join('|');
+      if (key === twistyKey.current) return;
+      twistyKey.current = key;
+      setTwisty(next);
+    } catch {
+      // The roads aren't loaded yet: the next rest tries again.
+    }
+  }, [twistyOn]);
+
   const idle = useCallback((s: Mapbox.MapState) => {
     const p = s.properties;
     const center = { lat: p.center[1], lng: p.center[0] };
     zoom.current = p.zoom;
+    void scoreTwisty(p.zoom);
     // The settle timer in camChanged usually asked for this region already; ask only when it
     // hasn't (a pending timer, or a rest the camera never announced, such as the first load).
     const key = regionKey(center, p.zoom);
@@ -269,7 +292,7 @@ export function MapboxMap({
       bounds: { minLat: p.bounds.sw[1], maxLat: p.bounds.ne[1], minLng: p.bounds.sw[0], maxLng: p.bounds.ne[0] },
       metersPerPoint: metersPerPointAt(center.lat, p.zoom),
     });
-  }, [trail, onIdle]);
+  }, [trail, onIdle, scoreTwisty]);
 
   const at = (f: GeoJSON.Feature<GeoJSON.Point>): LatLng => ({ lat: f.geometry.coordinates[1], lng: f.geometry.coordinates[0] });
 
@@ -338,7 +361,13 @@ export function MapboxMap({
             <Mapbox.RasterLayer id={TOPO_LAYER_ID} sourceID={TOPO_SOURCE_ID} style={{ rasterOpacity: 1 }} />
           </Mapbox.RasterSource>
         ) : null}
+        <ActivityUnder
+          key={trail.agencyLayers[0]?.key ?? 'none'}
+          act={trail.activityMap}
+          below={!trail.offline && trail.agencyLayers[0] ? `oml-agency-${trail.agencyLayers[0].key}-layer` : undefined}
+        />
         <TrailLayers trail={trail} />
+        <ActivityOver act={trail.activityMap} twisty={twistyOn ? twisty : null} />
         {(fills ?? []).map((f) => (
           <Fill key={f.id} fill={f} />
         ))}

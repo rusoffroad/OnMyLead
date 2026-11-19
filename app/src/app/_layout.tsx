@@ -53,6 +53,7 @@ import { startLanguageSync } from '@/lib/language-sync';
 import { backupMapWaypointsNow } from '@/lib/map-waypoints';
 import { backupTrailsNow } from '@/lib/trail-backup';
 import { t as tr, takeLanguageReturnPath, useLanguage } from '@/lib/i18n';
+import { ActivitySplash } from '@/components/activity-splash';
 
 // The activity log a bug report carries: errors, failed requests, screens (lib/app-log.ts).
 startAppLog();
@@ -255,6 +256,8 @@ function RootLayout() {
       <TabletProGate />
       <ProGateHost />
       <DirectionsHost />
+      {/* Activities (4.0): the quick splash after switching activity. */}
+      <ActivitySplash />
       <EmergencySiren />
       {/* Before You Ride: the safety and liability agreement, until the rider agrees. */}
       <RiderAgreementGate />
