@@ -1595,6 +1595,7 @@ const dict: Record<string, string> = {
   "Mapmaker": "マップメーカー",
   "Trail Scout": "トレイルスカウト",
   "OnMyLead Founder": "OnMyLead Founder",
+  "App Founder": "アプリ創設者",
   "Brand Ambassador": "Brand Ambassador",
   "Rookie": "ルーキー",
   "Veteran": "ベテラン",

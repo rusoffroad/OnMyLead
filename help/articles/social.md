@@ -4,7 +4,7 @@ summary: See what your friends are up to, like and comment on rides, badges and 
 category: groups
 order: 27
 release: "2.0"
-updated: 2026-11-18
+updated: 2026-11-19
 sources:
   - app/src/app/(tabs)/social-tab.tsx
   - app/src/app/social/index.tsx
@@ -86,9 +86,15 @@ Tap a rider's name anywhere in Social to open their profile: their picture, the 
 
 From a profile you can **Message** a friend, **Add Friend**, or **Report** them. You see a rider's activity only if their **Who Sees Your Activity** setting allows it.
 
-:::release 3.3
-OnMyLead's founder has an **OnMyLead Founder** tag beside their name on posts, comments and their profile. Every rider is friends with the founder, so the founder's posts show in your Feed. See [Add Friends](/help/friends#the-onmylead-founder).
+:::until 3.4
+OnMyLead's founder has an **OnMyLead Founder** tag beside their name on posts, comments and their profile.
 :::
+
+:::release 3.4
+OnMyLead's founder has an **App Founder** tag beside their name on posts, comments and their profile.
+:::
+
+Every rider is friends with the founder, so the founder's posts show in your Feed. See [Add Friends](/help/friends#the-onmylead-founder).
 
 ## See a Picture Full Size
 
