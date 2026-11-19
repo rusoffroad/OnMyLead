@@ -26,7 +26,7 @@ import { publicRidesNear } from '@/lib/api';
 import { showNotice } from '@/lib/confirm';
 import { openDirections } from '@/lib/directions';
 import { t } from '@/lib/i18n';
-import { currentPosition } from '@/lib/location';
+import { quickPosition } from '@/lib/location';
 import { useSession } from '@/lib/session';
 import { fetchSpotPage, setFavoriteSpot } from '@/lib/spots';
 import type { Ride } from '@/lib/types';
@@ -71,7 +71,7 @@ export default function SpotScreen() {
   // Reload when the rider signs in or out (their favorite and their review change).
   useEffect(load, [load, session?.user.id]);
   useEffect(() => {
-    currentPosition().then(setHere).catch(() => {});
+    quickPosition().then(setHere).catch(() => {});
   }, []);
 
   const spot = page?.spot ?? null;

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Pressable, View } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 
 import { Colors } from '@/constants/theme';
 import { regionMoved, type Bounds } from '@/core/discovery';
@@ -18,7 +18,7 @@ const FIT = { top: 24, right: 24, bottom: 24, left: 24 };
  * the flat map (rides-map.tsx). Always satellite here, whatever the rider's Map Style.
  */
 export function RidesMapboxMap({
-  rides, frame, frameKey, circle, title, onPressTitle, onOpen, onSearchArea, height = 400, full, onToggleFull, trail, spots, onOpenSpot,
+  rides, frame, frameKey, circle, title, onPressTitle, onOpen, onSearchArea, height = 400, full, onToggleFull, trail, spots, onOpenSpot, cover,
 }: RidesMapProps & { trail: TrailMap }) {
   const map = useRef<MapboxMapHandle>(null);
   const [ready, setReady] = useState(false);
@@ -99,6 +99,11 @@ export function RidesMapboxMap({
           </MapboxMarker>
         ) : null}
       </MapboxMap>
+      {cover && !ready ? (
+        <View pointerEvents="none" style={[StyleSheet.absoluteFill, { alignItems: 'center', justifyContent: 'center' }]}>
+          <ActivityIndicator color={Colors.text} />
+        </View>
+      ) : null}
       <MapOverlay
         title={title}
         onPressTitle={onPressTitle}
