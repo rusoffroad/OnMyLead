@@ -59,7 +59,7 @@ You lead. Create a ride, tell everyone where and when to meet, and OnMyLead give
 :::release 3.1
 From 3.1, Create a Ride is one short screen that starts out already filled in: today, the next quarter hour, where you are, and a ride for the friends you invite. A ride from here, right now, is two taps.
 
-1. On the **Home** tab, tap **Start a Ride** (**Create a Ride** from 3.4).
+1. On the **Home** tab, tap **Start a Ride** (**Create a Ride** from 4.0).
 2. Type a **Ride Name**, or leave it empty and the ride is named for its day, like "Saturday Ride".
 3. Tap **Day** to pick another day (see [Pick the Day](#pick-the-day) below). It starts on today.
 4. Tap **Meet At** to pick another time (see [Pick the Time](#pick-the-time) below). It starts on the next quarter hour.

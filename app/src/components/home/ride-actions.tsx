@@ -69,7 +69,7 @@ export function JoinHero({ code, onCode, onOpen, compact, tight }: { code: strin
 /**
  * Create a Ride and Events and Group Rides, side by side under Join (approved mock v4; renamed in
  * 3.1). Create shows how many rides a Free rider has left (and opens Pro when they're out); the
- * other opens rallies, ride weekends and public group rides near you. 3.4 (Chris 2026-11-18):
+ * other opens rallies, ride weekends and public group rides near you. 4.0 (Chris 2026-11-18):
  * "Start a Ride" became "Create a Ride", and both titles get two lines at the same size (the
  * one-line title used to shrink to fit, so it looked smaller than Events).
  */

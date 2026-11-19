@@ -34,7 +34,7 @@ import { MileSlider } from './mile-slider';
  * Tapping a place opens its page (app/spot/[id].tsx) with directions, rides there and Create a Ride
  * Here. On a tablet the controls and the list sit beside a full-height map.
  *
- * Favorite Places (3.4): the heart chip shows only the places the rider saved (newest first, any
+ * Favorite Places (4.0): the heart chip shows only the places the rider saved (newest first, any
  * distance away); `start="favorites"` opens on them.
  */
 export function Scout({ top, start = 'near' }: { top: React.ReactNode; start?: 'near' | 'favorites' }) {
@@ -74,7 +74,8 @@ export function Scout({ top, start = 'near' }: { top: React.ReactNode; start?: '
   const findHere = () =>
     currentPosition()
       .then(setHere)
-      .catch((e) => setLocError(e instanceof Error ? e.message : t('Could not get your location.')))
+      // Only our own words reach the rider; a phone error (kCLErrorDomain, no fix yet) gets the plain line.
+      .catch((e) => setLocError(e instanceof Error && /^Allow location access/.test(e.message) ? t(e.message) : t('Could not get your location.')))
       .finally(() => setLocating(false));
   const locate = () => {
     setLocating(true);

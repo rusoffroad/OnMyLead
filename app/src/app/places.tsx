@@ -4,7 +4,7 @@ import { FlagGate } from '@/components/app-notices';
 import { Scout } from '@/components/scout/scout';
 
 /**
- * Places to Ride, opened from its Home card (3.4): the same search as Find > Places to Ride, on a
+ * Places to Ride, opened from its Home card (4.0): the same search as Find > Places to Ride, on a
  * page of its own. /places?show=favorites opens on the rider's Favorite Places.
  */
 export default function PlacesScreen() {

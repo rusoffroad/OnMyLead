@@ -21,7 +21,7 @@ export type AdminSpotRow = {
   area_name: string | null;
   description: string | null;
   website: string | null;
-  /** 3.4 place details (migration 20261119100000_places_to_ride.sql); missing on an older server. */
+  /** 4.0 place details (migration 20261119100000_places_to_ride.sql); missing on an older server. */
   address?: string | null;
   phone?: string | null;
   /** One line per day range. */
@@ -55,7 +55,7 @@ export type SpotFields = Partial<Pick<AdminSpotRow,
 export const saveSpot = (id: string | null, fields: SpotFields) =>
   adminRpc<string>('admin_save_riding_spot', { p_id: id, p_fields: fields });
 
-// ---- Rider reviews of places (3.4) ----------------------------------------------------------
+// ---- Rider reviews of places (4.0) ----------------------------------------------------------
 
 export type ReviewStatus = 'live' | 'hidden';
 export type AdminPlaceReview = {

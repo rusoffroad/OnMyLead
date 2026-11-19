@@ -86,11 +86,11 @@ Tap a rider's name anywhere in Social to open their profile: their picture, the 
 
 From a profile you can **Message** a friend, **Add Friend**, or **Report** them. You see a rider's activity only if their **Who Sees Your Activity** setting allows it.
 
-:::until 3.4
+:::until 4.0
 OnMyLead's founder has an **OnMyLead Founder** tag beside their name on posts, comments and their profile.
 :::
 
-:::release 3.4
+:::release 4.0
 OnMyLead's founder has an **App Founder** tag beside their name on posts, comments and their profile.
 :::
 
