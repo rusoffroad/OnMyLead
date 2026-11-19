@@ -37,6 +37,9 @@ Syncing your settings and trails is a Pro feature. See [Free and Pro](/help/free
 
 - The map style (Satellite or Topo) and the trail layer switch
 - **Rider Trails on Maps** and **Follow Me on Maps**
+:::release 4.0
+- **Weather Radar** and **Forecast Where You Are** in Map Settings
+:::
 :::release 2.1
 - **Zoom In at Intersections**
 - **Zoom Out at the Edge**

@@ -58,6 +58,18 @@ export const APP_FLAGS = {
     hint: 'Average Speed and Estimated Time under the route builder (app 4.0). Off hides them; drawing and saving routes is not affected.',
     since: '4.0',
   },
+  weather_radar: {
+    group: 'maps',
+    label: 'Weather Radar',
+    hint: 'The Weather Radar switch in Map Settings (Pro): NOAA rain and snow radar over Ride Mode, Map Mode and the route builder (app 4.0). Off takes the radar off every map at once; free, no account.',
+    since: '4.0',
+  },
+  weather_forecast: {
+    group: 'maps',
+    label: 'Forecast Where You Are',
+    hint: 'The forecast button on Ride Mode and Map Mode (free): the temperature, the next hours, 7 days and official weather alerts from the National Weather Service (app 4.0). Off hides it; Ride Day weather on ride pages is not affected.',
+    since: '4.0',
+  },
   trail_ratings: {
     group: 'maps',
     label: 'Rate Trails',

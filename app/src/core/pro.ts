@@ -200,6 +200,8 @@ export const COMPARISON: { label: string; free: boolean | string; pro: boolean |
   { label: 'Bluetooth Sharing With No Service', free: false, pro: true },
   { label: 'CarPlay', free: false, pro: true },
   { label: 'Map Layers: Satellite, Topo and Trails', free: false, pro: true },
+  { label: 'Weather Radar on the Map', free: false, pro: true },
+  { label: 'Forecast and Weather Alerts Where You Are', free: true, pro: true },
   { label: 'Draw, Record, Save, Rate and Share Trails', free: false, pro: true },
   { label: 'Track Line and Named Spots', free: false, pro: true },
   { label: 'Group Rides on Your Trails', free: false, pro: true },
