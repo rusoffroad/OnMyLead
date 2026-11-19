@@ -19,7 +19,7 @@ sources:
   - app/src/core/pro.ts
   - supabase/migrations/20261104060000_bluetooth_sharing.sql
   - supabase/migrations/20261104100000_bluetooth_mesh.sql
-related: [permissions, ride-mode, ride-chat, location-sharing, emergency-and-safety, status-buttons, offline-maps, battery-saver, privacy]
+related: [radio-sharing, permissions, ride-mode, ride-chat, location-sharing, emergency-and-safety, status-buttons, offline-maps, battery-saver, privacy]
 keywords: [bluetooth, no service, no signal, offline, dead zone, mesh, relay, nearby, out of range, no cell, message, talk, seen by, got it]
 ---
 
@@ -55,6 +55,10 @@ From 3.1 the banner is one small line, for example **No Service 2 Nearby on Blue
 Bluetooth reaches about 30 to 100 meters (100 to 300 feet) between phones in the open, and less through trees, hills, bodies and steel. It works best when the group is bunched up, at a regroup, or riding close. Riders a half mile apart are usually out of range of each other unless riders in between pass it along.
 
 Riders farther away than that show where they were last seen, as before. See [Use Ride Mode](/help/ride-mode).
+
+:::release 4.0
+Need more range? Pair your own Meshtastic radio under **You** > **Radio Sharing**, and the same spots, alerts and messages also go over it to riders on your ride who have a radio too, miles apart. See [Share Over a Meshtastic Radio](/help/radio-sharing).
+:::
 
 ## Before You Lose Service
 

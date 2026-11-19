@@ -75,16 +75,16 @@ describe('Admin Features page', () => {
     }
   });
 
-  it('only the flags that need setup or testing start off', () => {
-    expect(APP_FLAG_KEYS.filter((k) => !flagOn(NO_SETTINGS, k)).sort()).toEqual(['apple_web_sign_in', 'radio_sharing']);
+  it('only the flag that needs setup first starts off', () => {
+    expect(APP_FLAG_KEYS.filter((k) => !flagOn(NO_SETTINGS, k)).sort()).toEqual(['apple_web_sign_in']);
   });
 
   it('lists only real changes, by what the app does', () => {
-    expect(flagChanges({}, { starlink: true, radio_sharing: false })).toEqual([]);
-    expect(flagChanges({}, { starlink: false, radio_sharing: true })).toEqual([
-      { flag: 'radio_sharing', on: true },
+    expect(flagChanges({}, { starlink: true, apple_web_sign_in: false })).toEqual([]);
+    expect(flagChanges({}, { starlink: false, radio_sharing: false })).toEqual([
+      { flag: 'radio_sharing', on: false },
       { flag: 'starlink', on: false },
-    ].sort((a, b) => APP_FLAG_KEYS.indexOf(a.flag as never) - APP_FLAG_KEYS.indexOf(b.flag as never)));
+    ]);
     expect(flagChanges({ route_eta: false }, {})).toEqual([{ flag: 'route_eta', on: true }]);
   });
 

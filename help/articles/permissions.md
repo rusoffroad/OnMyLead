@@ -4,7 +4,7 @@ summary: See every permission OnMyLead uses in one place, which ones are off, an
 category: troubleshooting
 order: 15
 release: "3.1"
-updated: 2026-11-15
+updated: 2026-11-19
 sources:
   - app/src/app/permissions.tsx
   - app/src/core/permissions.ts
@@ -34,6 +34,9 @@ The top of the page shows a light for each permission, green when it's allowed a
 - **Google Location Accuracy** (Android): without it, some Android phones place you miles off.
 - **Notifications**: status taps, EMERGENCY alerts, chat and ride changes.
 - **Bluetooth**: passes spots, taps and EMERGENCY between riders when there is no service. See [Share With Nearby Riders With No Service](/help/bluetooth-sharing).
+:::release 4.0
+  It also connects to your own Meshtastic radio if you pair one. See [Share Over a Meshtastic Radio](/help/radio-sharing).
+:::
 
 **Optional**
 
