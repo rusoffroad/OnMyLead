@@ -95,8 +95,8 @@ export default function RouteBuilder() {
   const fold = usePanelFold('route.panelOpen.v1', true, wide ? 'up' : 'down', true, fullMap.enter);
   const open = fold.open;
   // The time estimate's speed box: while it's being typed in, the panel rides up above the keyboard
-  // (a panel hanging from the top on a wide tablet is already clear of it), but never past the bar
-  // with the ride's name and the status bar (core/route-eta panelLift).
+  // (a panel hanging from the top on a wide tablet is already clear of it), but never up over the
+  // Map Settings button, the bar with the ride's name or the status bar (core/route-eta panelLift).
   const [typingSpeed, setTypingSpeed] = useState(false);
   const [panelH, setPanelH] = useState(0);
   const keyboard = useKeyboardHeight();

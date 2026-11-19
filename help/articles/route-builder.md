@@ -117,7 +117,7 @@ Under the tools, type the average speed you expect to ride in **Average Speed** 
 
 The estimate is moving time only, a rough guess for planning. It doesn't know about terrain, weather, stops, regroups or fuel, so plan extra time. Nothing is saved with the route; the app remembers your speed for next time, on all your devices.
 
-On a phone the panel moves up while you type the speed, as far as it can without covering the ride's name at the top. The panel needs to be open: when it's folded or in Full Map, only the miles show.
+On a phone the panel moves up while you type the speed, as far as it can without covering the ride's name or the map settings button at the top. The panel needs to be open: when it's folded or in Full Map, only the miles show.
 :::
 
 ## Search for a Place
