@@ -108,6 +108,12 @@ const PATHS = {
   spotTrailhead: ['M11 21V3.5', 'M11 5h7.5l2 2.25-2 2.25H11', 'M11 12.5H5.5l-2 2.25 2 2.25H11', 'M8 21h6'],
   // Motocross track: a checkered flag.
   spotTrack: ['M4.5 21.5V3.5', 'M4.5 3.5h16v11h-16z'],
+  // Snowmobile area: a snowflake.
+  spotSnow: ['M12 2.5v19', 'M3.8 7.25l16.4 9.5', 'M3.8 16.75l16.4-9.5', 'M9.5 4l2.5 2 2.5-2', 'M9.5 20l2.5-2 2.5 2'],
+  // Scenic drive: a road winding toward a peak.
+  spotDrive: ['M2.5 11l5-6 3.5 4 2.5-3 8 5', 'M9 21.5c0-3.5 6-3.5 6-6.5S11 13 11 11'],
+  // Campground: a tent.
+  spotCamp: ['M12 4L3 20h18z', 'M12 12l-3.5 8', 'M12 12l3.5 8', 'M10 4l2 2.5L14 4'],
   // Activities (4.0), one picture each for the switcher and the chip.
   // Offroad: two peaks with a trail switchback.
   actOffroad: ['M2.5 19.5L9 9l3.6 5.6L15.5 11l6 8.5z', 'M7.4 11.6l1.6 1.3 1.7-1.4'],
