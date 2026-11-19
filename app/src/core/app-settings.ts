@@ -1,5 +1,5 @@
 /**
- * What the owner sets on the Admin Dashboard's Settings page and every rider's app reads
+ * What the owner sets on the Admin Dashboard's Features and Settings pages and every rider's app reads
  * (public_app_settings() in migration 20261018000000_pro_entitlements.sql):
  *   * an announcement and a maintenance notice, each null or {"text": 1-500 chars, "until": ISO?};
  *   * feature flags, an object of booleans;
@@ -7,8 +7,9 @@
  *     chosen versions), read by core/app-versions.ts. Builds before 1.0.3 ignore them.
  *
  * Flags are kill switches for extras, never for safety: a flag the owner hasn't set, or an app that
- * can't reach the server, leaves the feature on. Ride Mode, Help and SOS, Mechanical Issue,
- * location sharing, chat and joining have no flag.
+ * can't reach the server, leaves the feature on. Ride Mode, Help and SOS, EMERGENCY, Mechanical
+ * Issue, location sharing, navigation, chat, joining and CarPlay have no flag. An app build older
+ * than a flag's `since` version ignores it (the feature stays on there).
  */
 
 import { NO_VERSIONS, parseAppVersions, type AppVersions, type Notice } from './app-versions';
@@ -24,37 +25,98 @@ export type AppSettings = {
 
 export const NO_SETTINGS: AppSettings = { announcement: null, maintenance: null, flags: {}, versions: NO_VERSIONS };
 
-/** The flags the app reads, with the names and notes the Settings page shows (Title Case). */
+/** How the Features page on the Admin Dashboard groups the switches, in order. */
+export const FLAG_GROUPS = [
+  { key: 'maps', title: 'Maps and Navigation' },
+  { key: 'rides', title: 'Rides and Activities' },
+  { key: 'social', title: 'Social and Community' },
+  { key: 'connect', title: 'No-Service Sharing' },
+  { key: 'extras', title: 'Toolkit and Extras' },
+  { key: 'account', title: 'Sign-In and Rewards' },
+] as const;
+
+export type FlagGroup = (typeof FLAG_GROUPS)[number]['key'];
+
+type FlagInfo = {
+  label: string;
+  hint: string;
+  group: FlagGroup;
+  /** Starts off: a feature that needs setting up (or testing) first. */
+  offUntilSet?: boolean;
+  /** The first app version that reads the switch. Older builds keep the feature on whatever it says. */
+  since?: string;
+};
+
+/** The flags the app reads, with the names and notes the Admin Features page shows (Title Case). */
 export const APP_FLAGS = {
-  find_a_ride: { label: 'Find a Ride', hint: 'The Find a Ride button and map, and Public Rides on the home screen. Invite codes and links still work.' },
-  scout: { label: 'Scout (Places to Ride)', hint: 'The Places to Ride switch on the Find tab (off-road parks, OHV areas and trails near the rider, and Suggest a Place). Place pages already open still work.' },
-  trip_planner: { label: 'Trip Planner', hint: 'The Trip Planner in the home screen toolkit. Saved trips are kept.' },
-  starlink: { label: 'Starlink', hint: 'The Starlink page in the home screen toolkit.' },
-  rus_gear: { label: 'RUS Gear Suggestions', hint: 'Product suggestions in the Garage and on trip checklists.' },
-  starlink_mount_ad: { label: 'Starlink Mount Ad', hint: 'The RUS Starlink Mini Mount V2 ad on the Starlink page.' },
-  ride_polls: { label: 'Ride Polls', hint: 'Creating new polls in ride chat. Polls already sent can still be voted on.' },
-  music_controls: { label: 'Music Controls', hint: 'The Music button in Ride Mode and Map Mode (play, pause, skip and volume for the music on the phone). Riders can also hide it themselves under You.' },
-  nav_mode: { label: 'Map Mode', hint: 'The Map Mode card on the home screen (offroad map, recording, custom trails and sharing). Trails on riders’ phones are kept; rider trails on maps still show.' },
-  mapbox_maps: { label: 'Mapbox Maps', hint: 'Every map drawn by Mapbox (Satellite, Topo, 3D Terrain and the standard map, free up to 25,000 riders a month). Off: the Apple, Google and website maps from 2.0 draw instead, with the same trails and downloads.' },
-  terrain_3d: { label: '3D Terrain', hint: 'The 3D Terrain map style in Ride Mode and Map Mode (Mapbox: free up to 25,000 riders a month). Off: riders who picked it see the flat satellite map.' },
-  bluetooth_sharing: { label: 'Bluetooth Sharing', hint: 'Ride Mode passing spots and alerts between nearby riders over Bluetooth when there is no service (app 2.1). Off stops the Bluetooth radio; sharing and alerts over the internet are not affected.' },
+  nav_mode: { group: 'maps', label: 'Map Mode', hint: 'The Map Mode card on the home screen (offroad map, recording, custom trails and sharing). Trails on riders’ phones are kept; rider trails on maps still show.' },
+  mapbox_maps: { group: 'maps', label: 'Mapbox Maps', hint: 'Every map drawn by Mapbox (Satellite, Topo, 3D Terrain and the standard map, free up to 25,000 riders a month). Off: the Apple, Google and website maps from 2.0 draw instead, with the same trails and downloads.' },
+  terrain_3d: { group: 'maps', label: '3D Terrain', hint: 'The 3D Terrain map style in Ride Mode and Map Mode (Mapbox: free up to 25,000 riders a month). Off: riders who picked it see the flat satellite map.' },
+  route_eta: {
+    group: 'maps',
+    label: 'Route Estimated Time',
+    hint: 'Average Speed and Estimated Time under the route builder (app 4.0). Off hides them; drawing and saving routes is not affected.',
+    since: '4.0',
+  },
+  trail_ratings: {
+    group: 'maps',
+    label: 'Rate Trails',
+    hint: 'The Rate This Trail button on shared trails. Off: ratings riders already gave still show; nobody can add or change one.',
+    since: '4.0',
+  },
+  find_a_ride: { group: 'rides', label: 'Find a Ride', hint: 'The Find a Ride button and map, and Public Rides on the home screen. Invite codes and links still work.' },
+  scout: { group: 'rides', label: 'Places to Ride', hint: 'The Places to Ride switch on the Find tab (off-road parks, OHV areas and trails near the rider, and Suggest a Place). Place pages already open still work.' },
+  activities: {
+    group: 'rides',
+    label: 'Activities',
+    hint: 'The activity switcher on Home (Offroad, Motorcycle, Road Trip, Snowmobile): each activity’s colours, Home words, Ride Mode buttons, and rides, events and places for that activity. Off: everyone sees Offroad, as before. On from 4.0 (Chris 2026-11-19).',
+  },
+  ride_polls: { group: 'rides', label: 'Ride Polls', hint: 'Creating new polls in ride chat. Polls already sent can still be voted on.' },
+  ride_cards: {
+    group: 'rides',
+    label: 'Ride Cards',
+    hint: 'The shareable Ride Card on a finished ride’s summary. Off hides the card; the ride’s stats and the group’s totals still show.',
+    since: '4.0',
+  },
+  home_feed: { group: 'social', label: 'Home Feed', hint: 'The Feed on the home screen (friends’ rides, badges and trails). Riders’ feed settings are kept.' },
+  social_posting: {
+    group: 'social',
+    label: 'Social Posts',
+    hint: 'Writing new ride reports in Social (“Post a ride report…”). Off: posts already shared, likes and comments still show.',
+    since: '4.0',
+  },
+  leaderboard: {
+    group: 'social',
+    label: 'Badge Leaderboard',
+    hint: 'The Leaderboard button on the Badges page (where you rank in your state, your country and everywhere). Badges themselves are not affected.',
+    since: '4.0',
+  },
+  founder_tag: {
+    group: 'social',
+    label: 'App Founder Tag',
+    hint: 'The App Founder tag beside the Founder’s name in Social, the Feed and profiles. Off hides the tag; the friendship is kept.',
+    since: '4.0',
+  },
+  bluetooth_sharing: { group: 'connect', label: 'Bluetooth Sharing', hint: 'Ride Mode passing spots and alerts between nearby riders over Bluetooth when there is no service (app 2.1). Off stops the Bluetooth radio; sharing and alerts over the internet are not affected.' },
   radio_sharing: {
+    group: 'connect',
     label: 'Radio Sharing (Meshtastic)',
     hint: 'Riders who pair their own Meshtastic radio under You also send Bluetooth Sharing spots, alerts and messages over it, for miles of range with no service (app 4.0). Off until it has been tested with real radios. Off drops the radio link; Bluetooth Sharing is not affected.',
     offUntilSet: true,
   },
-  referrals: { label: 'Refer a Friend', hint: 'Invite Friends and the 50% off Pro Annual reward. Turn on only once the Apple offer codes and the Google Play referral-50 offer exist. Rewards already earned can still be claimed when it is off.' },
-  home_feed: { label: 'Home Feed', hint: 'The Feed on the home screen (friends’ rides, badges and trails). Riders’ feed settings are kept.' },
-  activities: {
-    label: 'Activities',
-    hint: 'The activity switcher on Home (Offroad, Motorcycle, Road Trip, Snowmobile): each activity’s colours, Home words, Ride Mode buttons, and rides, events and places for that activity. Off: everyone sees Offroad, as before. On from 4.0 (Chris 2026-11-19).',
-  },
+  music_controls: { group: 'extras', label: 'Music Controls', hint: 'The Music button in Ride Mode and Map Mode (play, pause, skip and volume for the music on the phone). Riders can also hide it themselves under You.' },
+  trip_planner: { group: 'extras', label: 'Trip Planner', hint: 'The Trip Planner in the home screen toolkit. Saved trips are kept.' },
+  starlink: { group: 'extras', label: 'Starlink', hint: 'The Starlink page in the home screen toolkit.' },
+  starlink_mount_ad: { group: 'extras', label: 'Starlink Mount Ad', hint: 'The RUS Starlink Mini Mount V2 ad on the Starlink page.' },
+  rus_gear: { group: 'extras', label: 'RUS Gear Suggestions', hint: 'Product suggestions in the Garage and on trip checklists.' },
+  referrals: { group: 'account', label: 'Refer a Friend', hint: 'Invite Friends and the 50% off Pro Annual reward. Turn on only once the Apple offer codes and the Google Play referral-50 offer exist. Rewards already earned can still be claimed when it is off.' },
   apple_web_sign_in: {
+    group: 'account',
     label: 'Sign in with Apple on the Website and Android',
     hint: 'Continue with Apple on onmylead.com and in the Android app, through Apple’s web sign-in. Off until the Apple Services ID and its secret are set up in Supabase (docs/web-sign-in-with-apple.md); on before that, the button fails.',
     offUntilSet: true,
   },
-} as const satisfies Record<string, { label: string; hint: string; offUntilSet?: boolean }>;
+} as const satisfies Record<string, FlagInfo>;
 
 export type AppFlag = keyof typeof APP_FLAGS;
 
@@ -88,7 +150,26 @@ export function liveNotice(n: Notice | null, now: number = Date.now()): Notice |
 
 /** Flags that need setting up first (an Apple secret, say) start off; the owner switches them on. */
 export function flagOffUntilSet(flag: AppFlag): boolean {
-  return (APP_FLAGS[flag] as { offUntilSet?: boolean }).offUntilSet === true;
+  return (APP_FLAGS[flag] as FlagInfo).offUntilSet === true;
+}
+
+/** The first app version that reads this switch, if it is newer than the first flags (1.x). */
+export function flagSince(flag: AppFlag): string | undefined {
+  return (APP_FLAGS[flag] as FlagInfo).since;
+}
+
+/** The flags in one group of the Features page, in list order. */
+export function flagsInGroup(group: FlagGroup): AppFlag[] {
+  return APP_FLAG_KEYS.filter((k) => (APP_FLAGS[k] as FlagInfo).group === group);
+}
+
+/**
+ * The flags the owner changed on the Features page: what each one was and is now, by what the
+ * app does (so setting a never-set flag to its default isn't a change).
+ */
+export function flagChanges(before: Record<string, boolean>, after: Record<string, boolean>): { flag: AppFlag; on: boolean }[] {
+  const s = (flags: Record<string, boolean>) => ({ ...NO_SETTINGS, flags });
+  return APP_FLAG_KEYS.filter((k) => flagOn(s(before), k) !== flagOn(s(after), k)).map((k) => ({ flag: k, on: flagOn(s(after), k) }));
 }
 
 /** True unless the owner switched the feature off (or, for a flag that starts off, until the owner switched it on). */

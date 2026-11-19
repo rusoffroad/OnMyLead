@@ -928,6 +928,7 @@ export function RiderTrailCard({ t, onClose, onRate, onFollow }: { t: PublicTrai
     .filter(Boolean)
     .join('   ');
   const garage = useGarageWidths();
+  const rateOn = useFlag('trail_ratings');
   return (
     <View style={[styles.card, styles.riderCard]} accessibilityLiveRegion="polite">
       <View style={styles.cardHead}>
@@ -964,7 +965,7 @@ export function RiderTrailCard({ t, onClose, onRate, onFollow }: { t: PublicTrai
         </View>
       </View>
       <View style={styles.actions}>
-        {!t.mine ? (
+        {!t.mine && rateOn ? (
           <Pressable accessibilityRole="button" onPress={onRate} style={({ pressed }) => [styles.action, styles.actionMain, pressed && { opacity: 0.85 }]}>
             <Text style={[styles.actionText, { color: Colors.background }]}>{t.myScore != null || t.myQuality != null ? tr('Change Rating') : tr('Rate Trail')}</Text>
           </Pressable>

@@ -253,8 +253,8 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
   accounts, App Store and Google Play downloads), Store Reviews (both stores' ratings and reviews,
   replies posted to the store), Users (comp Pro, extend trial, revoke, suspend, delete), Rides (remove), Trials,
   Subscriptions, Promo Codes (App Store Connect offer codes), Reports (2.0: report page with the saved conversation, suspend 1/7/30/90 days or ban), Analytics, App Health
-  (Sentry, push tokens by iPhone / Android, server checks), Exports, Settings (trial days, feature
-  plans, flags, banners), Releases (halt / resume / widen the Google Play rollout, pause / resume
+  (Sentry, push tokens by iPhone / Android, server checks), Exports, Features (4.0: every feature switch
+  in groups, on/off for everyone with no app update), Settings (trial days, feature plans, banners), Releases (halt / resume / widen the Google Play rollout, pause / resume
   the App Store phased release, minimum and latest app version, a notice for chosen versions;
   `docs/release-rollback.md`), Audit log, Contact messages, Help Center editor.
 - Store data is Apple-only today (`app_store_subscriptions`, `app_store_events`, revenue, promo

@@ -17,6 +17,7 @@ import {
 import { useLayout } from '@/hooks/use-layout';
 import { confirmAsync } from '@/lib/confirm';
 import { deleteSharedTrail, getPublicTrail, savePublicTrail, stopSharing, useLocalTrails } from '@/lib/nav-trails';
+import { useFlag } from '@/lib/app-settings';
 import { requirePro } from '@/lib/pro';
 import { useGarageWidths } from '@/lib/trail-width';
 import { t as tr } from '@/lib/i18n';
@@ -32,6 +33,7 @@ export default function PublicTrailPage() {
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [rating, setRating] = useState(false);
+  const rateOn = useFlag('trail_ratings');
   const [deleting, setDeleting] = useState(false);
   const garage = useGarageWidths();
   const { trails } = useLocalTrails();
@@ -160,7 +162,7 @@ export default function PublicTrailPage() {
     <>
       <ErrorText error={error} />
       <Button title={tr('Navigate')} big onPress={() => router.push(`/nav?follow=${t.id}`)} />
-      {!t.mine ? (
+      {!t.mine && rateOn ? (
         <Button
           title={t.myScore != null || t.myQuality != null ? tr('Change Your Rating') : tr('Rate This Trail')}
           kind="secondary"

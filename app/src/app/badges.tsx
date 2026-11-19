@@ -9,6 +9,7 @@ import { Button, ErrorText, Screen } from '@/components/ui';
 import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import { allProgress, honorsHeld, LEVEL_NAME, RANKS, rankFor, type BadgeLevel, type BadgeProgress, type HonorDef, type MyBadges } from '@/core/badges';
 import { widthClass } from '@/core/layout';
+import { useFlag } from '@/lib/app-settings';
 import { fetchMyBadges, forgetRiderBadge, markBadgesSeen } from '@/lib/badges';
 import { useSession } from '@/lib/session';
 import { t } from '@/lib/i18n';
@@ -139,6 +140,8 @@ function RankCard({ rank }: { rank: ReturnType<typeof rankFor> }) {
 
 /** The way to the leaderboard: where you rank in your state, your country and everywhere. */
 function LeaderboardLink() {
+  // Admin can switch the leaderboard off (Features: Badge Leaderboard).
+  if (!useFlag('leaderboard')) return null;
   return (
     <Pressable
       accessibilityRole="button"

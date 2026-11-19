@@ -11,7 +11,8 @@ export function AdminPage({ title, subtitle, actions, children }: { title: strin
   return (
     <View style={[styles.page, size === 'phone' && styles.pagePhone]}>
       <View style={[styles.head, size === 'phone' && { flexDirection: 'column', alignItems: 'flex-start' }]}>
-        <View style={{ flexShrink: 1, flexGrow: 1, flexBasis: 360, gap: 4 }}>
+        {/* flexBasis is a width beside the actions; in the phone's column it would be a 360 pt tall gap. */}
+        <View style={{ flexShrink: 1, flexGrow: 1, flexBasis: size === 'phone' ? 'auto' : 360, gap: 4 }}>
           <Text accessibilityRole="header" style={[styles.title, size === 'phone' && { fontSize: 34, lineHeight: 36 }]}>{title}</Text>
           {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
         </View>
