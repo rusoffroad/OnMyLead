@@ -82,7 +82,7 @@ begin
 end $$;
 reset role;
 
--- Places for the other activities (20261121550000_activity_places.sql): a Snowmobile Area lists for
+-- Places for the other activities (20261122100000_activity_places.sql): a Snowmobile Area lists for
 -- Snowmobile only, never through the old function (builds before 4.0 don't know the kind), and a
 -- rider's suggestion is filed under their activity.
 reset role;

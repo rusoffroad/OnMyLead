@@ -18,7 +18,7 @@ sources:
   - app/src/components/activity-splash.tsx
   - app/src/components/activity-map-layers.tsx
   - app/src/components/home/snow-card.tsx
-  - supabase/migrations/20261121550000_activity_places.sql
+  - supabase/migrations/20261122100000_activity_places.sql
 related: [home-screen, status-buttons, find-a-ride, events, scout]
 keywords: [activity, mode, offroad, motorcycle, road trip, snowmobile, sled, car, rv, switch, colors, snow, avalanche, twisty roads, byways, campgrounds, splash]
 ---

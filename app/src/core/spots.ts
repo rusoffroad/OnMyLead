@@ -43,7 +43,7 @@ export const SPOT_KINDS: {
   { kind: 'trail_system', label: 'Trail Systems', one: 'Trail System', icon: 'spotTrails' },
   { kind: 'trailhead', label: 'Trailheads', one: 'Trailhead', icon: 'spotTrailhead' },
   { kind: 'track', label: 'Motocross Tracks', one: 'Motocross Track', icon: 'spotTrack' },
-  // Activities (4.0): places for the other activities (supabase migration 20261121550000_activity_places.sql).
+  // Activities (4.0): places for the other activities (supabase migration 20261122100000_activity_places.sql).
   { kind: 'snow_area', label: 'Snowmobile Areas', one: 'Snowmobile Area', icon: 'spotSnow' },
   { kind: 'scenic_drive', label: 'Scenic Drives', one: 'Scenic Drive', icon: 'spotDrive' },
   { kind: 'campground', label: 'Campgrounds', one: 'Campground', icon: 'spotCamp' },

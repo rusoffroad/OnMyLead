@@ -2,7 +2,7 @@
 // Places to Ride for the other activities (4.0, Chris 2026-11-19: "depending on what activity you
 // are in be sure to change the places we ride searches for the activity"). Writes one SQL seed that
 // upserts into public.riding_spots with each place's activities
-// (supabase/migrations/20261121550000_activity_places.sql explains the kinds).
+// (supabase/migrations/20261122100000_activity_places.sql explains the kinds).
 //
 //   NODE_USE_ENV_PROXY=1 node scripts/spots/import-activities.mjs      (from app/)
 //
@@ -22,7 +22,7 @@ import { fileURLToPath } from 'node:url';
 import { cleanText } from './classify.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const OUT = join(here, '../../../supabase/migrations/20261121550100_activity_places_seed.sql');
+const OUT = join(here, '../../../supabase/migrations/20261122100100_activity_places_seed.sql');
 const UA = 'OnMyLead-Scout-import/1.0 (+https://onmylead.com)';
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
