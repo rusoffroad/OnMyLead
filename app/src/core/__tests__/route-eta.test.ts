@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { milesToMeters } from '../geo';
-import { cleanSpeedText, etaSeconds, formatEta, parseSpeed } from '../route-eta';
+import { cleanSpeedText, etaSeconds, formatEta, PANEL_TOP_ROOM, panelLift, parseSpeed } from '../route-eta';
 
 describe('route builder time estimate', () => {
   it('reads the speed the rider typed', () => {
@@ -37,5 +37,25 @@ describe('route builder time estimate', () => {
     expect(formatEta(0, 15)).toBeNull();
     expect(formatEta(null, 15)).toBeNull();
     expect(formatEta(milesToMeters(5), null)).toBeNull();
+  });
+});
+
+describe('route panel over the keyboard', () => {
+  const phone = { windowH: 852, topInset: 59, bottomInset: 34, bottomGap: 0 };
+  it('stays put with the keyboard down', () => {
+    expect(panelLift({ ...phone, keyboard: 0, panelH: 500 })).toBe(0);
+  });
+  it('clears the keyboard when there is room', () => {
+    expect(panelLift({ ...phone, keyboard: 300, panelH: 300 })).toBe(266);
+  });
+  it('never pushes a tall panel under the ride name and the clock', () => {
+    const lift = panelLift({ ...phone, keyboard: 335, panelH: 666 });
+    expect(852 - lift - 666).toBe(59 + PANEL_TOP_ROOM);
+  });
+  it('never moves down for a panel taller than the room', () => {
+    expect(panelLift({ ...phone, keyboard: 335, panelH: 800 })).toBe(0);
+  });
+  it('lifts the tablet card from its corner gap', () => {
+    expect(panelLift({ windowH: 1194, topInset: 24, bottomInset: 20, bottomGap: 12, keyboard: 400, panelH: 600 })).toBe(400);
   });
 });
