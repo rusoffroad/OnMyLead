@@ -121,23 +121,27 @@ export function TourPager({ mode: start, onClose }: { mode: TourMode; onClose: (
       <CardWords card={card} index={i} count={cards.length} last={last} onBack={back} onNext={next} />
     );
 
-  const skip =
-    mode === 'tour' && !last ? (
-      <Pressable accessibilityRole="button" onPress={onClose} style={[styles.skip, { top: (wide ? 0 : insets.top) + 14, right: (wide ? 0 : insets.right) + 16 }]} hitSlop={10}>
-        <Text style={styles.skipText}>{t('Skip')}</Text>
-      </Pressable>
-    ) : null;
+  const showSkip = mode === 'tour' && !last;
+  const skipButton = (
+    <Pressable accessibilityRole="button" onPress={onClose} style={styles.skipPill} hitSlop={10}>
+      <Text style={styles.skipText}>{t('Skip')}</Text>
+    </Pressable>
+  );
+  // Phones and tablet portrait: Skip sits in its own bar above the picture, so it never covers
+  // anything in the screenshot (like Ride Mode's "1 Separated"). Landscape: over the words side.
+  const skipBar = <View style={styles.skipBar}>{showSkip ? skipButton : null}</View>;
 
   if (wide) {
     return (
       <View style={styles.scrim}>
         <View style={[styles.wideCard, !landscape && styles.tallCard, short && styles.shortCard]} {...pan.panHandlers} accessibilityViewIsModal>
+          {landscape ? null : skipBar}
           <View style={landscape ? styles.wideArt : styles.tallArt}>
             <Image source={image} style={styles.fill} contentFit="cover" contentPosition="top" accessibilityIgnoresInvertColors />
             <Fade direction={landscape ? 'right' : 'down'} />
           </View>
           <View style={[landscape ? styles.wideBody : styles.tallBody, short && styles.shortBody]}>{words}</View>
-          {skip}
+          {landscape && showSkip ? <View style={styles.skipCorner}>{skipButton}</View> : null}
         </View>
       </View>
     );
@@ -145,12 +149,12 @@ export function TourPager({ mode: start, onClose }: { mode: TourMode; onClose: (
 
   return (
     <View style={[styles.phone, { paddingBottom: insets.bottom + Spacing.three }]} {...pan.panHandlers} accessibilityViewIsModal>
-      <View style={[styles.phoneArt, { marginTop: insets.top + 8 }]}>
+      <View style={{ marginTop: insets.top, paddingRight: insets.right }}>{skipBar}</View>
+      <View style={styles.phoneArt}>
         <Image source={image} style={styles.fill} contentFit="cover" contentPosition="top" accessibilityIgnoresInvertColors />
         <Fade direction="down" />
       </View>
       <View style={styles.phoneBody}>{words}</View>
-      {skip}
     </View>
   );
 }
@@ -331,6 +335,8 @@ const styles = themedStyles(() => ({
   pressed: { opacity: 0.85, transform: [{ scale: 0.98 }] },
   btnText: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 19 },
   nextText: { color: '#FFFFFF' },
-  skip: { position: 'absolute', backgroundColor: 'rgba(10,22,38,0.72)', borderWidth: 1, borderColor: 'rgba(241,244,248,0.18)', borderRadius: 999, paddingHorizontal: 14, paddingVertical: 6 },
-  skipText: { color: '#F1F4F8', fontFamily: font(600), fontSize: 15 },
+  skipBar: { height: 48, flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', paddingHorizontal: 16 },
+  skipCorner: { position: 'absolute', top: 14, right: 16 },
+  skipPill: { backgroundColor: Colors.backgroundSelected, borderWidth: 1, borderColor: Colors.border, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 6 },
+  skipText: { color: Colors.text, fontFamily: font(600), fontSize: 15 },
 }));
