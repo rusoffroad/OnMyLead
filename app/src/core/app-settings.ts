@@ -101,7 +101,8 @@ export const APP_FLAGS = {
   radio_sharing: {
     group: 'connect',
     label: 'Radio Sharing (Meshtastic)',
-    hint: 'Riders who pair their own Meshtastic radio under You also send Bluetooth Sharing spots, alerts and messages over it, for miles of range with no service (app 4.0). On unless turned off here. Off hides You > Radio Sharing and drops the radio link at once, no app update needed; Bluetooth Sharing is not affected.',
+    hint: 'Riders who pair their own Meshtastic radio under You also send Bluetooth Sharing spots, alerts and messages over it, for miles of range with no service (app 4.0). Off until it has been tested with real radios (Chris 2026-11-19). Off hides You > Radio Sharing and drops the radio link at once, no app update needed; Bluetooth Sharing is not affected.',
+    offUntilSet: true,
   },
   music_controls: { group: 'extras', label: 'Music Controls', hint: 'The Music button in Ride Mode and Map Mode (play, pause, skip and volume for the music on the phone). Riders can also hide it themselves under You.' },
   trip_planner: { group: 'extras', label: 'Trip Planner', hint: 'The Trip Planner in the home screen toolkit. Saved trips are kept.' },
