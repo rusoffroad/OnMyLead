@@ -108,6 +108,21 @@ const PATHS = {
   spotTrailhead: ['M11 21V3.5', 'M11 5h7.5l2 2.25-2 2.25H11', 'M11 12.5H5.5l-2 2.25 2 2.25H11', 'M8 21h6'],
   // Motocross track: a checkered flag.
   spotTrack: ['M4.5 21.5V3.5', 'M4.5 3.5h16v11h-16z'],
+  // Activities (4.0), one picture each for the switcher and the chip.
+  // Offroad: two peaks with a trail switchback.
+  actOffroad: ['M2.5 19.5L9 9l3.6 5.6L15.5 11l6 8.5z', 'M7.4 11.6l1.6 1.3 1.7-1.4'],
+  // Motorcycle: from the side, two wheels, tank and bars.
+  actMotorcycle: [
+    'M1.5 16.5a3.5 3.5 0 1 0 7 0a3.5 3.5 0 1 0-7 0', 'M15.5 16.5a3.5 3.5 0 1 0 7 0a3.5 3.5 0 1 0-7 0',
+    'M5 16.5l3.8-6h5.4l1.8 3H12l-2.5 3', 'M19 16.5l-3.2-6.3 1.4-3.2h2.3',
+  ],
+  // Road Trip: a car from the side.
+  actRoadTrip: [
+    'M2.5 16V12.5L5.2 7.5h10.3l3.5 5H21.5V16h-1.6', 'M8.6 16h6.8', 'M2.5 16h1.9', 'M3 12.5h16',
+    'M4.4 16a2.1 2.1 0 1 0 4.2 0a2.1 2.1 0 1 0-4.2 0', 'M15.4 16a2.1 2.1 0 1 0 4.2 0a2.1 2.1 0 1 0-4.2 0', 'M10.5 7.5v5',
+  ],
+  // Snowmobile: a sled on its ski and track.
+  actSnowmobile: ['M2 19.5h15c1.6 0 2.6-.8 3.6-2.2', 'M4 15.5h10.8l3.2-3.4-2.4-2.6H10L7.6 12H4z', 'M13.6 9.5l1.6-3.2h2.6', 'M7.5 15.5v4', 'M13 15.5v4'],
 } as const;
 
 /** Solid parts drawn under an icon's lines (the trail marker, the flag's checks). */

@@ -47,6 +47,7 @@ import { CarPlayHome } from '@/components/carplay-home';
 import { parseCarPlayAction } from '@/core/carplay';
 import { startRiderAgreement } from '@/lib/rider-agreement';
 import { startSettingsSync } from '@/lib/settings-sync';
+import { startActivitySync } from '@/lib/activity';
 import { startAppearanceSync } from '@/lib/appearance-sync';
 import { startLanguageSync } from '@/lib/language-sync';
 import { backupMapWaypointsNow } from '@/lib/map-waypoints';
@@ -139,6 +140,7 @@ function RootLayout() {
   // Settings, Map Mode trails and Map Mode waypoints follow the account to the rider's other devices.
   useEffect(() => {
     startAppearanceSync();
+    startActivitySync();
     startLanguageSync();
     startSettingsSync(() => {
       backupTrailsNow();

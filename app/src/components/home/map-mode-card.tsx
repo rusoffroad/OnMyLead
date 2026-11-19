@@ -17,11 +17,12 @@ const SHADE = 'rgba(8,14,24,';
  * offroaders"). "Ride Solo" says it needs no group; the trail count says what's near. Recording,
  * Track Line and offline maps live inside Map Mode, so the banner keeps to one big button.
  */
-export function MapModeBanner({ image, trailsNear, compact, tight }: { image: string | null; trailsNear: number | null; compact?: boolean; tight?: boolean }) {
+/** `line` is the activity's own words for the card (core/activities.ts); Offroad's are today's. */
+export function MapModeBanner({ image, trailsNear, compact, tight, line }: { image: string | null; trailsNear: number | null; compact?: boolean; tight?: boolean; line?: string }) {
   const near = trailsNear
     ? trailsNear === 1 ? t('1 trail near you') : t('{n} trails near you', { n: trailsNear.toLocaleString(currentLocale()) })
     : null;
-  const sub = near ? `${near}. ${t('Record, explore, go offline.')}` : t('Trails, recording and offline maps.');
+  const sub = near ? `${near}. ${t('Record, explore, go offline.')}` : line ?? t('Trails, recording and offline maps.');
   const open = () => router.push('/nav');
   return (
     <Pressable

@@ -66,6 +66,8 @@ export const SYNCED_SETTINGS: Record<string, string> = {
   'promo.inviteFriends.v1': 'The one-time Invite Friends pop-up was seen',
   // Appearance (themes thread; lib/appearance applies a change from another device)
   'onmylead.appearance': 'Theme, Dark/Light/Match Phone and Color Blind Mode',
+  // Activities (lib/activity applies a change from another device at launch)
+  'onmylead.activity': 'The activity picked on Home (Offroad, Motorcycle, Road Trip, Snowmobile)',
   // Language (lib/i18n applies a change from another device)
   'onmylead.language': 'The app language, or Match Phone',
   // Ride Mode alerts (their threads; each writes its key with setSyncedItem once both branches are in)
