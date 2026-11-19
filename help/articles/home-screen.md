@@ -30,10 +30,10 @@ keywords: [places to ride, create a ride, one screen, home, starlink card, starl
 ---
 
 :::release 3.0
-:::until 3.4
+:::until 4.0
 **Home** is the first tab. It opens on a satellite map of your area with your greeting. Under it are the four things riders do most: **Map Mode**, **Join a Ride**, **Start a Ride** and **Events**. Below those are the sections you pick, like who's out riding and what's up next.
 :::
-:::release 3.4
+:::release 4.0
 **Home** is the first tab. It opens on a satellite map of your area with your greeting. Under it are the things riders do most: **Map Mode**, **Join a Ride**, **Create a Ride**, **Events and Group Rides** and **Places to Ride**. On a phone they all fit on the first screen, without scrolling. On smaller phones (shorter than an iPhone Pro Max or Plus) the greeting is left out to make room. Below those are the sections you pick, like who's out riding and what's up next.
 :::
 
@@ -59,8 +59,8 @@ The big red card. Type the invite code from the ride leader and tap **Join**. Yo
 
 Two tiles side by side:
 
-:::release 3.4
-From 3.4 the first tile is called **Create a Ride**, and its title is the same size as the one beside it.
+:::release 4.0
+From 4.0 the first tile is called **Create a Ride**, and its title is the same size as the one beside it.
 :::
 
 - **Start a Ride** creates a new ride. On Free it says how many you have left this month (**1 Left This Month**, or **None Left This Month**, which opens Pro). On Pro and during the trial it says **Lead your group**. See [Create a Ride](/help/create-a-ride) and [Free and Pro](/help/free-vs-pro).
@@ -70,7 +70,7 @@ From 3.4 the first tile is called **Create a Ride**, and its title is the same s
 From 3.1 the second tile is **Events and Group Rides**: it opens rallies, poker runs and ride weekends, and public group rides near you, with a switch between them. See [Events](/help/events).
 :::
 
-:::release 3.4
+:::release 4.0
 ## Places to Ride
 
 The card under those two tiles, with pins on a satellite map. Tap it to find off-road parks, national forests, OHV areas, trails and motocross tracks near you, see each place's address, phone, hours and rider reviews, and save your Favorite Places. It says **New** until you open it the first time. See [Find Places to Ride With Scout](/help/scout).
@@ -109,8 +109,8 @@ Swipe a ride left to delete it (if you organize it) or leave it. On onmylead.com
 4. Tap **Done**.
 
 Map Mode, Join a Ride, Start a Ride and Events (**Events and Group Rides** from 3.1) always show first, your badges stay at the top and Your Toolkit stays at the bottom.
-:::release 3.4
-From 3.4, **Places to Ride** always shows with them, after Events and Group Rides.
+:::release 4.0
+From 4.0, **Places to Ride** always shows with them, after Events and Group Rides.
 :::
 
 **Reset to Default** puts everything back. Your layout is saved to your account, so it's the same on your phone, tablet and the website.

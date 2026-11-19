@@ -57,7 +57,7 @@ const styles = themedStyles(() => ({
     minHeight: 224, borderRadius: 22, overflow: 'hidden', padding: 16, justifyContent: 'space-between', gap: 14, backgroundColor: '#0B1626',
     borderWidth: 1.5, borderColor: 'rgba(110,165,255,0.7)', boxShadow: '0px 18px 36px -14px rgba(0, 0, 0, 0.7)',
   },
-  // On a phone (3.4) the card sizes to what's in it, a little tighter, so every Home card fits on one screen.
+  // On a phone (4.0) the card sizes to what's in it, a little tighter, so every Home card fits on one screen.
   cardCompact: { minHeight: 0, padding: 14, gap: 10 },
   titleCompact: { fontSize: 38, lineHeight: 40 },
   subCompact: { maxWidth: undefined },

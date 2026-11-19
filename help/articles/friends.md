@@ -90,11 +90,11 @@ This friendship never shows where you are. Unlike other friends, the founder doe
 
 Don't want it? Remove the founder like any friend, or block. You aren't added back, even if you unblock later. You can still send the founder a friend request yourself any time.
 
-:::until 3.4
+:::until 4.0
 The founder's name carries an **OnMyLead Founder** tag in the Feed, Social, comments, his profile, Friends, Messages and a ride's Going list, so you know who it is.
 :::
 
-:::release 3.4
+:::release 4.0
 The founder's name carries an **App Founder** tag in the Feed, Social, comments, his profile, Friends, Messages and a ride's Going list, so you know who it is.
 :::
 

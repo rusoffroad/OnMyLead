@@ -36,7 +36,7 @@ const RIDES_MILES = 15;
 const WEB_URL = process.env.EXPO_PUBLIC_WEB_URL ?? 'https://onmylead.com';
 
 /**
- * A place to ride: its profile (Places to Ride, 3.4). Name and kind, Save to Favorite Places, the
+ * A place to ride: its profile (Places to Ride, 4.0). Name and kind, Save to Favorite Places, the
  * quick actions (Directions, Call, Website, Share), Create a Ride Here and Open in Map Mode, its
  * trails by level, address / phone / hours / fees / season, rider reviews with photos (and the
  * free Reviews on Google link), public rides nearby and what it is. Works signed out (the

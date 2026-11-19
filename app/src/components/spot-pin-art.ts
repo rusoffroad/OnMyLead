@@ -1,7 +1,7 @@
 import type { SpotKind } from '@/core/spots';
 
 /**
- * The map pin for a place to ride (Places to Ride, 3.4; Chris 2026-11-18: "you can do better on the
+ * The map pin for a place to ride (Places to Ride, 4.0; Chris 2026-11-18: "you can do better on the
  * icons on the map" and no teal). One teardrop shape in the app's own colours, its point on the
  * place, with a white picture of what you ride there:
  *
