@@ -2,7 +2,6 @@ import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Linking, Platform, Pressable, Share, Text, View } from 'react-native';
 
-import { Icon } from '@/components/icon';
 import { RideRow, RowGroup } from '@/components/ride-row';
 import { RidesMap } from '@/components/rides-map';
 import { awayText } from '@/components/rides-map-chrome';

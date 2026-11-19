@@ -1,5 +1,4 @@
 import { Image } from 'expo-image';
-import { router } from 'expo-router';
 import { useState } from 'react';
 import { ActivityIndicator, Linking, Pressable, ScrollView, Text, View } from 'react-native';
 import Svg, { Defs, LinearGradient, Path, Stop } from 'react-native-svg';
