@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 
 import { Icon } from '@/components/icon';
+import { ProTag } from '@/components/pro-tag';
 import { KeyboardLift, keyboardScroll, TextBox } from '@/components/keyboard';
 import { SheetRoot, SheetScroll, SwipeSheet } from '@/components/swipe-sheet';
 import { ThemedText } from '@/components/themed-text';
@@ -11,6 +12,7 @@ import { charactersLeft, checkRideMessage, isBuiltInReply, RIDE_MESSAGE_MAX } fr
 
 import { t as tr } from '@/lib/i18n';
 import { SheetModal } from '@/components/sheet-modal';
+import { useCan } from '@/lib/pro';
 type Props = {
   visible: boolean;
   tablet: boolean;
@@ -33,7 +35,9 @@ export function RideMessageSheet({ visible, tablet, saved, onSend, onRemove, onC
   const [editing, setEditing] = useState(false);
 
   const left = charactersLeft(text);
-  const canKeep = !isBuiltInReply(text);
+  // 4.0: typing your own message is free; saving it as one of My Quick Replies stays Pro.
+  const saveOk = useCan('quick_replies');
+  const canKeep = !isBuiltInReply(text) && saveOk;
 
   const close = () => {
     setError(null);
@@ -125,6 +129,7 @@ export function RideMessageSheet({ visible, tablet, saved, onSend, onRemove, onC
                   {keep && canKeep ? <Icon name="check" size={18} color="#fff" /> : null}
                 </View>
                 <ThemedText style={{ color: Colors.text, flex: 1 }}>{tr('Save as One of My Quick Replies')}</ThemedText>
+                <ProTag feature="quick_replies" />
               </Pressable>
             </SheetScroll>
             <Button title={tr('Send to Everyone')} big onPress={() => send(text, keep && canKeep)} style={{ backgroundColor: Colors.sky }} />

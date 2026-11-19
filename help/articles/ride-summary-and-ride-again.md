@@ -22,6 +22,10 @@ keywords: [summary, stats, statistics, distance, track, ride card, share, recap,
 
 When the organizer ends a ride, everyone who was on it gets a summary on the ride page. Organizers can also start the same ride again with one tap.
 
+:::release 4.0
+From 4.0, **Ride Again** creates a ride, so it needs Pro, except for accounts made before 4.0, which keep one free ride a month through February 1, 2027.
+:::
+
 ## See Your Ride Summary
 
 :::until 3.0

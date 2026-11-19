@@ -32,6 +32,10 @@ keywords: [presented by, sponsor, sponsored event, event or public ride, differe
 
 Events are the big days: a rally, a poker run, a club weekend or a meetup. An event has its dates, a place, photos, an **Agenda** of what's happening and when (group rides, poker runs, concerts, raffles, shows, food), and the **Group Rides** you can join. Anyone can see events. Pro riders create them.
 
+:::release 4.0
+From 4.0, a co-host's tools (Edit Details, photos, the agenda and rides) are part of OnMyLead Pro. A co-host on Free sees **Co-Host Tools** with the Pro tag instead. Seeing events and saying you're going or interested stay free.
+:::
+
 ## Event or Public Ride?
 
 They're different things, and an event can hold public rides.

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, AppState, View } from 'react-native';
 
 import { FlagGate } from '@/components/app-notices';
+import { ProFeatureGate } from '@/components/pro-feature-gate';
 import { StarlinkMountAd } from '@/components/starlink-mount-ad';
 import { ThemedText } from '@/components/themed-text';
 import { Button, Card, Choice, ErrorText, Field, Screen, Tag } from '@/components/ui';
@@ -27,7 +28,9 @@ const numText = (n: number | null | undefined) => (n == null ? '' : String(n));
 export default function StarlinkPageScreen() {
   return (
     <FlagGate flag="starlink">
-      <StarlinkPage />
+      <ProFeatureGate feature="starlink">
+        <StarlinkPage />
+      </ProFeatureGate>
     </FlagGate>
   );
 }

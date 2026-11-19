@@ -22,6 +22,10 @@ keywords: [3d, 3d map, terrain, elevation, contour, contour lines, topo, peaks, 
 
 3D Terrain shows the satellite map draped over the real shape of the land, so you can see ridges, canyons and climbs before you ride them. Contour lines and peak heights are drawn on top, along with every trail layer.
 
+:::release 4.0
+From 4.0, 3D Terrain is part of OnMyLead Pro (it was already a Map Style, which needs Pro). On Free the map style picker opens the Pro screen.
+:::
+
 ## Turn On 3D Terrain
 
 1. Open Ride Mode or Map Mode.

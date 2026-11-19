@@ -34,6 +34,10 @@ screenshots:
 
 You lead. Create a ride, tell everyone where and when to meet, and OnMyLead gives you a link, a code and a QR code to share. Public rides show up for riders nearby. Private rides are only for the people you invite.
 
+:::release 4.0
+From 4.0, creating rides is part of OnMyLead Pro. Accounts made before 4.0 keep one free ride a month through February 1, 2027. On Free, Create a Ride carries the Pro tag and opens the Pro screen. Joining rides other riders create is always free. See [Free and Pro](/help/free-vs-pro).
+:::
+
 ![The Create a Ride screen](/help/img/create.webp)
 
 ## Create Your Ride

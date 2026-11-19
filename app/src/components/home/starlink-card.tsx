@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { AppState, Platform, Pressable, Text, View } from 'react-native';
 
 import { Icon } from '@/components/icon';
+import { ProTag } from '@/components/pro-tag';
 import { Colors, font, Radius, RideColors, themedStyles } from '@/constants/theme';
 import { flagOn } from '@/core/app-settings';
 import type { DishGlance, GlanceLabel } from '@/core/starlink-proto';
@@ -113,6 +114,7 @@ export function StarlinkHomeCard() {
         <Text style={styles.title}>{t('Starlink')}</Text>
         <View style={[styles.dot, { backgroundColor: dot }]} />
         <Text style={styles.state} numberOfLines={1}>{t(g.state)}</Text>
+        <ProTag feature="starlink" />
         <View style={{ flex: 1 }} />
         <Icon name="chevron" color={Home.muted} />
       </View>

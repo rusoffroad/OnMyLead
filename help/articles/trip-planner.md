@@ -19,6 +19,10 @@ keywords: [trip, packing list, checklist, gear list, what to bring, camping, ove
 
 The Trip Planner keeps a packing list for each trip. Tick items off as they go in the rig, and reuse the list next time.
 
+:::release 4.0
+From 4.0, the Trip Planner is part of OnMyLead Pro. On Free, its row on the You tab carries the Pro tag and the planner shows what Pro adds. Trips you already saved are kept and come back with Pro.
+:::
+
 ## Open the Trip Planner
 
 :::until 3.0

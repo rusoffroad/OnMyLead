@@ -194,7 +194,7 @@ export default function You() {
       <MenuGroup title={t('Your Gear')}>
         <MenuRow icon="machine" color={Colors.accent} title={t('Garage')} detail={t('Your machines, mods and fuel range')} onPress={needsAccount('/garage')} />
         {tripsOn ? (
-          <MenuRow icon="checklist" color={RideColors.green} title={t('Trip Planner')} detail={t('Packing lists you tick off and reuse')} onPress={needsAccount('/trips')} />
+          <MenuRow icon="checklist" color={RideColors.green} title={t('Trip Planner')} detail={t('Packing lists you tick off and reuse')} onPress={needsAccount('/trips')} right={can('trip_planner') ? undefined : <ProTag feature="trip_planner" />} />
         ) : null}
         <MenuRow icon="map" color={Colors.sky} title={t('Offline Maps')} detail={offlineSummary} onPress={() => router.push('/maps')} />
       </MenuGroup>
@@ -375,7 +375,7 @@ export default function You() {
           />
         ) : null}
         {starlinkOn ? (
-          <MenuRow icon="dish" color={RideColors.yellow} title="Starlink" detail={t('Your dish, your plan and battery run time')} onPress={() => router.push('/starlink')} />
+          <MenuRow icon="dish" color={RideColors.yellow} title="Starlink" detail={t('Your dish, your plan and battery run time')} onPress={() => router.push('/starlink')} right={can('starlink') ? undefined : <ProTag feature="starlink" />} />
         ) : null}
       </MenuGroup>
 

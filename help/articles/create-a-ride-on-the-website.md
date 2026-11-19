@@ -28,6 +28,10 @@ screenshots:
 
 You can plan a ride on the big screen at onmylead.com. It's the same ride as one made in the app: the ride, its route and its stops show up in the OnMyLead app on your phone or tablet as soon as you save. Ride Mode and live tracking stay in the app.
 
+:::release 4.0
+From 4.0, creating rides on the website is part of OnMyLead Pro too, the same as in the app. Accounts made before 4.0 keep one free ride a month through February 1, 2027. See [Free and Pro](/help/free-vs-pro).
+:::
+
 ![Drawing a route on onmylead.com](/help/img/web-route.webp)
 
 :::release 2.0

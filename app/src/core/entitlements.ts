@@ -49,7 +49,15 @@ export type FeatureKey =
   | 'bluetooth_sharing'
   | 'custom_dot'
   | 'group_photos'
-  | 'carplay';
+  | 'carplay'
+  // 4.0 plan (Pro once the owner turns on the pro_plan_4 switch; Free rows until then).
+  | 'places'
+  | 'terrain_3d'
+  | 'garage'
+  | 'trip_planner'
+  | 'starlink'
+  | 'event_cohost'
+  | 'leaderboard_filters';
 
 export const FEATURE_KEYS: FeatureKey[] = [
   'create_ride', 'import_gpx', 'offline_maps', 'saved_groups', 'create_poll', 'ride_history',
@@ -81,6 +89,7 @@ export const FEATURE_KEYS: FeatureKey[] = [
   'custom_dot',
   'group_photos',
   'carplay',
+  'places', 'terrain_3d', 'garage', 'trip_planner', 'starlink', 'event_cohost', 'leaderboard_filters',
 ];
 
 /** Names for prompts and the comparison table (Title Case). */
@@ -122,6 +131,13 @@ export const FEATURE_NAMES: Record<FeatureKey, string> = {
   custom_dot: 'Customize Your Dot',
   group_photos: 'Group Photos',
   carplay: 'CarPlay',
+  places: 'Places to Ride',
+  terrain_3d: '3D Terrain',
+  garage: 'Garage',
+  trip_planner: 'Trip Planner',
+  starlink: 'Starlink',
+  event_cohost: 'Co-Host Events',
+  leaderboard_filters: 'Leaderboard Filters',
 };
 
 /** Pro-only by default (feature_plans min_plan 'pro'); used when a cached Pro answer runs out on the device. */
@@ -331,18 +347,23 @@ export function can(e: Entitlements, feature: FeatureKey): boolean {
 
 /**
  * Whether a button for this feature carries the small Pro tag: only for a Free account on a
- * server that gates it, and only for features that are Pro-only. Creating rides isn't one (Free
- * gets a ride a month; Create a Ride shows what's left instead), and Pro, Pro Trial and Admin
- * accounts never see a tag.
+ * server that gates it, and only for features that are Pro-only. Creating rides carries it only
+ * when Free gets no rides at all (the 4.0 plan); with a monthly allowance Create a Ride shows
+ * what's left instead. Pro, Pro Trial and Admin accounts never see a tag.
  */
 export function showsProTag(e: Entitlements, feature: FeatureKey): boolean {
-  if (feature === 'create_ride') return false;
+  if (feature === 'create_ride') return createsRidesOnlyWithPro(e);
   return !can(e, feature);
+}
+
+/** The 4.0 plan for this account: a Free rider with no ride allowance at all. */
+export function createsRidesOnlyWithPro(e: Entitlements): boolean {
+  return e.switchedOn && e.rideAllowance === 0;
 }
 
 /** "Rides Created This Month: 0 of 1", or null when unlimited. */
 export function rideAllowanceText(e: Entitlements): string | null {
-  if (!e.switchedOn || e.rideAllowance === null) return null;
+  if (!e.switchedOn || e.rideAllowance === null || e.rideAllowance === 0) return null;
   return tc('Rides Created This Month: {v} of {rideAllowance}', { v: Math.min(e.ridesCreatedThisMonth, e.rideAllowance), rideAllowance: e.rideAllowance });
 }
 

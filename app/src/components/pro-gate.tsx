@@ -38,6 +38,10 @@ export function ProShield({ size = 64 }: { size?: number }) {
 
 /** What the prompt says for a block, already translated: a Pro feature, or the Free ride limit. */
 function promptCopy(block: ProBlock): { title: string; body: string; need: string } {
+  if (block.kind === 'ride_limit' && block.allowance === 0) {
+    const info = FEATURE_INFO.create_ride;
+    return { title: t(info.title), body: t(info.body), need: t('Part of OnMyLead Pro.') };
+  }
   if (block.kind === 'ride_limit') {
     const reset = nextReset().toLocaleDateString(currentLocale(), { month: 'long', day: 'numeric', timeZone: 'UTC' });
     return {
