@@ -26,7 +26,7 @@ export function RidesMap(props: RidesMapProps) {
  * The Find a ride map on the web: satellite imagery with road and place names, same pins and
  * controls as the phone. Zoomed in, the trail layers show too, as they do on the phone.
  */
-function FlatRidesMap({ rides, frame, frameKey, circle, title, onPressTitle, onOpen, onSearchArea, height = 400, full, onToggleFull, trail, spots, onOpenSpot }: RidesMapProps & { trail: TrailMap }) {
+function FlatRidesMap({ rides, frame, frameKey, circle, title, onPressTitle, onOpen, onSearchArea, height = 400, full, onToggleFull, trail, spots, onOpenSpot, loading }: RidesMapProps & { trail: TrailMap }) {
   const el = useRef<HTMLDivElement>(null);
   const map = useRef<L.Map | null>(null);
   const layer = useRef<L.LayerGroup | null>(null);
@@ -124,7 +124,7 @@ function FlatRidesMap({ rides, frame, frameKey, circle, title, onPressTitle, onO
       <MapOverlay
         title={title}
         onPressTitle={onPressTitle}
-        count={spots ? spots.length : rides.length}
+        count={loading ? null : spots ? spots.length : rides.length}
         places={!!spots}
         moved={moved}
         onSearch={

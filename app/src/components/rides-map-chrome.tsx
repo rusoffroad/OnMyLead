@@ -36,6 +36,8 @@ export type RidesMapProps = {
   onOpenSpot?: (spot: Spot) => void;
   /** A spinner over the map until it has drawn, so a slow first load isn't an empty box (Places to Ride). */
   cover?: boolean;
+  /** The pins are still loading: the count chip waits instead of saying there are none yet (Places to Ride). */
+  loading?: boolean;
 };
 
 /** The map's frame: a rounded card in the page, or square corners when it fills the screen. */
@@ -144,7 +146,8 @@ export function MapOverlay({
 }: {
   title?: string | null;
   onPressTitle?: () => void;
-  count: number;
+  /** Null while the map's pins are still loading: the chip waits instead of saying there are none. */
+  count: number | null;
   /** Count places to ride (Scout) instead of rides. */
   places?: boolean;
   moved: boolean;
@@ -164,14 +167,16 @@ export function MapOverlay({
             {onPressTitle ? <Icon name="chevron" size={14} color={Colors.textSecondary} strokeWidth={2.4} /> : null}
           </Pressable>
         ) : null}
-        <View style={[styles.chip, styles.count]}>
-          <View style={[styles.countDot, { backgroundColor: places ? Colors.accent : Colors.sky }]} />
-          <Text style={styles.chipText}>
-            {places
-              ? count === 0 ? t('No places here yet') : count === 1 ? t('1 Place') : t('{n} Places', { n: count })
-              : count === 0 ? t('No rides here yet') : `${count} ${count === 1 ? t('Ride') : t('Rides')}`}
-          </Text>
-        </View>
+        {count === null ? null : (
+          <View style={[styles.chip, styles.count]}>
+            <View style={[styles.countDot, { backgroundColor: places ? Colors.accent : Colors.sky }]} />
+            <Text style={styles.chipText}>
+              {places
+                ? count === 0 ? t('No places here yet') : count === 1 ? t('1 Place') : t('{n} Places', { n: count })
+                : count === 0 ? t('No rides here yet') : `${count} ${count === 1 ? t('Ride') : t('Rides')}`}
+            </Text>
+          </View>
+        )}
       </View>
       {moved && onSearch ? (
         <View style={styles.bottom} pointerEvents="box-none">

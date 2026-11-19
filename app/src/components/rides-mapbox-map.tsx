@@ -18,7 +18,7 @@ const FIT = { top: 24, right: 24, bottom: 24, left: 24 };
  * the flat map (rides-map.tsx). Always satellite here, whatever the rider's Map Style.
  */
 export function RidesMapboxMap({
-  rides, frame, frameKey, circle, title, onPressTitle, onOpen, onSearchArea, height = 400, full, onToggleFull, trail, spots, onOpenSpot, cover,
+  rides, frame, frameKey, circle, title, onPressTitle, onOpen, onSearchArea, height = 400, full, onToggleFull, trail, spots, onOpenSpot, loading, cover,
 }: RidesMapProps & { trail: TrailMap }) {
   const map = useRef<MapboxMapHandle>(null);
   const [ready, setReady] = useState(false);
@@ -107,7 +107,7 @@ export function RidesMapboxMap({
       <MapOverlay
         title={title}
         onPressTitle={onPressTitle}
-        count={spots ? spots.length : rides.length}
+        count={loading ? null : spots ? spots.length : rides.length}
         places={!!spots}
         moved={moved}
         onSearch={
