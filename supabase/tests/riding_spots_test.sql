@@ -14,6 +14,10 @@ insert into admin_users (user_id) values ('00000000-0000-0000-0000-000000000d72'
 do $$ begin
   if (select count(*) from riding_spots where source in ('usfs', 'blm', 'osm')) < 300 then raise exception 'FAIL: seed missing'; end if;
   if not exists (select 1 from riding_spots where source = 'osm' and source_id = '331218708' and name = 'Hidden Falls Adventure Park') then raise exception 'FAIL: Hidden Falls not seeded'; end if;
+  -- Places to Ride (20261119100000): details filled by hand, and Park Trails parks are places too.
+  if (select address || '|' || phone from riding_spots where source = 'osm' and source_id = '331218708') <> '7030 E FM 1431, Marble Falls, TX 78654|830-798-9820' then raise exception 'FAIL: Hidden Falls details'; end if;
+  if not exists (select 1 from riding_spots where source = 'osm' and source_id = '475716605' and name = 'Wolf Caves Offroad Park' and kind = 'park' and status = 'live') then raise exception 'FAIL: Wolf Caves not a place'; end if;
+  if exists (select 1 from park_trails t where not exists (select 1 from riding_spots s where s.source = 'osm' and s.source_id = t.park_osm_id::text)) then raise exception 'FAIL: a Park Trails park has no place'; end if;
 end $$;
 delete from riding_spots;
 insert into riding_spots (id, source, source_id, name, kind, lat, lng, state, area_name, website, license, attribution, status) values

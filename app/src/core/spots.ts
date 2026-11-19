@@ -225,3 +225,169 @@ export function suggestionProblem(s: SpotSuggestion): string | null {
   if (s.note.length > 500) return 'Keep the note under 500 characters.';
   return null;
 }
+
+// ---- Place page (3.4: details, trails, reviews) -----------------------------------------------
+// Server side: riding_spot_page in migration 20261119100000_places_to_ride.sql.
+
+export type SpotDetails = {
+  address: string | null;
+  phone: string | null;
+  /** One line per day range, as the park writes them. */
+  hours: string[];
+  fees: string | null;
+  season: string | null;
+  /** Where the details came from ("The park's website") and when they were checked (YYYY-MM-DD). */
+  detailsSource: string | null;
+  detailsChecked: string | null;
+};
+
+/** The park's trails we draw (Park Trails), counted by level. Closed ones are counted only as closed. */
+export type SpotTrails = { trails: number; miles: number; easy: number; medium: number; hard: number; extreme: number; unrated: number; closed: number };
+
+export type SpotReview = { id: string; stars: number; body: string | null; photos: string[]; name: string; userId: string | null; mine: boolean; at: string };
+export type MyReview = { id: string; stars: number; body: string | null; photos: string[]; hidden: boolean; at: string };
+export type SpotReviews = { count: number; average: number | null; photos: string[]; list: SpotReview[]; mine: MyReview | null };
+
+export type SpotPage = { spot: SpotDetail & SpotDetails; trails: SpotTrails | null; reviews: SpotReviews };
+
+const int = (v: unknown) => Math.max(0, Math.floor(num(v) || 0));
+const strings = (v: unknown) => (Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string' && !!x.trim()) : []);
+
+/** Phone digits a dialer understands: "830-798-9820" -> "8307989820", keeping a leading +. Null if it isn't a phone number. */
+export function phoneDigits(phone: string | null | undefined): string | null {
+  const s = (phone ?? '').trim();
+  if (!/^[0-9+(). -]{7,30}$/.test(s)) return null;
+  const digits = s.replace(/[^0-9]/g, '');
+  if (digits.length < 7 || digits.length > 15) return null;
+  return (s.startsWith('+') ? '+' : '') + digits;
+}
+
+/** "(830) 798-9820" for a 10-digit US number, else as written. */
+export function phoneText(phone: string): string {
+  const d = phoneDigits(phone);
+  if (!d) return phone.trim();
+  const us = d.length === 11 && d.startsWith('1') ? d.slice(1) : d;
+  if (us.length === 10 && !d.startsWith('+')) return `(${us.slice(0, 3)}) ${us.slice(3, 6)}-${us.slice(6)}`;
+  return phone.trim();
+}
+
+/** The park on Google Maps, where riders read its Google reviews and photos (a free link: no Google data is copied). */
+export function googleMapsUrl(s: Pick<Spot, 'name' | 'lat' | 'lng'>): string {
+  const q = `${s.name} ${s.lat.toFixed(5)},${s.lng.toFixed(5)}`;
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`;
+}
+
+/** The link riders share for a place. */
+export const spotShareUrl = (webUrl: string, id: string) => `${webUrl.replace(/\/+$/, '')}/spot/${id}`;
+
+function parseReview(o: unknown): SpotReview | null {
+  if (!o || typeof o !== 'object') return null;
+  const r = o as Record<string, unknown>;
+  const stars = int(r.stars);
+  if (!str(r.id) || stars < 1 || stars > 5) return null;
+  return {
+    id: String(r.id), stars, body: str(r.body), photos: strings(r.photos).slice(0, 4), name: str(r.name) ?? 'Rider',
+    userId: str(r.user_id), mine: r.mine === true, at: str(r.at) ?? '',
+  };
+}
+
+/** The server's place page (riding_spot_page), or null when the place isn't listed (or the answer is junk). */
+export function parseSpotPage(j: unknown): SpotPage | null {
+  if (!j || typeof j !== 'object') return null;
+  const o = j as Record<string, unknown>;
+  const base = parseSpotDetail(o.spot);
+  if (!base) return null;
+  const s = o.spot as Record<string, unknown>;
+  const t = o.trails && typeof o.trails === 'object' ? (o.trails as Record<string, unknown>) : null;
+  const rv = o.reviews && typeof o.reviews === 'object' ? (o.reviews as Record<string, unknown>) : {};
+  const mineRaw = rv.mine && typeof rv.mine === 'object' ? (rv.mine as Record<string, unknown>) : null;
+  const mineStars = mineRaw ? int(mineRaw.stars) : 0;
+  const avg = num(rv.average);
+  const hours = (str(s.hours) ?? '').split('\n').map((l) => l.trim()).filter(Boolean);
+  return {
+    spot: {
+      ...base,
+      address: str(s.address),
+      phone: phoneDigits(str(s.phone)) ? str(s.phone) : null,
+      hours,
+      fees: str(s.fees),
+      season: str(s.season),
+      detailsSource: str(s.details_source),
+      detailsChecked: str(s.details_checked),
+    },
+    trails: t && int(t.trails) > 0
+      ? { trails: int(t.trails), miles: Math.max(0, num(t.miles) || 0), easy: int(t.easy), medium: int(t.medium), hard: int(t.hard), extreme: int(t.extreme), unrated: int(t.unrated), closed: int(t.closed) }
+      : null,
+    reviews: {
+      count: int(rv.count),
+      average: Number.isFinite(avg) && avg >= 1 && avg <= 5 ? avg : null,
+      photos: strings(rv.photos).slice(0, 12),
+      list: (Array.isArray(rv.list) ? rv.list : []).map(parseReview).filter((x): x is SpotReview => !!x),
+      mine: mineRaw && str(mineRaw.id) && mineStars >= 1 && mineStars <= 5
+        ? { id: String(mineRaw.id), stars: mineStars, body: str(mineRaw.body), photos: strings(mineRaw.photos).slice(0, 4), hidden: mineRaw.hidden === true, at: str(mineRaw.at) ?? '' }
+        : null,
+    },
+  };
+}
+
+// ---- Reviews ---------------------------------------------------------------------------------
+
+export const REVIEW_MAX_CHARS = 1000;
+export const REVIEW_MAX_PHOTOS = 4;
+export const SPOT_PHOTO_BUCKET = 'spot-photos';
+
+export type ReviewDraft = { stars: number; body: string; photos: string[] };
+
+/** What's wrong with a review before it's sent, or null when it's ready. */
+export function reviewProblem(d: ReviewDraft): string | null {
+  if (!Number.isInteger(d.stars) || d.stars < 1 || d.stars > 5) return 'Tap the stars to rate it.';
+  if (d.body.trim().length > REVIEW_MAX_CHARS) return 'Keep the review under 1,000 characters.';
+  if (d.photos.length > REVIEW_MAX_PHOTOS) return 'Up to 4 photos.';
+  return null;
+}
+
+/** Where a review photo is saved: the rider's own folder (the bucket and the server only allow that). */
+export function spotPhotoPath(userId: string, id: string): string {
+  return `${userId}/${id.replace(/[^A-Za-z0-9-]/g, '').slice(0, 60)}.jpg`;
+}
+
+/** True for a photo path in this rider's own folder (what save_riding_spot_review accepts). */
+export function isOwnSpotPhoto(userId: string, path: string): boolean {
+  return new RegExp(`^${userId.replace(/[^0-9a-f-]/gi, '')}/[A-Za-z0-9._-]{1,100}$`).test(path) && !path.includes('..');
+}
+
+/** "4.6" for a rating. */
+export const ratingText = (avg: number) => (Math.round(avg * 10) / 10).toFixed(1);
+
+/** Full, half and empty stars for a rating, five in all. */
+export function starShapes(avg: number): ('full' | 'half' | 'empty')[] {
+  const r = Math.round(Math.min(5, Math.max(0, avg)) * 2) / 2;
+  return [1, 2, 3, 4, 5].map((i) => (r >= i ? 'full' : r >= i - 0.5 ? 'half' : 'empty'));
+}
+
+/** The trail-level pills on a place page, easiest first; levels the park has none of are left out. */
+export function trailLevels(t: SpotTrails): { key: keyof SpotTrails; label: string; count: number }[] {
+  return ([
+    { key: 'easy', label: 'Level 1–2' },
+    { key: 'medium', label: 'Level 3' },
+    { key: 'hard', label: 'Level 4' },
+    { key: 'extreme', label: 'Level 5' },
+    { key: 'unrated', label: 'Unrated' },
+  ] as const).map((l) => ({ ...l, count: t[l.key] })).filter((l) => l.count > 0);
+}
+
+// ---- Open in Map Mode and favorites (3.4, Chris 2026-11-18) ------------------------------------
+
+/** Map Mode opened on a place: /nav?at=30.60791,-98.15822. */
+export const mapModeHref = (s: Pick<Spot, 'lat' | 'lng'>) => `/nav?at=${s.lat.toFixed(5)},${s.lng.toFixed(5)}`;
+
+/** The place from Map Mode's ?at= (see mapModeHref), or null when there isn't a good one. */
+export function parseMapAt(v: string | string[] | undefined): LatLng | null {
+  const raw = Array.isArray(v) ? v[0] : v;
+  const m = /^\s*(-?\d{1,2}(?:\.\d+)?)\s*,\s*(-?\d{1,3}(?:\.\d+)?)\s*$/.exec(raw ?? '');
+  if (!m) return null;
+  const lat = Number(m[1]);
+  const lng = Number(m[2]);
+  if (Math.abs(lat) > 90 || Math.abs(lng) > 180) return null;
+  return { lat, lng };
+}
