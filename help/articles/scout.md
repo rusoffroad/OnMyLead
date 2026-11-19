@@ -38,14 +38,14 @@ Scout finds places to ride near you: off-road parks, OHV areas, trail systems, t
 2. Tap **Places to Ride** at the top. (**Rides** takes you back to public rides.)
 3. Allow location if asked. If location is off, tap **Use My Location**, or search a town or park instead.
 
-:::release 3.4
+:::release 4.0
 You can also tap the **Places to Ride** card on Home, under **Create a Ride** and **Events and Group Rides**. It opens the same search on its own page. It says **New** until you open it the first time.
 :::
 
-:::until 3.4
+:::until 4.0
 Places show on the map as teal signs, with a picture of the kind of place (a flag on a peak for an off-road park, a quad for an OHV area, a forked trail for a trail system, a signpost for a trailhead and a checkered flag for a motocross track), and in a list under it (beside it on a tablet or a wide screen), nearest first.
 :::
-:::release 3.4
+:::release 4.0
 Places show on the map as pins, coloured by the kind of place with a white picture of what you ride there: red with a 4x4 for an off-road park, blue with an ATV for an OHV area, green with a pine tree for a trail system, green with a trail sign for a trailhead and gold with a dirt bike for a motocross track. They're also in a list under the map (beside it on a tablet or a wide screen), nearest first.
 :::
  Each place shows what kind it is, where it is, how far away it is and how many public rides are coming up there.
@@ -62,7 +62,7 @@ Planning a trip? Tap **Look Around a Town or Park**, type a place and pick it fr
 
 Under the slider, tap a kind, such as **Off-Road Parks** or **Trailheads**, to show only that kind. Tap more than one to see each of them. Tap a kind again to turn it off. Each chip shows how many places of that kind Scout found.
 
-:::release 3.4
+:::release 4.0
 ## Favorite Places
 
 Save the places you like so they're easy to find again:
@@ -75,7 +75,7 @@ You need to be signed in to save favorites. They're saved to your account, so th
 
 ## Open a Place
 
-:::until 3.4
+:::until 4.0
 Tap a place in the list, or tap its sign on the map and then **Open Place**. Its page shows:
 
 - what kind of place it is, where it is and how far away it is;
@@ -86,7 +86,7 @@ Tap a place in the list, or tap its sign on the map and then **Open Place**. Its
 - a short description, when the source has one.
 :::
 
-:::release 3.4
+:::release 4.0
 Tap a place in the list, or tap its pin on the map and then **Open Place**. Its page is the place's profile:
 
 - what kind of place it is, where it is, how far away it is, and **Save** to add it to your Favorite Places;

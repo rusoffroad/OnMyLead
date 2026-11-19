@@ -92,12 +92,12 @@ export function shortHome(windowHeight: number): boolean {
   return windowHeight > 0 && windowHeight < SHORT_HOME_HEIGHT;
 }
 
-/** Below this window height (points) a phone's home leaves the greeting out (3.4), so all the cards fit. */
+/** Below this window height (points) a phone's home leaves the greeting out (4.0), so all the cards fit. */
 export const GREETING_MIN_HEIGHT = 900;
 
 /**
  * The size of the home map header (points below the status bar), how far the first card reaches up
- * over it, and whether the greeting shows (3.4, Chris 2026-11-18: every Home card on one screen,
+ * over it, and whether the greeting shows (4.0, Chris 2026-11-18: every Home card on one screen,
  * "maybe just scoot it up"). Tablets and wide windows keep the 3.0 header. On a phone the header
  * is shorter and the cards start higher; the big phones (Pro Max and Plus, 932 and up) keep the
  * greeting, smaller ones drop it and set the cards' titles a little smaller (`tight`) so Places to

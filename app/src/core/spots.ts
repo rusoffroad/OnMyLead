@@ -226,7 +226,7 @@ export function suggestionProblem(s: SpotSuggestion): string | null {
   return null;
 }
 
-// ---- Place page (3.4: details, trails, reviews) -----------------------------------------------
+// ---- Place page (4.0: details, trails, reviews) -----------------------------------------------
 // Server side: riding_spot_page in migration 20261119100000_places_to_ride.sql.
 
 export type SpotDetails = {
@@ -377,7 +377,7 @@ export function trailLevels(t: SpotTrails): { key: keyof SpotTrails; label: stri
   ] as const).map((l) => ({ ...l, count: t[l.key] })).filter((l) => l.count > 0);
 }
 
-// ---- Open in Map Mode and favorites (3.4, Chris 2026-11-18) ------------------------------------
+// ---- Open in Map Mode and favorites (4.0, Chris 2026-11-18) ------------------------------------
 
 /** Map Mode opened on a place: /nav?at=30.60791,-98.15822. */
 export const mapModeHref = (s: Pick<Spot, 'lat' | 'lng'>) => `/nav?at=${s.lat.toFixed(5)},${s.lng.toFixed(5)}`;

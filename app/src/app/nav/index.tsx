@@ -100,7 +100,7 @@ const MPS_TO_MPH = 2.23694;
  */
 export default function NavMode() {
   const params = useLocalSearchParams<{ follow?: string; trail?: string; draw?: string; at?: string }>();
-  // Opened from a place to ride (Open in Map Mode, 3.4): the map opens on the place, not the rider.
+  // Opened from a place to ride (Open in Map Mode, 4.0): the map opens on the place, not the rider.
   const placeAt = useMemo(() => parseMapAt(params.at), [params.at]);
   const trackLinePro = useCan('track_line');
   // Free riders get a number of Map Mode hours each month; riding with a group never counts.

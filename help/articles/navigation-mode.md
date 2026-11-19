@@ -84,7 +84,7 @@ From 3.0, Map Mode is the first card on Home, labelled **Ride Solo**: tap **Open
 :::
 
 
-:::release 3.4
+:::release 4.0
 - From a place in [Places to Ride](/help/scout), tap **Open in Map Mode**. Map Mode opens centred on that place, so you can look over its trails and terrain before you go.
 :::
 

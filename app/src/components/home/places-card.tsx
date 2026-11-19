@@ -22,7 +22,7 @@ const RED = '#E5262E';
 const PANEL = 'rgba(18,27,42,';
 
 /**
- * Places to Ride on Home (3.4, approved mock v3, Chris 2026-11-18): its own card under Create a
+ * Places to Ride on Home (4.0, approved mock v3, Chris 2026-11-18): its own card under Create a
  * Ride and Events. Satellite ground on the right with a few pins in the kinds' colours, the words
  * on the left, and the red go button. Opens /places (Scout on a page of its own). Shows only while
  * the scout flag is on.
