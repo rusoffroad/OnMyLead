@@ -92,6 +92,23 @@ export function shortHome(windowHeight: number): boolean {
   return windowHeight > 0 && windowHeight < SHORT_HOME_HEIGHT;
 }
 
+/** Below this window height (points) a phone's home leaves the greeting out (4.0), so all the cards fit. */
+export const GREETING_MIN_HEIGHT = 900;
+
+/**
+ * The size of the home map header (points below the status bar), how far the first card reaches up
+ * over it, and whether the greeting shows (4.0, Chris 2026-11-18: every Home card on one screen,
+ * "maybe just scoot it up"). Tablets and wide windows keep the 3.0 header. On a phone the header
+ * is shorter and the cards start higher; the big phones (Pro Max and Plus, 932 and up) keep the
+ * greeting, smaller ones drop it and set the cards' titles a little smaller (`tight`) so Places to
+ * Ride still fits above the tab bar.
+ */
+export function homeHeader(windowHeight: number, phone: boolean): { hero: number; overlap: number; greeting: boolean; tight: boolean } {
+  if (!phone) return { hero: 300, overlap: 78, greeting: true, tight: false };
+  if (windowHeight <= 0 || windowHeight >= GREETING_MIN_HEIGHT) return { hero: 190, overlap: 61, greeting: true, tight: false };
+  return { hero: 150, overlap: 62, greeting: false, tight: true };
+}
+
 /** Where the 3.0 home map sits when the phone's location isn't shared: Moab, Utah, a ride-anywhere landmark. */
 export const HERO_FALLBACK = { lat: 38.6, lng: -109.55 } as const;
 /** How close the home map follows the rider: rounded to about 5 km, so the picture is cached and never pinpoints them. */

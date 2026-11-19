@@ -1,12 +1,13 @@
-import { router } from 'expo-router';
-import { useEffect, useMemo, useState } from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { router, useFocusEffect } from 'expo-router';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Icon } from '@/components/icon';
 import { PlaceSearch } from '@/components/place-search';
-import { awayText, SpotPin } from '@/components/rides-map-chrome';
+import { awayText, mapFrameStyle, SpotPin } from '@/components/rides-map-chrome';
 import { RidesMap } from '@/components/rides-map';
+import { SPOT_INK } from '@/components/spot-pin-art';
 import { RowGroup } from '@/components/ride-row';
 import { ThemedText } from '@/components/themed-text';
 import { TwoPane } from '@/components/two-pane';
@@ -16,14 +17,16 @@ import { boundsAround } from '@/core/discovery';
 import type { LatLng } from '@/core/geo';
 import { sideColumnWidth } from '@/core/layout';
 import type { Place } from '@/core/places';
-import { filterKinds, kindCounts, placeLine, SCOUT_DEFAULT_MILES, SPOT_KINDS, spotKindInfo, toggleKind, type Spot, type SpotKind } from '@/core/spots';
+import { boundsOfSpots, filterKinds, kindCounts, placeLine, SCOUT_DEFAULT_MILES, SPOT_KINDS, spotKindInfo, toggleKind, type Spot, type SpotKind } from '@/core/spots';
 import { useFullMap } from '@/hooks/use-full-map';
 import { useLayout } from '@/hooks/use-layout';
 import { track } from '@/lib/analytics';
 import { t } from '@/lib/i18n';
-import { currentPosition } from '@/lib/location';
-import { readScoutMiles, saveScoutMiles, spotsNear } from '@/lib/spots';
+import { quickPosition } from '@/lib/location';
+import { useSession } from '@/lib/session';
+import { favoriteSpots, readScoutMiles, saveScoutMiles, spotsNear } from '@/lib/spots';
 import { MileSlider } from './mile-slider';
+import { useDiscoverActivity } from '@/lib/activity';
 
 /**
  * Scout (Find > Places to Ride): off-road parks, OHV areas, trail systems, trailheads and
@@ -31,8 +34,13 @@ import { MileSlider } from './mile-slider';
  * nearest first, on a map and in a list. Searching a town or park looks around there instead.
  * Tapping a place opens its page (app/spot/[id].tsx) with directions, rides there and Create a Ride
  * Here. On a tablet the controls and the list sit beside a full-height map.
+ *
+ * Favorite Places (4.0): the heart chip shows only the places the rider saved (newest first, any
+ * distance away); `start="favorites"` opens on them.
  */
-export function Scout({ top }: { top: React.ReactNode }) {
+export function Scout({ top, start = 'near' }: { top: React.ReactNode; start?: 'near' | 'favorites' }) {
+  // Activities (4.0): only the rider's activity while the switcher is on.
+  const activity = useDiscoverActivity();
   const layout = useLayout();
   const insets = useSafeAreaInsets();
   const fullMap = useFullMap(null);
@@ -49,15 +57,29 @@ export function Scout({ top }: { top: React.ReactNode }) {
   const [notYet, setNotYet] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { session } = useSession();
+  const [onlyFavs, setOnlyFavs] = useState(start === 'favorites');
+  const [favs, setFavs] = useState<Spot[] | null>(null);
+
+  // Favorites reload each time Scout comes back into view (a place page may have saved or unsaved one).
+  useFocusEffect(
+    useCallback(() => {
+      if (!session) return setFavs([]);
+      favoriteSpots(here).then(setFavs).catch(() => setFavs((f) => f ?? []));
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [session?.user.id, here?.lat, here?.lng]),
+  );
 
   useEffect(() => {
     readScoutMiles().then(setSavedMiles).catch(() => setSavedMiles(SCOUT_DEFAULT_MILES));
   }, []);
 
+  // The phone's recent fix opens the map at once; a fresh High fix could take 10 seconds (Chris, build 27).
   const findHere = () =>
-    currentPosition()
+    quickPosition()
       .then(setHere)
-      .catch((e) => setLocError(e instanceof Error ? e.message : t('Could not get your location.')))
+      // Only our own words reach the rider; a phone error (kCLErrorDomain, no fix yet) gets the plain line.
+      .catch((e) => setLocError(e instanceof Error && /^Allow location access/.test(e.message) ? t(e.message) : t('Could not get your location.')))
       .finally(() => setLocating(false));
   const locate = () => {
     setLocating(true);
@@ -77,7 +99,7 @@ export function Scout({ top }: { top: React.ReactNode }) {
       setLoading(true);
       setError(null);
       try {
-        const found = await spotsNear(origin, miles);
+        const found = await spotsNear(origin, miles, [], activity);
         if (!live) return;
         setNotYet(found === null);
         setSpots(found ?? []);
@@ -94,19 +116,30 @@ export function Scout({ top }: { top: React.ReactNode }) {
     };
     // origin is a new object only when the rider or the searched place moves.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [origin, savedMiles]);
+  }, [origin, savedMiles, activity]);
 
   const changeMiles = (m: number) => {
     setMiles(m);
     saveScoutMiles(m);
   };
 
-  const shown = useMemo(() => filterKinds(spots ?? [], kinds), [spots, kinds]);
-  const counts = useMemo(() => kindCounts(spots ?? []), [spots]);
+  const pool = onlyFavs ? favs : spots;
+  const shown = useMemo(() => filterKinds(pool ?? [], kinds), [pool, kinds]);
+  const counts = useMemo(() => kindCounts(pool ?? []), [pool]);
   // Like the search, the map waits for the saved distance so it doesn't frame 250 mi and then jump.
   const ready = origin && savedMiles != null ? origin : null;
-  const frame = useMemo(() => (ready ? boundsAround(ready, miles) : null), [ready, miles]);
-  const ring = useMemo(() => (ready ? { center: ready, miles } : null), [ready, miles]);
+  const favFrame = useMemo(() => boundsOfSpots(favs ?? []), [favs]);
+  const frame = useMemo(
+    () => (onlyFavs && favFrame ? favFrame : ready ? boundsAround(ready, miles) : null),
+    [onlyFavs, favFrame, ready, miles],
+  );
+  const ring = useMemo(() => (ready && !onlyFavs ? { center: ready, miles } : null), [ready, miles, onlyFavs]);
+  const toggleFavs = () => {
+    if (!session) return router.push('/sign-in');
+    setKinds([]);
+    setOnlyFavs((on) => !on);
+    track('spot_favorites_viewed');
+  };
   const open = (s: Pick<Spot, 'id'>) => router.push(`/spot/${s.id}`);
 
   const map = frame ? (
@@ -116,13 +149,21 @@ export function Scout({ top }: { top: React.ReactNode }) {
       onOpenSpot={open}
       onOpen={() => {}}
       frame={frame}
-      frameKey={`${place?.id ?? 'here'}:${miles}`}
+      frameKey={onlyFavs ? `favs:${favs?.length ?? 0}` : `${place?.id ?? 'here'}:${miles}`}
       circle={ring}
       title={place?.name ?? null}
       height={layout.wide || fullMap.full ? '100%' : 340}
       full={fullMap.full}
       onToggleFull={fullMap.full ? fullMap.exit : fullMap.enter}
+      cover
+      loading={onlyFavs ? favs === null : loading || spots === null}
     />
+  ) : (locating || origin) && !onlyFavs ? (
+    // Holds the map's place while the phone finds the rider, so the page doesn't sit half empty.
+    <View style={[mapFrameStyle(layout.wide ? '100%' : 340), styles.waiting]} accessibilityLiveRegion="polite">
+      <ActivityIndicator color={Colors.text} />
+      <ThemedText themeColor="textSecondary">{t('Finding where you are…')}</ThemedText>
+    </View>
   ) : null;
 
   const controls = (
@@ -135,16 +176,26 @@ export function Scout({ top }: { top: React.ReactNode }) {
           <Button title={here ? t('Back to Near Me') : t('Clear')} kind="ghost" onPress={() => setPlace(null)} />
         </View>
       ) : null}
-      {!origin ? (
+      {!origin && !onlyFavs && !locating ? (
         <Card>
-          <ThemedText>{locating ? t('Finding where you are…') : t('Turn on location to see places to ride near you, or search a town or park above.')}</ThemedText>
-          {!locating && locError ? <ThemedText type="small" themeColor="textSecondary">{locError}</ThemedText> : null}
-          {!locating ? <Button title={t('Use My Location')} onPress={locate} /> : null}
+          <ThemedText>{t('Turn on location to see places to ride near you, or search a town or park above.')}</ThemedText>
+          {locError ? <ThemedText type="small" themeColor="textSecondary">{locError}</ThemedText> : null}
+          <Button title={t('Use My Location')} onPress={locate} />
         </Card>
       ) : null}
-      <MileSlider miles={miles} onChange={changeMiles} />
-      {spots?.length ? (
+      {onlyFavs ? null : <MileSlider miles={miles} onChange={changeMiles} />}
+      {spots?.length || favs?.length || onlyFavs ? (
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.kindScroll} contentContainerStyle={styles.kinds} accessibilityRole="toolbar">
+          <Pressable
+            accessibilityRole="checkbox"
+            accessibilityState={{ checked: onlyFavs }}
+            accessibilityLabel={`${t('Favorite Places')}${favs?.length ? `, ${favs.length}` : ''}`}
+            onPress={toggleFavs}
+            style={({ pressed }) => [styles.kind, onlyFavs && styles.kindOn, pressed && { opacity: 0.7 }]}>
+            <Icon name="heart" size={15} color={onlyFavs ? Colors.onScout : Colors.scout} strokeWidth={2.4} />
+            <Text style={[styles.kindText, onlyFavs && styles.kindTextOn]}>{t('Favorites')}</Text>
+            {favs?.length ? <Text style={[styles.kindCount, onlyFavs && styles.kindTextOn]}>{favs.length}</Text> : null}
+          </Pressable>
           {SPOT_KINDS.filter((k) => counts[k.kind] > 0).map((k) => {
             const on = kinds.includes(k.kind);
             return (
@@ -155,7 +206,7 @@ export function Scout({ top }: { top: React.ReactNode }) {
                 accessibilityLabel={`${t(k.label)}, ${counts[k.kind]}`}
                 onPress={() => setKinds((ks) => toggleKind(ks, k.kind))}
                 style={({ pressed }) => [styles.kind, on && styles.kindOn, pressed && { opacity: 0.7 }]}>
-                <Icon name={k.icon} size={15} color={on ? Colors.onScout : Colors.scout} strokeWidth={2.4} />
+                <Icon name={k.icon} size={15} color={on ? Colors.onScout : SPOT_INK[k.kind]} strokeWidth={2.4} />
                 <Text style={[styles.kindText, on && styles.kindTextOn]}>{t(k.label)}</Text>
                 <Text style={[styles.kindCount, on && styles.kindTextOn]}>{counts[k.kind]}</Text>
               </Pressable>
@@ -169,8 +220,20 @@ export function Scout({ top }: { top: React.ReactNode }) {
 
   const list = (
     <>
-      {loading ? <ThemedText themeColor="textSecondary">{t('Looking for places to ride…')}</ThemedText> : null}
-      {spots && !loading ? (
+      {loading && !onlyFavs ? <ThemedText themeColor="textSecondary">{t('Looking for places to ride…')}</ThemedText> : null}
+      {onlyFavs ? (
+        favs === null ? (
+          <ThemedText themeColor="textSecondary">{t('Loading your favorite places…')}</ThemedText>
+        ) : favs.length === 0 ? (
+          <Card>
+            <ThemedText>{t('No favorite places yet. Open a place and tap Save to keep it here.')}</ThemedText>
+          </Card>
+        ) : (
+          <ThemedText type="heading">
+            {favs.length === 1 ? t('1 Favorite Place') : t('{n} Favorite Places', { n: favs.length })}
+          </ThemedText>
+        )
+      ) : spots && !loading ? (
         notYet ? (
           <Card>
             <ThemedText>{t('Places to Ride is almost here. Check back after the next update.')}</ThemedText>
@@ -187,9 +250,9 @@ export function Scout({ top }: { top: React.ReactNode }) {
           </ThemedText>
         )
       ) : null}
-      {shown.length ? <RowGroup>{shown.slice(0, 150).map((s) => <SpotRow key={s.id} spot={s} onPress={() => open(s)} />)}</RowGroup> : null}
+      {shown.length ? <RowGroup>{shown.slice(0, 150).map((s) => <SpotRow key={s.id} spot={s} onPress={() => open(s)} away={!onlyFavs || !!here} />)}</RowGroup> : null}
       {shown.length > 150 ? <ThemedText type="small" themeColor="textSecondary">{t('Showing the nearest 150. Zoom the map or shorten the distance to see the rest.')}</ThemedText> : null}
-      {spots && !notYet ? (
+      {spots && !notYet && !onlyFavs ? (
         <Pressable accessibilityRole="button" onPress={() => router.push('/spot/suggest')} style={({ pressed }) => [styles.suggest, pressed && { opacity: 0.7 }]}>
           <Icon name="plus" size={18} color={Colors.sky} />
           <View style={{ flex: 1 }}>
@@ -230,7 +293,7 @@ export function Scout({ top }: { top: React.ReactNode }) {
 }
 
 /** One place in the list: its sign, name, where it is, how far, and rides coming up there. */
-export function SpotRow({ spot, onPress }: { spot: Spot; onPress: () => void }) {
+export function SpotRow({ spot, onPress, away = true }: { spot: Spot; onPress: () => void; away?: boolean }) {
   const where = placeLine(spot);
   return (
     <Pressable accessibilityRole="link" onPress={onPress} style={({ pressed }) => [styles.row, pressed && { backgroundColor: Colors.backgroundSelected }]}>
@@ -246,7 +309,7 @@ export function SpotRow({ spot, onPress }: { spot: Spot; onPress: () => void }) 
           </ThemedText>
         ) : null}
       </View>
-      <Text style={styles.away}>{awayText(spot.distanceMi)}</Text>
+      {away ? <Text style={styles.away}>{awayText(spot.distanceMi)}</Text> : null}
       <Icon name="chevron" size={18} color={Colors.textSecondary} />
     </Pressable>
   );
@@ -254,6 +317,7 @@ export function SpotRow({ spot, onPress }: { spot: Spot; onPress: () => void }) 
 
 const styles = themedStyles(() => ({
   placeRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.two },
+  waiting: { alignItems: 'center', justifyContent: 'center', gap: Spacing.two },
   // The chips scroll sideways in one row so the map stays near the top on a phone.
   kindScroll: { marginHorizontal: -Spacing.three, flexGrow: 0 },
   kinds: { flexDirection: 'row', gap: 8, paddingHorizontal: Spacing.three },

@@ -41,6 +41,7 @@ import { handleProError, requirePro } from '@/lib/pro';
 import { ProTag } from '@/components/pro-tag';
 
 import { t as tr } from '@/lib/i18n';
+import { useDiscoverActivity } from '@/lib/activity';
 
 
 const toInt = (s: string) => (s.trim() ? Math.max(1, parseInt(s, 10)) || null : null);
@@ -49,6 +50,8 @@ type Kind = 'public' | 'private';
 type RoutePlan = 'mapped' | 'freeride';
 
 export default function NewRide() {
+  // Activities (4.0): the ride is for the activity picked on Home (Offroad while the switcher is off).
+  const activity = useDiscoverActivity();
   const { type, copy, trail, group, event, spot, lat, lng, state } = useLocalSearchParams<{ type?: string; copy?: string; trail?: string; group?: string; event?: string; spot?: string; lat?: string; lng?: string; state?: string }>();
   const [fromSpot] = useState(() => (copy ? null : spotFromParams({ spot, lat, lng, state })));
   const { session, loading } = useSession();
@@ -297,6 +300,7 @@ export default function NewRide() {
         requiredEquipment,
         fuelNotes,
         visibility: kind,
+        activity: activity ?? null,
         // A private ride's invite code is the invitation, so anyone holding it can join.
         joinPolicy: kind === 'private' ? 'open' : joinPolicy,
         bubblePreset: bubble,

@@ -20,6 +20,7 @@ import { useSession } from '@/lib/session';
 import { riderProfile, riderTimeline, SocialOffError } from '@/lib/social';
 
 import { t } from '@/lib/i18n';
+import { FounderTag } from '@/components/founder-tag';
 /**
  * A rider's profile: their picture big (tap it for full size), name, the Pro tag if they have Pro,
  * their totals, and their posts, rides, badges and trails, newest first. Riders only see someone's
@@ -80,6 +81,7 @@ export default function RiderProfileScreen() {
         <Text style={styles.name} numberOfLines={2}>{profile.name}</Text>
         {profile.pro ? <ProTag size="large" /> : null}
       </View>
+      <FounderTag userId={profile.id} />
       {sinceLine(profile.since) ? <Text style={styles.since}>{sinceLine(profile.since)}</Text> : null}
       {profile.canSee && !profile.blocked ? (
         <View style={styles.stats}>

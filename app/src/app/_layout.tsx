@@ -32,6 +32,7 @@ import { startAdTracking } from '@/lib/ad-tracking';
 import { startFoundUs } from '@/lib/found-us';
 import { startOutboxSync } from '@/lib/outbox';
 import { startAppSettings } from '@/lib/app-settings';
+import { startRadio } from '@/lib/radio';
 import { startEntitlements } from '@/lib/entitlements';
 import { startUsageCounts } from '@/lib/usage';
 import { currentEntitlements, useCan } from '@/lib/pro';
@@ -46,6 +47,7 @@ import { CarPlayHome } from '@/components/carplay-home';
 import { parseCarPlayAction } from '@/core/carplay';
 import { startRiderAgreement } from '@/lib/rider-agreement';
 import { startSettingsSync } from '@/lib/settings-sync';
+import { startActivitySync } from '@/lib/activity';
 import { startAppearanceSync } from '@/lib/appearance-sync';
 import { startLanguageSync } from '@/lib/language-sync';
 import { backupMapWaypointsNow } from '@/lib/map-waypoints';
@@ -121,6 +123,8 @@ function RootLayout() {
   useEffect(() => startUsageCounts(), []);
   // The owner's announcement, maintenance notice, feature flags and release controls.
   useEffect(() => startAppSettings(), []);
+  // Radio Sharing: does nothing unless the Admin switch is on and the rider paired a radio.
+  useEffect(() => startRadio(), []);
   // Phones stay upright, tablets turn (Android; the Apple app does this in its Info.plist).
   useEffect(() => startOrientationRule(), []);
   // Who has agreed to the Rider Safety and Liability Agreement, and sending each record to the server.
@@ -136,6 +140,7 @@ function RootLayout() {
   // Settings, Map Mode trails and Map Mode waypoints follow the account to the rider's other devices.
   useEffect(() => {
     startAppearanceSync();
+    startActivitySync();
     startLanguageSync();
     startSettingsSync(() => {
       backupTrailsNow();
@@ -179,6 +184,7 @@ function RootLayout() {
         <Stack.Screen name="r/[code]" options={{ title: '' }} />
         <Stack.Screen name="invite-friends" options={{ title: tr('Invite Friends') }} />
         <Stack.Screen name="events/index" options={{ title: tr('Events and Group Rides') }} />
+        <Stack.Screen name="places" options={{ title: tr('Places to Ride') }} />
         <Stack.Screen name="spot/[id]" options={{ title: tr('Place to Ride') }} />
         <Stack.Screen name="spot/suggest" options={{ title: tr('Suggest a Place') }} />
         <Stack.Screen name="events/new" options={{ title: tr('Create an Event') }} />
@@ -205,6 +211,7 @@ function RootLayout() {
         <Stack.Screen name="blocked" options={{ title: tr('Blocked Riders') }} />
         <Stack.Screen name="report-rider" options={{ title: tr('Report a Rider') }} />
         <Stack.Screen name="battery" options={{ title: tr('Battery Saver') }} />
+        <Stack.Screen name="radio" options={{ title: tr('Radio Sharing') }} />
         <Stack.Screen name="permissions" options={{ title: tr('Permissions') }} />
         <Stack.Screen name="appearance" options={{ title: tr('Appearance') }} />
         <Stack.Screen name="language" options={{ title: tr('Language') }} />

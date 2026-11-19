@@ -4,8 +4,9 @@ summary: What's on your home screen. Map Mode, joining and starting rides, event
 category: getting-started
 order: 15
 release: "2.0"
-updated: 2026-11-16
+updated: 2026-11-19
 sources:
+  - app/src/core/activities.ts
   - app/src/components/found-us-card.tsx
   - app/src/lib/found-us.ts
   - app/src/app/leaderboard.tsx
@@ -25,12 +26,17 @@ sources:
   - app/src/core/home-layout.ts
   - app/src/components/tab-bar.tsx
   - supabase/migrations/20261102300000_home_feed.sql
-related: [join-a-ride, create-a-ride, find-a-ride, navigation-mode, riding-groups, friends, follow-leaders, badges-and-ranks, use-onmylead-on-a-tablet]
-keywords: [home, starlink card, starlink on home, customize home, reorder home, hide sections, out riding now, up next, ride solo, home screen, rides tab, main screen, feed, activity, customize feed, who sees my activity, toolkit, public rides near me, distance, radius, 500 miles, rides left, unlimited, your group]
+related: [scout, join-a-ride, create-a-ride, find-a-ride, navigation-mode, riding-groups, friends, follow-leaders, badges-and-ranks, use-onmylead-on-a-tablet]
+keywords: [places to ride, create a ride, one screen, home, starlink card, starlink on home, customize home, reorder home, hide sections, out riding now, up next, ride solo, home screen, rides tab, main screen, feed, activity, customize feed, who sees my activity, toolkit, public rides near me, distance, radius, 500 miles, rides left, unlimited, your group]
 ---
 
 :::release 3.0
+:::until 4.0
 **Home** is the first tab. It opens on a satellite map of your area with your greeting. Under it are the four things riders do most: **Map Mode**, **Join a Ride**, **Start a Ride** and **Events**. Below those are the sections you pick, like who's out riding and what's up next.
+:::
+:::release 4.0
+**Home** is the first tab. It opens on a satellite map of your area with your greeting. Under it are the things riders do most: **Map Mode**, **Join a Ride**, **Create a Ride**, **Events and Group Rides** and **Places to Ride**. On a phone they all fit on the first screen, without scrolling. On smaller phones (shorter than an iPhone Pro Max or Plus) the greeting is left out to make room. Below those are the sections you pick, like who's out riding and what's up next.
+:::
 
 ## At the Top
 
@@ -54,11 +60,21 @@ The big red card. Type the invite code from the ride leader and tap **Join**. Yo
 
 Two tiles side by side:
 
+:::release 4.0
+From 4.0 the first tile is called **Create a Ride**, and its title is the same size as the one beside it.
+:::
+
 - **Start a Ride** creates a new ride. On Free it says how many you have left this month (**1 Left This Month**, or **None Left This Month**, which opens Pro). On Pro and during the trial it says **Lead your group**. See [Create a Ride](/help/create-a-ride) and [Free and Pro](/help/free-vs-pro).
 - **Events** opens rallies, poker runs and ride weekends. See [Events](/help/events).
 
 :::release 3.1
 From 3.1 the second tile is **Events and Group Rides**: it opens rallies, poker runs and ride weekends, and public group rides near you, with a switch between them. See [Events](/help/events).
+:::
+
+:::release 4.0
+## Places to Ride
+
+The card under those two tiles, with pins on a satellite map. Tap it to find off-road parks, national forests, OHV areas, trails and motocross tracks near you, see each place's address, phone, hours and rider reviews, and save your Favorite Places. It says **New** until you open it the first time. See [Find Places to Ride With Scout](/help/scout).
 :::
 
 When one of your rides is live, a card under them says **Your ride is live. Tap to open Ride Mode**.
@@ -93,7 +109,12 @@ Swipe a ride left to delete it (if you organize it) or leave it. On onmylead.com
 3. Use the up and down arrows to move a section higher or lower.
 4. Tap **Done**.
 
-Map Mode, Join a Ride, Start a Ride and Events (**Events and Group Rides** from 3.1) always show first, your badges stay at the top and Your Toolkit stays at the bottom. **Reset to Default** puts everything back. Your layout is saved to your account, so it's the same on your phone, tablet and the website.
+Map Mode, Join a Ride, Start a Ride and Events (**Events and Group Rides** from 3.1) always show first, your badges stay at the top and Your Toolkit stays at the bottom.
+:::release 4.0
+From 4.0, **Places to Ride** always shows with them, after Events and Group Rides.
+:::
+
+**Reset to Default** puts everything back. Your layout is saved to your account, so it's the same on your phone, tablet and the website.
 
 ## Public Rides Near You
 
@@ -295,4 +316,10 @@ In landscape, and on a big window, Home has two columns: join, create, find, eve
 ## On the Website
 
 When you're signed in at onmylead.com, the **Rides** page is the same home screen.
+:::
+
+:::release 4.0
+### Your Activity
+
+The colored button at the top of Home, next to the bell, shows your activity (Offroad, Motorcycle, Road Trip or Snowmobile). Tap it to switch. Home's colors and words change to match, and public rides, events and places show the ones for that activity. See [Switch Activities](/help/activities).
 :::

@@ -4,10 +4,11 @@ summary: Switch between satellite and topo, pick which roads, trails and land bo
 category: routes-maps
 order: 50
 release: "1.0"
-updated: 2026-11-15
+updated: 2026-11-19
 sources:
   - app/src/hooks/use-dot-size.ts
   - app/src/components/trail-map-overlay.tsx
+  - app/src/components/map-weather.tsx
   - app/src/components/trail-width-row.tsx
   - app/src/core/trail-width.ts
   - app/src/lib/trail-width.ts
@@ -81,6 +82,9 @@ In Ride Mode the leader and the ride's organizers also see **Leader Trackline** 
 From 2.1 the stacked-layers button is the round **Map Settings** button, with a two-slider icon, and it opens **Map Settings**, one sheet for everything about the map. On a phone it slides up from the bottom; on a tablet held sideways it sits on the right so you can watch the map change. The map stays lightly visible behind it, so each change shows as you make it. Swipe it down, tap the map, or tap **X** to close it. A small blue dot on the button means the map isn't showing the standard set.
 
 - **Map Style**: **Satellite**, **Topo** and **3D Terrain**, each shown as a picture. The one you're using has a blue ring and a check.
+:::release 4.0
+- **Weather**: **Weather Radar** (Pro) draws rain and snow from NOAA radar over the map, and **Forecast Where You Are** (free) adds a temperature button to Ride Mode and Map Mode. Both start off. See [Weather Radar and Forecast](/help/weather).
+:::
 - **On the Map**: four big switches, each with a strip of map showing the lines it draws:
   - **Streets and Roads**: highways, paved roads, dirt roads and street-legal-only roads.
   - **Off-Road Trails**: motorized trails and tracks, including width-limited trails.

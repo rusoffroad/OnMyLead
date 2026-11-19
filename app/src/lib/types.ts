@@ -10,6 +10,8 @@ export type MemberRole = 'organizer' | 'co_organizer' | 'leader' | 'sweep' | 'ri
 
 export type Ride = {
   id: string;
+  /** Activities (4.0, migration 20261120100000): 'offroad' for every ride before it (core/activities.ts activityOf). */
+  activity?: string | null;
   organizer_id: string;
   invite_code: string;
   name: string;

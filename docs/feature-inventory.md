@@ -76,6 +76,7 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
 - Invite card: Share, Text, Email, Copy Link, Show QR Code.
 - Find a Ride **[flag]**: Near Me / By State, place search, radius, map with search this area.
 - Scout, Places to Ride (2.1) **[flag scout]**: Find tab switch; off-road parks, OHV areas, trail systems, trailheads and motocross tracks within 10-1,000 mi (250 default), kind filters, place pages with Create a Ride Here, directions and nearby public rides; Suggest a Place reviewed in Admin > Places to Ride. Data: USFS, BLM, OpenStreetMap (riding_spots).
+- Activities (4.0) **[flag activities, on]**: chip in Home's header switches Offroad, Motorcycle, Road Trip, Snowmobile; each repaints the accent and card edges, changes Home's card lines and Ride Mode's Tell the Group buttons (the panel is unchanged), and filters public rides, events and Places to Ride; new rides and events carry the activity. Places get activities in Admin > Places to Ride.
 - Universal Links for onmylead.com/r/*, /g/* **[iOS-only]**; **[Android gap]** no App Links.
 
 ### Ride Mode and Live Tracking
@@ -120,6 +121,11 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
   `modules/onmylead-nearby` (Swift + Kotlin), migrations `20261104060000_bluetooth_sharing.sql`,
   `20261104100000_bluetooth_mesh.sql`. You > Bluetooth Sharing switch; **[flag]**
   `bluetooth_sharing`. Apps only (not the website).
+- Radio Sharing (4.0, not yet tested with real radios): You > Radio Sharing pairs the rider's own
+  Meshtastic radio; in Ride Mode the same sealed Bluetooth Sharing packets also go over it on
+  private port 287, and packets heard from it join the mesh. `core/meshtastic.ts`,
+  `core/radio-share.ts`, `lib/radio.ts`, `modules/onmylead-mesh-radio` (Swift + Kotlin). No
+  migration. **[flag]** `radio_sharing` (off). Apps only (not the website).
 
 ### Chat and Polls
 - Ride chat to everyone or to the leader only, in-app pop-ups, resolve / clear messages.
@@ -247,8 +253,8 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
   accounts, App Store and Google Play downloads), Store Reviews (both stores' ratings and reviews,
   replies posted to the store), Users (comp Pro, extend trial, revoke, suspend, delete), Rides (remove), Trials,
   Subscriptions, Promo Codes (App Store Connect offer codes), Reports (2.0: report page with the saved conversation, suspend 1/7/30/90 days or ban), Analytics, App Health
-  (Sentry, push tokens by iPhone / Android, server checks), Exports, Settings (trial days, feature
-  plans, flags, banners), Releases (halt / resume / widen the Google Play rollout, pause / resume
+  (Sentry, push tokens by iPhone / Android, server checks), Exports, Features (4.0: every feature switch
+  in groups, on/off for everyone with no app update), Settings (trial days, feature plans, banners), Releases (halt / resume / widen the Google Play rollout, pause / resume
   the App Store phased release, minimum and latest app version, a notice for chosen versions;
   `docs/release-rollback.md`), Audit log, Contact messages, Help Center editor.
 - Store data is Apple-only today (`app_store_subscriptions`, `app_store_events`, revenue, promo

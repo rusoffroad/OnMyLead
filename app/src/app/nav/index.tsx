@@ -30,6 +30,7 @@ import { FollowMeButton } from '@/components/follow-me-button';
 import { bottomPanelPadding, FULL_MAP_BAR_H, fullMapPadding } from '@/core/full-map';
 import { backPress, mapExitPrompt } from '@/core/mode-exit';
 import { distanceM, type LatLng } from '@/core/geo';
+import { parseMapAt } from '@/core/spots';
 import { foregroundPermission } from '@/core/location-permission';
 import { compassAllowed } from '@/lib/compass';
 import {
@@ -98,7 +99,9 @@ const MPS_TO_MPH = 2.23694;
  * The screen stays on while recording or following. Trails saved here work as group ride routes.
  */
 export default function NavMode() {
-  const params = useLocalSearchParams<{ follow?: string; trail?: string; draw?: string }>();
+  const params = useLocalSearchParams<{ follow?: string; trail?: string; draw?: string; at?: string }>();
+  // Opened from a place to ride (Open in Map Mode, 4.0): the map opens on the place, not the rider.
+  const placeAt = useMemo(() => parseMapAt(params.at), [params.at]);
   const trackLinePro = useCan('track_line');
   // Free riders get a number of Map Mode hours each month; riding with a group never counts.
   const [focused, setFocused] = useState(true);
@@ -306,6 +309,13 @@ export default function NavMode() {
     // `trail.pick` is stable enough: it's a state setter.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Opened on a place: the camera stays there instead of following the rider's dot.
+  useEffect(() => {
+    if (placeAt) camEvent('pan');
+    // camEvent is stable (useFollowMe).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [placeAt]);
 
   // Opened with a trail to follow: a rider's public trail (?follow=) or one of yours (?trail=).
   useEffect(() => {
@@ -695,7 +705,7 @@ export default function NavMode() {
           trackLines={trackLines}
           obstacles={mode === 'measure' ? drawObs : rec ? rec.obstacles ?? [] : followed?.obstacles ?? []}
           onObstacle={editSpot}
-          center={me}
+          center={placeAt ?? me}
           found={found}
           onCenter={(c) => (looking.current = c)}
           padding={panelPad}

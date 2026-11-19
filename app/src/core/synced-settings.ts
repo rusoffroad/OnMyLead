@@ -36,6 +36,8 @@ export const SYNCED_SETTINGS: Record<string, string> = {
   'map.layers.v1': 'Base map (Satellite, Topo, ...) and the trail layer switch',
   'map.riderTrails.v1': 'Show trails other riders shared',
   'map.parkTrails.v1': 'Show the trails of offroad parks',
+  'map.weatherRadar.v1': 'Weather Radar on live maps',
+  'map.weatherForecast.v1': 'Forecast Where You Are on live maps',
   'map.followMe.v1': 'Follow Me on live maps',
   'map.intersectionZoom.v1': 'Zoom In at Intersections on live maps',
   'map.edgeZoomOut.v1': 'Zoom Out at the Edge on live maps',
@@ -44,6 +46,7 @@ export const SYNCED_SETTINGS: Record<string, string> = {
   'nav.trackLineOn.v1': 'The Track Line switch (the line itself stays on the device)',
   'nav.measureTrails.v1': 'Map Mode measures along trails',
   'route.followTrails.v1': 'Route Builder snaps to trails',
+  'route.etaSpeed.v1': 'Route Builder speed for the estimated time',
   'nav.customTrailIntro.v1': 'The custom trail intro was seen',
   'directions.app.v1': 'Directions app: Apple Maps, Google Maps or Ask Each Time',
   // Ride Mode
@@ -65,6 +68,8 @@ export const SYNCED_SETTINGS: Record<string, string> = {
   'promo.inviteFriends.v1': 'The one-time Invite Friends pop-up was seen',
   // Appearance (themes thread; lib/appearance applies a change from another device)
   'onmylead.appearance': 'Theme, Dark/Light/Match Phone and Color Blind Mode',
+  // Activities (lib/activity applies a change from another device at launch)
+  'onmylead.activity': 'The activity picked on Home (Offroad, Motorcycle, Road Trip, Snowmobile)',
   // Language (lib/i18n applies a change from another device)
   'onmylead.language': 'The app language, or Match Phone',
   // Ride Mode alerts (their threads; each writes its key with setSyncedItem once both branches are in)

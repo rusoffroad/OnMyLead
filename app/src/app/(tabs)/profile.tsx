@@ -48,6 +48,7 @@ import { setSocialProfileShown, syncSocialProfile } from '@/lib/social-profile';
 import { socialSetting, type SocialProfile } from '@/core/social-profile';
 import { useMusicControlsSetting } from '@/hooks/use-music-controls';
 import { nearbyAvailable, useBluetoothSharingSetting } from '@/lib/nearby';
+import { radioAvailable, useRadio } from '@/lib/radio';
 import { HELP_CENTER_DISPLAY, HELP_CENTER_TITLE } from '@/core/help-link';
 import { openHelpCenter } from '@/lib/help-center';
 import { musicAvailable } from '@/lib/music';
@@ -91,6 +92,9 @@ export default function You() {
   const [bluetoothMine, setBluetoothMine] = useBluetoothSharingSetting();
   // Bluetooth Sharing is Pro (2.1). On Free the switch still runs the relay and the safety alerts.
   const bluetoothPro = can('bluetooth_sharing');
+  // Radio Sharing (a Meshtastic radio): only when the Admin switch is on (it starts off).
+  const radioFlag = useFlag('radio_sharing');
+  const radio = useRadio();
   const { trails: myTrails } = useLocalTrails();
   const [riderTrails, , setRiderTrails] = useRememberedToggle(RIDER_TRAILS_KEY, true);
   const [parkTrails, , setParkTrails] = useRememberedToggle(PARK_TRAILS_KEY, true);
@@ -357,6 +361,17 @@ export default function You() {
                 />
               </View>
             }
+          />
+        ) : null}
+        {nearbyAvailable && radioAvailable && bluetoothFlag && radioFlag ? (
+          <MenuRow
+            icon="signal"
+            color={Colors.sky}
+            title={t('Radio Sharing')}
+            detail={radio.saved
+              ? t('Paired with {name}', { name: radio.name || radio.saved.name })
+              : t('Pair your Meshtastic radio for miles of range with no service')}
+            onPress={() => router.push('/radio' as Href)}
           />
         ) : null}
         {starlinkOn ? (

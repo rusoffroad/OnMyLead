@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
 import { clockText, parseTime } from '../time';
+import { parsePeriods } from '../weather';
 import {
-  daylightBar, daylightCheck, forecastInRange, forecastUrl, parseForecast, spanText, startsIn, sunTimes, weatherWarnings, weatherWords,
+  dayForecastFrom, daylightBar, daylightCheck, forecastInRange, spanText, startsIn, sunTimes, weatherWarnings, weatherWords,
 } from '../ride-day';
 
 const MOAB = { lat: 38.57, lng: -109.55 };
@@ -60,42 +61,41 @@ describe('daylight check', () => {
 
 describe('forecast', () => {
   const meet = new Date('2026-10-18T15:00:00Z');
-  it('asks for the rounded area around the meet day', () => {
-    const url = forecastUrl(38.5733, -109.5498, meet);
-    expect(url).toContain('latitude=38.57&longitude=-109.55');
-    expect(url).toContain('start_date=2026-10-17&end_date=2026-10-19');
-    expect(url).toContain('temperature_unit=fahrenheit');
-  });
+  // The Weather Service's 7-day forecast: a day and a night each, on the spot's own clock (Moab, UTC-6).
+  const nws = {
+    properties: {
+      periods: [
+        { name: 'Today', startTime: '2026-10-18T06:00:00-06:00', endTime: '2026-10-18T18:00:00-06:00', isDaytime: true, temperature: 71, temperatureUnit: 'F', probabilityOfPrecipitation: { value: 70 }, windSpeed: '5 to 12 mph', windDirection: 'SW', shortForecast: 'Showers And Thunderstorms Likely' },
+        { name: 'Tonight', startTime: '2026-10-18T18:00:00-06:00', endTime: '2026-10-19T06:00:00-06:00', isDaytime: false, temperature: 45, temperatureUnit: 'F', probabilityOfPrecipitation: { value: 40 }, windSpeed: '28 mph', windDirection: 'W', shortForecast: 'Chance Showers' },
+        { name: 'Sunday', startTime: '2026-10-19T06:00:00-06:00', endTime: '2026-10-19T18:00:00-06:00', isDaytime: true, temperature: 60, temperatureUnit: 'F', probabilityOfPrecipitation: { value: 0 }, windSpeed: '5 mph', windDirection: 'N', shortForecast: 'Sunny' },
+      ],
+    },
+  };
 
-  it('picks the meeting spot’s day, not UTC’s', () => {
+  it('picks the meeting spot’s day, not UTC’s, from the Weather Service periods', () => {
     // 03:00 UTC on the 19th is still the evening of the 18th in Moab (UTC-6).
     const late = new Date('2026-10-19T03:00:00Z');
-    const json = {
-      utc_offset_seconds: -21600,
-      daily: {
-        time: ['2026-10-18', '2026-10-19'],
-        weather_code: [95, 0],
-        temperature_2m_max: [71.4, 60],
-        temperature_2m_min: [44.6, 40],
-        precipitation_probability_max: [70, 0],
-        wind_speed_10m_max: [12.2, 5],
-        wind_gusts_10m_max: [38, 9],
-      },
-    };
-    expect(parseForecast(json, late)).toEqual({
-      date: '2026-10-18', summary: 'Thunderstorms', highF: 71, lowF: 45, rainChance: 70, windMph: 12, gustMph: 38,
+    expect(dayForecastFrom(parsePeriods(nws), late)).toEqual({
+      date: '2026-10-18', summary: 'Showers and Thunderstorms Likely', highF: 71, lowF: 45, rainChance: 70, windMph: 28, gustMph: null,
     });
+    expect(dayForecastFrom(parsePeriods(nws), new Date('2026-10-19T17:00:00Z'))?.summary).toBe('Sunny');
+  });
+
+  it('uses the night alone when the day has passed', () => {
+    const evening = { properties: { periods: nws.properties.periods.slice(1) } };
+    expect(dayForecastFrom(parsePeriods(evening), new Date('2026-10-19T02:00:00Z'))).toMatchObject({ highF: 45, lowF: 45, summary: 'Chance Showers' });
   });
 
   it('returns null for a missing day or a broken response', () => {
-    expect(parseForecast({ daily: { time: ['2026-10-01'] } }, meet)).toBeNull();
-    expect(parseForecast(null, meet)).toBeNull();
-    expect(parseForecast({ error: true }, meet)).toBeNull();
+    expect(dayForecastFrom(parsePeriods(nws), new Date('2026-10-25T15:00:00Z'))).toBeNull();
+    expect(dayForecastFrom(parsePeriods(null), meet)).toBeNull();
+    expect(dayForecastFrom(parsePeriods({ error: true }), meet)).toBeNull();
   });
 
   it('only asks within the forecast window', () => {
-    const now = new Date('2026-10-12T12:00:00Z');
+    const now = new Date('2026-10-13T12:00:00Z');
     expect(forecastInRange(meet, now)).toBe(true);
+    expect(forecastInRange(meet, new Date('2026-10-11T12:00:00Z'))).toBe(false);
     expect(forecastInRange(new Date('2026-11-20T12:00:00Z'), now)).toBe(false);
     expect(forecastInRange(new Date('2026-10-01T12:00:00Z'), now)).toBe(false);
   });
@@ -108,6 +108,11 @@ describe('forecast', () => {
     const w = weatherWarnings({ date: '', summary: 'Thunderstorms', highF: 104, lowF: 30, rainChance: 80, windMph: 20, gustMph: 40 });
     expect(w).toHaveLength(4);
     expect(w[0]).toMatch(/lightning/);
+    // The Weather Service's words, and its wind (it gives no gusts).
+    expect(weatherWarnings({ date: '', summary: 'Showers and Thunderstorms Likely', highF: 70, lowF: 50, rainChance: 70, windMph: 28, gustMph: null })).toEqual([
+      'Thunderstorms in the forecast. Watch for lightning and flash floods in washes.',
+      'Wind up to 28 mph. Expect dust and blowing sand.',
+    ]);
   });
 });
 

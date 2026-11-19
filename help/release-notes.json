@@ -1,5 +1,109 @@
 [
   {
+    "version": "4.0",
+    "title": "Activities and Places to Ride",
+    "intro": "OnMyLead 4.0 is for more than offroad: switch between Offroad, Motorcycle, Road Trip and Snowmobile from the button on Home, each with its own colors, Ride Mode buttons, rides, events and places. It also adds Places to Ride: find off-road parks, national forests and trails near you, with rider reviews and favorites. Every Home card now fits on one screen.",
+    "whatsNew": "What's new in 4.0:\n\n• Activities: switch between Offroad, Motorcycle, Road Trip and Snowmobile on Home, each with its own colors, buttons, rides and places.\n• Places to Ride: parks, forests and trails near you, with rider reviews and favorites.\n• Weather on the map: rain and snow radar, plus the forecast where you are.\n• Route builder: enter your average speed to see an estimated time.\n• Home fits on one screen, and Start a Ride is now Create a Ride.\n• The founder tag now reads App Founder.",
+    "apple": null,
+    "google": null,
+    "notes": [
+      {
+        "kind": "new",
+        "text": "Activities: Offroad, Motorcycle, Road Trip and Snowmobile. Tap the colored button at the top of Home to switch."
+      },
+      {
+        "kind": "new",
+        "text": "Each activity has its own color on Home and on every card's edge. Offroad keeps OnMyLead red; EMERGENCY and Need Help stay red everywhere."
+      },
+      {
+        "kind": "new",
+        "text": "Tell the Group in Ride Mode follows the ride's activity: Warming Up and Belt Broke for snowmobiles, Food Stop and Restroom Stop on a road trip, Rest Stop on a motorcycle. The Ride Mode panel is the same as before."
+      },
+      {
+        "kind": "new",
+        "text": "Public rides, events and Places to Ride show the ones for your activity, and new rides and events are made for it. Your friends, groups and messages stay the same."
+      },
+      {
+        "kind": "new",
+        "text": "Places to Ride, a new card on Home: off-road parks, national forests, OHV areas, trail systems, trailheads and motocross tracks near you, on a map and in a list."
+      },
+      {
+        "kind": "new",
+        "text": "Every place has its own page: address, phone, hours, fees and season when we have them, its trails by level, directions, Call, Website, Share and Create a Ride Here."
+      },
+      {
+        "kind": "new",
+        "text": "Rider Reviews: give a place 1 to 5 stars, say how it was and add up to 4 photos. Reviews on Google opens the place on Google Maps."
+      },
+      {
+        "kind": "new",
+        "text": "Open in Map Mode opens Map Mode right on a place, so you can look over its trails and terrain before you go."
+      },
+      {
+        "kind": "new",
+        "text": "Favorite Places: tap Save on a place, then Favorites in Places to Ride to see them all."
+      },
+      {
+        "kind": "new",
+        "text": "Estimated Time in the route builder: type the average speed you expect to ride and see about how long the route takes. It's moving time only, so plan extra for stops and terrain."
+      },
+      {
+        "kind": "new",
+        "text": "Weather Radar (Pro): rain and snow from NOAA radar drawn over the map in Ride Mode, Map Mode and the route builder, updated every 5 minutes. Turn it on in Map Settings > Weather."
+      },
+      {
+        "kind": "new",
+        "text": "Forecast Where You Are (free): a temperature button on Ride Mode and Map Mode. Tap it for the next 12 hours, 7 days and official weather alerts from the National Weather Service."
+      },
+      {
+        "kind": "improved",
+        "text": "Ride Day weather on the ride page now comes from the National Weather Service. It shows about a week before the ride, for rides in the United States."
+      },
+      {
+        "kind": "improved",
+        "text": "Every Home card now fits on one phone screen without scrolling, and Start a Ride is now Create a Ride, the same size as Events."
+      },
+      {
+        "kind": "improved",
+        "text": "New map pins for places to ride, coloured by kind with a picture of what you ride there."
+      },
+      {
+        "kind": "improved",
+        "text": "The tag beside the founder's name now reads App Founder instead of OnMyLead Founder, so the founder's name no longer gets cut off in Friends, Social and other lists."
+      }
+    ]
+  },
+  {
+    "version": "3.3",
+    "title": "Meet the Founder",
+    "intro": "OnMyLead 3.3 makes every rider friends with OnMyLead's founder, with an OnMyLead Founder tag beside the founder's name, and brings everything from 3.2: End Ride for Everyone in Ride Mode, a steadier rider line, and location sharing that stops as soon as the ride ends.",
+    "whatsNew": "What's new in 3.3:\n\n• Every rider is friends with OnMyLead's founder, marked OnMyLead Founder. Remove or block any time.\n• Organizers can end the ride for everyone from Ride Mode: tap Exit, then End Ride for Everyone.\n• Steadier rider line in Ride Mode and on CarPlay.\n• Location sharing stops as soon as the ride ends, even if you left Ride Mode.",
+    "apple": "2026-11-18",
+    "google": "2026-11-18",
+    "notes": [
+      {
+        "kind": "new",
+        "text": "Every rider is friends with OnMyLead's founder, new riders too. The founder's posts and rides show in your Feed and Social, and yours in the founder's, as your Who Sees Your Activity setting allows. It never shows where you are: the founder only sees you in Out Riding under the usual rules. Remove the founder like any friend, or block, and you stay removed."
+      },
+      {
+        "kind": "new",
+        "text": "An OnMyLead Founder tag beside the founder's name in the Feed, Social, comments, profiles, Friends, Messages and a ride's Going list."
+      },
+      {
+        "kind": "new",
+        "text": "End Ride for Everyone in Ride Mode: when the ride is over, the organizer and co-organizers tap ‹ Exit and pick End Ride for Everyone under Ride over?, then confirm. The ride ends for the whole group, everyone's location sharing stops and Ride Mode closes. It needs service. Riders still find Leave Ride in the same place."
+      },
+      {
+        "kind": "fixed",
+        "text": "The rider line in Ride Mode and on CarPlay holds steady. A friend riding right beside the leader no longer jumps between a few yards and about 200 feet over and over: every rider is compared at the same moment, and dots ease between updates."
+      },
+      {
+        "kind": "fixed",
+        "text": "Location sharing stops as soon as the ride ends. If you left Ride Mode with Exit and Keep Sharing and the organizer ended the ride from the ride page or another phone, your phone kept trying to send your location every few seconds. It now stops right away."
+      }
+    ]
+  },
+  {
     "version": "3.2",
     "title": "End the Ride from Ride Mode",
     "intro": "OnMyLead 3.2 lets the organizer end a ride for everyone right from Ride Mode's Exit button, next to Leave Ride, and keeps the distances on the rider line steady in Ride Mode and on CarPlay.",

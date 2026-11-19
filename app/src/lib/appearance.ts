@@ -2,7 +2,8 @@ import { useSyncExternalStore } from 'react';
 import { Appearance as SystemAppearance, Platform } from 'react-native';
 
 import { newerAppearance, parseAppearance, sameAppearance, type Appearance } from '@/core/appearance';
-import { applyAppearance, Colors, currentAppearance, currentScheme, themeVersion } from '@/constants/theme';
+import type { ActivityId } from '@/core/activities';
+import { applyAppearance, Colors, currentAppearance, currentScheme, paintedActivity, themeVersion } from '@/constants/theme';
 import { writeAppearance } from './appearance-storage';
 
 // The rider's appearance (Dark / Light / Match Phone, theme, Color Blind Mode) for every screen.
@@ -100,6 +101,17 @@ export function setAppearance(patch: Partial<Omit<Appearance, 'updatedAt'>>, fro
 
 /** What account sync uploads: the choice and when it was made. */
 export const getAppearanceForSync = (): Appearance => currentAppearance();
+
+/**
+ * Wears an activity's colours (lib/activity.ts calls it when the rider switches). The app redraws,
+ * like a theme change, and comes back to `from`.
+ */
+export function paintActivity(id: ActivityId, from?: string) {
+  if (paintedActivity() === id) return;
+  returnTo = from ?? null;
+  applyAppearance(currentAppearance(), systemScheme(), id);
+  publish();
+}
 
 /**
  * Account sync hands over what the account holds; it is used only if it is newer than this

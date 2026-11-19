@@ -4,7 +4,7 @@ summary: See every permission OnMyLead uses in one place, which ones are off, an
 category: troubleshooting
 order: 15
 release: "3.1"
-updated: 2026-11-15
+updated: 2026-11-19
 sources:
   - app/src/app/permissions.tsx
   - app/src/core/permissions.ts

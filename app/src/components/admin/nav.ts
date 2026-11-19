@@ -26,6 +26,7 @@ export const ADMIN_SECTIONS: AdminSection[] = [
   { key: 'help', title: 'Help Center', href: '/admin/help', group: 'System' },
   { key: 'app-health', title: 'App Health', href: '/admin/app-health', group: 'System' },
   { key: 'releases', title: 'Releases', href: '/admin/releases', group: 'System' },
+  { key: 'features', title: 'Features', href: '/admin/features', group: 'System' },
   { key: 'settings', title: 'Settings', href: '/admin/settings', group: 'System' },
   { key: 'audit', title: 'Audit Log', href: '/admin/audit', group: 'System' },
 ];

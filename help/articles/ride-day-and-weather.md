@@ -4,11 +4,13 @@ summary: See the forecast for the meeting area and check whether your ride gets 
 category: rides
 order: 60
 release: "1.0"
-updated: 2026-11-17
+updated: 2026-11-19
 sources:
   - app/src/components/ride-day.tsx
   - app/src/core/ride-day.ts
   - app/src/lib/forecast.ts
+  - app/src/lib/weather.ts
+  - app/src/core/weather.ts
   - app/src/app/r/[code].tsx
 related: [create-a-ride, directions, fuel-range, emergency-and-safety]
 keywords: [weather, forecast, rain, wind, temperature, sunset, sunrise, daylight, dark, countdown, storm, tablet]
@@ -29,7 +31,15 @@ Ride Day shows the meet day's forecast:
 - The chance of rain
 - The wind speed, and gusts when they're much stronger than the wind
 
+:::until 4.0
 The forecast shows up about two weeks before the ride. Until then the card says when it will appear. The forecast is for the ride's general meeting area, not the exact spot.
+:::
+
+:::release 4.0
+The forecast comes from the National Weather Service. It shows up about a week before the ride; until then the card says when it will appear. The forecast is for the ride's general meeting area, not the exact spot. It covers rides in the United States only.
+
+The Weather Service doesn't give gusts in its 7-day forecast, so the wind shown is the top of its forecast wind for the day.
+:::
 
 :::tip
 The last forecast your phone loaded is saved, so it still shows at a trailhead with no signal. It only updates when you have a connection.
@@ -42,8 +52,15 @@ Ride Day adds a heads-up when the forecast calls for:
 - Thunderstorms (watch for lightning and flash floods in washes)
 - A 60% or higher chance of rain
 - Gusts of 35 mph or more
+:::release 4.0
+- Wind of 25 mph or more
+:::
 - A high of 100°F or more
 - A low of 32°F or below
+
+:::release 4.0
+Want the weather where you are right now, while you ride? See [Weather Radar and Forecast](/help/weather).
+:::
 
 ## Daylight Check
 

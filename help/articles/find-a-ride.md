@@ -4,8 +4,9 @@ summary: Browse public rides near you, near a place you search, or anywhere in a
 category: joining
 order: 10
 release: "1.0"
-updated: 2026-11-16
+updated: 2026-11-19
 sources:
+  - app/src/core/activities.ts
   - app/src/app/(tabs)/find.tsx
   - app/src/components/ride-tile.tsx
   - app/src/app/(tabs)/index.tsx
@@ -132,4 +133,8 @@ The **Rides** tab also lists a few upcoming **Public Rides**. Tap **Find Rides o
 :::release 3.0
 The **Home** tab also lists a few upcoming **Public Rides**. Tap **Find Rides on the Map** (or **See All on the Map**, which shows how many there are) to see them all.
 :::
+:::
+
+:::release 4.0
+Public rides show the ones for your activity (Offroad, Motorcycle, Road Trip or Snowmobile). Switch activities with the colored button on Home to see the others. See [Switch Activities](/help/activities).
 :::

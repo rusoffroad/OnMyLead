@@ -12,8 +12,10 @@ import { Spacing } from '@/constants/theme';
 import { deviceLabel, downloadSeries, needsRefresh, signInMethodLabel, STORE_NAME, storeState, type StoreKey } from '@/core/admin-growth';
 import { campaignLabel, foundUsLabel } from '@/core/found-us';
 import { bucketFor, fmtAgo, fmtDate, fmtInt } from '@/core/admin-format';
+import { combineTotals, fmtAverage, starText } from '@/core/admin-reviews';
 import { useAdminData } from '@/lib/admin';
 import * as api from '@/lib/admin-growth';
+import * as reviewsApi from '@/lib/admin-reviews';
 
 const STORES: StoreKey[] = ['apple', 'google'];
 
@@ -64,6 +66,8 @@ export default function GrowthPage() {
       <FoundUsPanel range={range} />
 
       <Downloads range={range} bucket={bucket} />
+
+      <Ratings />
     </AdminPage>
   );
 }
@@ -217,6 +221,43 @@ function Downloads({ range, bucket }: { range: DateRange; bucket: api.Bucket }) 
           {d.by_device.length ? (
             <BarList items={d.by_device.map((x) => ({ label: `${STORE_NAME[x.store]}: ${deviceLabel(x.store, x.device)}`, value: x.downloads }))} />
           ) : <Empty text="No downloads in this period." />}
+        </>
+      ) : null}
+    </Panel>
+  );
+}
+
+/** Star ratings and the newest reviews from both stores; the full list is on Store Reviews. */
+function Ratings() {
+  const data = useAdminData(() => reviewsApi.reviews('all', null, 'all', '', 0, 3), []);
+  const r = data.data;
+  const totals = r ? combineTotals(r.stores) : null;
+  const seeAll = <TextButton label="See All Reviews" onPress={() => router.push('/admin/reviews')} />;
+  return (
+    <Panel title="Ratings and Reviews" right={seeAll}>
+      <LoadError error={data.error} what="Ratings" />
+      {!r && data.loading ? <Loading /> : null}
+      {r && totals ? (
+        <>
+          <StatGrid>
+            <StatTile label="Average Rating" value={fmtAverage(totals.average)} tone="pro" hint={`${fmtInt(totals.count)} ${totals.count === 1 ? 'rating' : 'ratings'} on both stores`} />
+            {STORES.map((st) => (
+              <StatTile key={st} label={`${STORE_NAME[st]} Rating`} value={fmtAverage(r.stores[st]?.average)}
+                hint={`${fmtInt(r.stores[st]?.count ?? 0)} ${r.stores[st]?.count === 1 ? 'rating' : 'ratings'}; ${fmtInt(r.stores[st]?.written ?? 0)} written`} />
+            ))}
+            <StatTile label="Waiting for a Reply" value={fmtInt(totals.unanswered)} hint="Written reviews you haven't answered" />
+          </StatGrid>
+          {r.rows.length === 0 ? <Empty text="No written reviews yet." /> : r.rows.map((x) => (
+            <View key={`${x.store}:${x.review_id}`} style={{ gap: Spacing.half, paddingVertical: Spacing.two }}>
+              <ThemedText type="smallBold">
+                {starText(x.rating)}  {x.title || 'Rating'}
+              </ThemedText>
+              {x.body ? <ThemedText type="small" numberOfLines={3}>{x.body}</ThemedText> : null}
+              <ThemedText type="small" themeColor="textSecondary">
+                {STORE_NAME[x.store]}{x.author ? `, ${x.author}` : ''}, {fmtDate(x.created_at)}
+              </ThemedText>
+            </View>
+          ))}
         </>
       ) : null}
     </Panel>

@@ -2,8 +2,10 @@ import '@/global.css';
 
 import { Appearance as SystemAppearance, Platform, StyleSheet } from 'react-native';
 
+import { activityPalette, parseActivity, type ActivityId } from '@/core/activities';
 import { buildPalette, parseAppearance, type Appearance, type Palette, type Scheme } from '@/core/appearance';
 import { applyMapInk } from '@/core/ink';
+import { readActivitySync } from '@/lib/activity-storage';
 import { readAppearanceSync } from '@/lib/appearance-storage';
 
 /*
@@ -15,7 +17,10 @@ import { readAppearanceSync } from '@/lib/appearance-storage';
  */
 
 let appearance: Appearance = parseAppearance(readAppearanceSync());
-let palette: Palette = buildPalette(appearance, SystemAppearance.getColorScheme());
+// The rider's activity (core/activities.ts) repaints the accent; Offroad (the default) changes nothing.
+let activity: ActivityId = parseActivity(readActivitySync());
+const activityColors = () => (scheme: Scheme, edge: string) => activityPalette(activity, scheme, edge);
+let palette: Palette = buildPalette(appearance, SystemAppearance.getColorScheme(), activityColors());
 let version = 0;
 
 export const Colors: Palette['colors'] = { ...palette.colors };
@@ -138,12 +143,15 @@ export const currentScheme = (): Scheme => palette.scheme;
 export const scrollIndicator = () => (palette.scheme === 'light' ? 'black' : 'white');
 /** Color Blind Mode: statuses also show a symbol (core/appearance.ts statusSymbol). */
 export const colorBlindOn = () => appearance.colorBlind;
+/** The activity whose colours the app is wearing (Offroad unless Activities is on and another is picked). */
+export const paintedActivity = (): ActivityId => activity;
 /** Goes up by one on every change; the root layout keys the app on it to redraw everything. */
 export const themeVersion = () => version;
 
 /** Refills every colour object from a new choice. Returns true when anything visible changed. */
-export function applyAppearance(next: Appearance, system: string | null | undefined): boolean {
-  const p = buildPalette(next, system);
+export function applyAppearance(next: Appearance, system: string | null | undefined, nextActivity: ActivityId = activity): boolean {
+  activity = nextActivity;
+  const p = buildPalette(next, system, activityColors());
   appearance = next;
   if (JSON.stringify(p) === JSON.stringify(palette)) return false;
   palette = p;

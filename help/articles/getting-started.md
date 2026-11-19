@@ -4,7 +4,7 @@ summary: What OnMyLead is, how to get the app on iPhone, iPad or Android, make y
 category: getting-started
 order: 10
 release: "1.0"
-updated: 2026-11-17
+updated: 2026-11-19
 sources:
   - app/src/app/(tabs)/_layout.tsx
   - app/src/components/tab-bar.tsx
@@ -65,7 +65,7 @@ Along the bottom of the screen: **Home**, **Rides**, the raised blue **Map Mode*
 
 ### Home
 
-Your home screen: **Map Mode** first, then **Join a Ride** (the big red card), **Start a Ride** and **Events**, then the sections you choose, like **Out Riding Now**, **Up Next**, **Your Group** and your **Feed**. Tap **Customize Home** at the bottom to change them. The bell and your picture at the top open your notifications and **You** (your profile, settings, Garage and tools). See [Your Home Screen](/help/home-screen).
+Your home screen: **Map Mode** first, then **Join a Ride** (the big red card), **Start a Ride** (**Create a Ride** from 4.0) and **Events**, then (from 4.0) **Places to Ride**, then the sections you choose, like **Out Riding Now**, **Up Next**, **Your Group** and your **Feed**. Tap **Customize Home** at the bottom to change them. The bell and your picture at the top open your notifications and **You** (your profile, settings, Garage and tools). See [Your Home Screen](/help/home-screen).
 
 ### Rides
 

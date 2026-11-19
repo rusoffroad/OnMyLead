@@ -9,6 +9,7 @@ import type { LatLng } from '@/core/geo';
 import { difficultyColor, difficultyLabel, feetOrMiles, mappedBy, RIDER_TRAIL_INK, vehicleLabel, type PublicTrail } from '@/core/nav-trails';
 import { formatBytes, IMAGERY_ATTRIBUTION, statusLine, type OfflineChoice } from '@/core/offline-maps';
 import { OSM_ATTRIBUTION } from '@/core/osm-trails';
+import { RADAR_ATTRIBUTION } from '@/core/weather';
 import { PARK_LEVEL_COLORS, PARK_LEVEL_LEGEND, PARK_TRAILS_ATTRIBUTION, parkLevelLabel, parkTrailColor, parkTrailLength, type ParkTrail } from '@/core/park-trails';
 import {
   FEATURE_GROUPS, FEATURE_INK, featuresChanged, MAP_FEATURES, QUICK_LAYERS, quickLayerOn, quickLayerToggle, type MapFeature, type MapFeatureId, type QuickLayer,
@@ -42,6 +43,7 @@ import { setTiltShown, useTiltSettings } from '@/lib/tilt';
 
 import { t as tr } from '@/lib/i18n';
 import { SheetModal } from '@/components/sheet-modal';
+import { WeatherCorner, WeatherSettings } from '@/components/map-weather';
 const SAND = '#ECCD91';
 const WEB = Platform.OS === 'web';
 
@@ -91,6 +93,7 @@ export function TrailMapOverlay({
   const credit = [
     trail.base === 'topo' ? TOPO_ATTRIBUTION : trail.offline ? IMAGERY_ATTRIBUTION : null,
     ...trail.agencyLayers.map((a) => a.attribution),
+    trail.weather.radar && trail.mapbox ? RADAR_ATTRIBUTION : null,
     osmOn ? OSM_ATTRIBUTION : trail.parkTrailsOn ? PARK_TRAILS_ATTRIBUTION : null,
   ]
     .filter(Boolean)
@@ -120,6 +123,7 @@ export function TrailMapOverlay({
             <Text style={styles.offlineSub}>{tr('Downloaded Map')}</Text>
           </View>
         ) : null}
+        <WeatherCorner trail={trail} forecast={controls} />
       </View>
       <MapSettingsSheet
         visible={open}
@@ -278,6 +282,8 @@ function MapSettingsSheet({
                 </Text>
               ) : null}
             </View>
+
+            <WeatherSettings trail={trail} pro={() => pro('map_layers')} forecastHere={controls} />
 
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>{tr('On the Map')}</Text>
@@ -928,6 +934,7 @@ export function RiderTrailCard({ t, onClose, onRate, onFollow }: { t: PublicTrai
     .filter(Boolean)
     .join('   ');
   const garage = useGarageWidths();
+  const rateOn = useFlag('trail_ratings');
   return (
     <View style={[styles.card, styles.riderCard]} accessibilityLiveRegion="polite">
       <View style={styles.cardHead}>
@@ -964,7 +971,7 @@ export function RiderTrailCard({ t, onClose, onRate, onFollow }: { t: PublicTrai
         </View>
       </View>
       <View style={styles.actions}>
-        {!t.mine ? (
+        {!t.mine && rateOn ? (
           <Pressable accessibilityRole="button" onPress={onRate} style={({ pressed }) => [styles.action, styles.actionMain, pressed && { opacity: 0.85 }]}>
             <Text style={[styles.actionText, { color: Colors.background }]}>{t.myScore != null || t.myQuality != null ? tr('Change Rating') : tr('Rate Trail')}</Text>
           </Pressable>

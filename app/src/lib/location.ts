@@ -486,6 +486,22 @@ export async function currentPosition(accuracy = Location.Accuracy.High) {
   return { lat: l.coords.latitude, lng: l.coords.longitude };
 }
 
+/**
+ * A fix quick enough to open a map on (Places to Ride, a place's distance): the phone's own last fix
+ * from the last 30 minutes when it has one, which comes back at once, else a Balanced fix, which
+ * comes faster than High. Asks for permission like currentPosition. Never for sharing or navigation.
+ */
+export async function quickPosition() {
+  const fg = await foregroundPermission();
+  if (fg.status !== 'granted') throw new Error('Allow location access in Settings to use your current location.');
+  if (Platform.OS !== 'web') {
+    const last = await Location.getLastKnownPositionAsync({ maxAge: 30 * 60_000 }).catch(() => null);
+    if (last) return { lat: last.coords.latitude, lng: last.coords.longitude };
+  }
+  const l = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+  return { lat: l.coords.latitude, lng: l.coords.longitude };
+}
+
 /** Two-letter US state for a point: the phone's reverse geocoder when it has one, else a box guess. */
 export async function stateAt(p: { lat: number; lng: number }): Promise<string | null> {
   if (Platform.OS !== 'web') {

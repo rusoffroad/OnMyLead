@@ -3,11 +3,15 @@ import { useState } from 'react';
 import { Text, View } from 'react-native';
 
 import {
-  AdminColors, AdminPage, DataTable, ErrorNote, FilterChips, Pager, Panel, planTone, SearchBox, StatusBadge, type Column,
+  AdminColors, AdminPage, DataTable, ErrorNote, FilterChips, Pager, Panel, planTone, rangeFor, SearchBox, StatGrid, StatTile, StatusBadge,
+  type Column,
 } from '@/components/admin';
 import { font } from '@/constants/theme';
 import { fmtAgo, fmtDate, fmtInt } from '@/core/admin-format';
+import { combineTotals, fmtAverage } from '@/core/admin-reviews';
 import * as admin from '@/lib/admin';
+import * as growth from '@/lib/admin-growth';
+import * as reviews from '@/lib/admin-reviews';
 
 // Badge holders ('ambassador', 'founder') are listed from the badge itself, not from admin_users.
 type Filter = admin.UserFilter | admin.HonorKey;
@@ -76,6 +80,7 @@ export default function Users() {
 
   return (
     <AdminPage title="Users" subtitle="Everyone with an account. Search by name or email.">
+      <UserMetrics />
       <Panel>
         <View style={{ gap: 12 }}>
           <SearchBox value={q} onChange={(v) => { setQ(v); setPage(0); }} placeholder="Search Name or Email" />
@@ -99,5 +104,36 @@ export default function Users() {
         )}
       </Panel>
     </AdminPage>
+  );
+}
+
+/**
+ * Riders, downloads and ratings in one row above the list. Each tile opens its own page; a tile
+ * whose numbers can't load is left out so the list below still works.
+ */
+function UserMetrics() {
+  const [range] = useState(() => rangeFor('30d'));
+  const g = admin.useAdminData(() => growth.growthSummary(range.from, range.to), [range.from, range.to]).data;
+  const d = admin.useAdminData(() => growth.downloads(range.from, range.to, 'day'), [range.from, range.to]).data;
+  const r = admin.useAdminData(() => reviews.reviews('all', null, 'all', '', 0, 1), []).data;
+  if (!g && !d && !r) return null;
+  const t = r ? combineTotals(r.stores) : null;
+  return (
+    <StatGrid>
+      {g ? (
+        <StatTile label="Registered Riders" value={fmtInt(g.riders_total)} tone="pro" hint={`${fmtInt(g.riders_new)} new in the last 30 days`}
+          onPress={() => router.push('/admin/growth')} />
+      ) : null}
+      {d ? (
+        <StatTile label="App Downloads" value={fmtInt(d.stores.apple.all_time + d.stores.google.all_time)}
+          hint={`App Store ${fmtInt(d.stores.apple.all_time)}, Google Play ${fmtInt(d.stores.google.all_time)}; ${fmtInt(d.stores.apple.downloads + d.stores.google.downloads)} in the last 30 days`}
+          onPress={() => router.push('/admin/growth')} />
+      ) : null}
+      {r && t ? (
+        <StatTile label="Average Rating" value={fmtAverage(t.average)}
+          hint={`${fmtInt(t.count)} ${t.count === 1 ? 'rating' : 'ratings'}; ${fmtInt(t.unanswered)} waiting for a reply`}
+          onPress={() => router.push('/admin/reviews')} />
+      ) : null}
+    </StatGrid>
   );
 }

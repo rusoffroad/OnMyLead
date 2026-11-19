@@ -12,6 +12,7 @@ import { dmPreview, NOT_SWITCHED_ON, type DmThread } from '@/core/out-riding';
 import { myDmThreads, OutRidingOffError } from '@/lib/out-riding';
 import { useSession } from '@/lib/session';
 import { t as tr } from '@/lib/i18n';
+import { FounderTag } from '@/components/founder-tag';
 
 const when = (iso: string | null) => {
   if (!iso) return '';
@@ -87,6 +88,7 @@ export default function Messages() {
                 <View style={{ flex: 1, gap: 2 }}>
                   <View style={styles.top}>
                     <Text style={styles.name} numberOfLines={1}>{t.other_name}</Text>
+                    <FounderTag userId={t.other_id} />
                     <Text style={styles.time}>{when(t.last_at)}</Text>
                   </View>
                   <View style={styles.top}>

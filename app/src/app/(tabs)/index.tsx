@@ -5,6 +5,7 @@ import { Platform, Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AppNotices } from '@/components/app-notices';
+import { ActivityChip, ActivitySheet } from '@/components/home/activity-switcher';
 import { HeroBadges } from '@/components/badge-strip';
 import { FeedList, FeedSheet } from '@/components/home/feed';
 import { GroupCard, NoGroupCard } from '@/components/home/group-card';
@@ -15,6 +16,7 @@ import { MapModeBanner } from '@/components/home/map-mode-card';
 import { OutRidingNow } from '@/components/home/out-riding-now';
 import { HeadLink, Home, homeStyles, Initial, SectionHead } from '@/components/home/parts';
 import { PublicRidesRail, RadiusChip, RadiusSheet } from '@/components/home/public-rides';
+import { PlacesCard } from '@/components/home/places-card';
 import { ActionTiles, JoinHero } from '@/components/home/ride-actions';
 import { StarlinkHomeCard } from '@/components/home/starlink-card';
 import { HelpRow, Toolkit } from '@/components/home/toolkit';
@@ -31,6 +33,7 @@ import { ROW_ACTION_HINT, SwipeRow } from '@/components/swipe-row';
 import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Screen } from '@/components/ui';
 import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
+import { activityById } from '@/core/activities';
 import { flagOn } from '@/core/app-settings';
 import { DEFAULT_HOME_LAYOUT, HOME_LAYOUT_KEY, parseHomeLayout, serializeHomeLayout, shownSections, type HomeLayout, type HomeSection } from '@/core/home-layout';
 import { READABLE_WIDTH } from '@/core/layout';
@@ -39,12 +42,13 @@ import { deletePrompt, leavePrompt, ridersToTell } from '@/core/cancel';
 import { DEFAULT_FEED_SETTINGS, FEED_NOT_SWITCHED_ON, type FeedSettings } from '@/core/feed';
 import type { SocialItem } from '@/core/social';
 import type { GroupChatSummary } from '@/core/group-chat';
-import { createQuota, firstName, greeting, parseRadius, RADIUS_STORAGE_KEY, toolkitFor } from '@/core/home';
+import { createQuota, firstName, greeting, homeHeader, parseRadius, RADIUS_STORAGE_KEY, toolkitFor } from '@/core/home';
 import { historySplit } from '@/core/pro';
 import { rowActionFor } from '@/core/row-swipe';
 import { useLayout } from '@/hooks/use-layout';
 import { useTheme } from '@/hooks/use-theme';
 import { deleteRide, discoverPublicRides, getMembers, leaveRide, myRideName, myRides, publicRidesNear } from '@/lib/api';
+import { setActivity, useActivity, wearActivity } from '@/lib/activity';
 import { useAppSettings } from '@/lib/app-settings';
 import { appVersionLabel } from '@/lib/app-update';
 import { fetchMyBadges } from '@/lib/badges';
@@ -75,10 +79,8 @@ const RAIL_MAX = 10;
 type Mine = RideMember & { rides: Ride };
 type Near = Ride & { distanceMi?: number };
 
-/** How tall the map header is (points, below the status bar). The Join card overlaps its bottom. */
-const HERO_HEIGHT = 300;
-/** How far the Map Mode banner reaches up over the bottom of the map header. */
-const OVERLAP = 78;
+// How tall the map header is and how far the Map Mode banner reaches up over it: homeHeader in
+// core/home.ts (shorter on phones since 4.0, so every card fits on one screen).
 
 /** Rider trails around a spot, counted once per app session (it's a line on the banner, not a live number). */
 let trailCount: number | null = null;
@@ -92,6 +94,17 @@ export default function HomeScreen() {
   const findOn = flagOn(settings, 'find_a_ride');
   const navOn = flagOn(settings, 'nav_mode');
   const feedOn = flagOn(settings, 'home_feed');
+  const placesOn = flagOn(settings, 'scout');
+  // Activities (4.0): the rider's activity while the flag is on, else Offroad (today's app).
+  const { activity, on: activitiesOn } = useActivity();
+  const act = activityById(activitiesOn ? activity : 'offroad');
+  /** What discovery filters by: nothing while Activities is off, so every ride shows as before. */
+  const discoverFor = activitiesOn ? activity : undefined;
+  const [activityOpen, setActivityOpen] = useState(false);
+  // Only while Home is on screen, so a flag change never redraws the app under a rider in Ride Mode.
+  useFocusEffect(useCallback(() => wearActivity(activitiesOn), [activitiesOn]));
+  const head = homeHeader(layout.height, !layout.expanded);
+  const compact = !layout.expanded;
   const tools = toolkitFor({ trip_planner: flagOn(settings, 'trip_planner'), starlink: flagOn(settings, 'starlink') });
 
   const [mine, setMine] = useState<Mine[]>([]);
@@ -123,7 +136,7 @@ export default function HomeScreen() {
     return () => setFocused(false);
   }, []));
   // One satellite picture for the map header and the Map Mode tile (cached on the phone).
-  const heroUrl = useHeroMap(Math.min(layout.width, 1200), HERO_HEIGHT + insets.top);
+  const heroUrl = useHeroMap(Math.min(layout.width, 1200), head.hero + insets.top);
 
   // Signing out (or into another account) must not leave the last rider's things on screen.
   const uid = session?.user.id;
@@ -188,9 +201,9 @@ export default function HomeScreen() {
     // Never asks for location here: with it, rides sort by distance; without it, every public ride.
     const at = await positionIfAllowed();
     setLocated(!!at);
-    if (at && mi > 0) return publicRidesNear(at, mi);
-    return discoverPublicRides();
-  }, []);
+    if (at && mi > 0) return publicRidesNear(at, mi, discoverFor);
+    return discoverPublicRides(undefined, 100, discoverFor);
+  }, [discoverFor]);
 
   useFocusEffect(
     useCallback(() => {
@@ -307,6 +320,7 @@ export default function HomeScreen() {
       <View style={styles.topRight}>
         {/* Signed-out riders can switch language before they have an account; signed in, it's in You. */}
         {session ? null : <LanguageButton />}
+        {activitiesOn ? <ActivityChip activity={activity} name={t(act.name)} onPress={() => setActivityOpen(true)} /> : null}
         {session ? (
           <>
             <InboxBell compact onMap />
@@ -328,13 +342,13 @@ export default function HomeScreen() {
   );
 
   const hero = (
-    <HomeHero url={heroUrl} height={HERO_HEIGHT}>
-      <View style={[styles.heroInner, { maxWidth: layout.expanded ? 1200 : READABLE_WIDTH }]}>
+    <HomeHero url={heroUrl} height={head.hero}>
+      <View style={[styles.heroInner, { maxWidth: layout.expanded ? 1200 : READABLE_WIDTH, paddingBottom: head.overlap + (compact ? 4 : 18) }]}>
         {header}
         <View style={{ flex: 1 }} />
         {/* Badges at the very top, just above the greeting (Chris 2026-11-10). */}
         {session && badges ? <HeroBadges mine={badges} /> : null}
-        {hello}
+        {head.greeting ? hello : null}
       </View>
     </HomeHero>
   );
@@ -368,16 +382,23 @@ export default function HomeScreen() {
   );
 
   // 3.0 (approved mock v4, Chris 2026-11-10): Map Mode first, over the bottom of the map header,
-  // then the red Join a Ride, then Start a Ride and Events side by side. These four always lead;
-  // the sections under them are the rider's to show, hide and order (Customize Home).
+  // then the red Join a Ride, then Create a Ride and Events side by side, then Places to Ride (4.0,
+  // its own card underneath). These always lead; the sections under them are the rider's to show,
+  // hide and order (Customize Home). On a phone they sit a little tighter so they fit on one screen.
   const actions = (
-    <View style={{ gap: 12, marginTop: -OVERLAP }}>
-      {navOn ? <MapModeBanner image={heroUrl} trailsNear={trailsNear} /> : null}
-      <JoinHero code={code} onCode={setCode} onOpen={openCode} />
+    <View style={{ gap: head.tight ? 8 : compact ? 10 : 12, marginTop: -head.overlap }}>
+      {navOn ? <MapModeBanner image={heroUrl} trailsNear={trailsNear} compact={compact} tight={head.tight} line={t(act.mapLine)} /> : null}
+      <JoinHero code={code} onCode={setCode} onOpen={openCode} compact={compact} tight={head.tight} activity={activitiesOn ? activity : undefined} />
       <ActionTiles
+        compact={compact}
+        tight={head.tight}
         quota={session ? createQuota(ent) : null}
+        createLine={act.createLine ? t(act.createLine) : undefined}
+        eventsLine={t(act.eventsLine)}
+        activity={activitiesOn ? activity : undefined}
         onStart={() => (session ? requirePro('create_ride') && router.push('/ride/new') : router.push('/sign-in'))}
       />
+      {placesOn ? <PlacesCard compact={compact} tight={head.tight} line={t(act.placesLine)} activity={activitiesOn ? activity : undefined} /> : null}
       {nudgeAndLive}
       {!loading && !session ? (
         <Button title={t('Sign In or Create a Free Account')} kind="ghost" onPress={() => router.push('/sign-in?mode=create')} />
@@ -401,7 +422,7 @@ export default function HomeScreen() {
             swipeRow(m, <RideRow ride={m.rides} note={m.status === 'joined' ? t(roleLabel(m.role)) : m.status.replace('_', ' ')} />))}
         </RowGroup>
       ) : null}
-      <EventsCard signedIn={!!session} radius={radius} />
+      <EventsCard signedIn={!!session} radius={radius} activity={discoverFor} />
       {going.length && ROW_ACTION_HINT ? <Text style={[homeStyles.muted, { fontSize: 12 }]}>{ROW_ACTION_HINT}</Text> : null}
     </Block>
   );
@@ -495,6 +516,17 @@ export default function HomeScreen() {
     <>
       <CustomizeHomeSheet visible={customizing} layout={homeLayout} onClose={() => setCustomizing(false)} onSave={saveLayout} />
       <RadiusSheet visible={radiusOpen} radius={radius ?? 0} located={located} onPick={pickRadius} onClose={() => setRadiusOpen(false)} />
+      {activitiesOn ? (
+        <ActivitySheet
+          visible={activityOpen}
+          activity={activity}
+          onPick={(id) => {
+            setActivityOpen(false);
+            setActivity(id);
+          }}
+          onClose={() => setActivityOpen(false)}
+        />
+      ) : null}
       {session && feedOn ? (
         <FeedSheet
           visible={feedOpen}
@@ -585,7 +617,7 @@ const styles = themedStyles(() => ({
   logo: { width: 150, height: 52 },
   topRight: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   avatar: { width: 42, height: 42, borderRadius: 21, borderWidth: 1, borderColor: 'rgba(230,194,122,0.5)', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
-  heroInner: { flex: 1, width: '100%', alignSelf: 'center', paddingHorizontal: Spacing.three, paddingBottom: OVERLAP + 18 },
+  heroInner: { flex: 1, width: '100%', alignSelf: 'center', paddingHorizontal: Spacing.three },
   hello: { color: ON_MAP, fontFamily: font(700), fontSize: 26, lineHeight: 31, textShadowColor: 'rgba(0,0,0,0.6)', textShadowRadius: 8 },
   customize: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, minHeight: 50, borderRadius: 14,

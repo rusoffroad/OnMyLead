@@ -3,7 +3,7 @@
   "bundleId": "com.rusoffroad.onmylead.app",
   "appleId": "6822352321",
   "country": "us",
-  "live": "3.1",
+  "live": "3.3",
   "prelaunch": {
     "version": "1.0",
     "notice": "OnMyLead 1.0 for iPhone, iPad and Android is with Apple and Google for store review. These guides describe that first release."
@@ -62,6 +62,16 @@
       "submitted": "2026-11-16",
       "notes": "The map on CarPlay with turn-by-turn, trails and roads with Layers, CarPlay ride messages and group chats with one-tap replies, Exit in Map Mode and Ride Mode, Leave Ride under the ride's name, quick Create a Ride, Events and Group Rides, Ride Mode with no service (start and leave queue offline), the Permissions page, calmer Bluetooth pop-ups, faster offline map downloads, the one-time Invite Friends pop-up and the new Home tiles. iOS builds 14 and 15 (submitted 2026-11-13) and 17 were pulled from review for CarPlay fixes; Chris truck-tested build 18. Build 22 (main 6526cc1) passed two clean test runs, was installed on Chris's iPhone and submitted with automatic release 2026-11-16 ~05:50Z, replacing 19. Android versionCode 14 went live 2026-11-14; versionCode 16 (same code as iOS 22) submitted to production as a full rollout 2026-11-16. Live on the App Store and Google Play 2026-11-16.",
       "released": "2026-11-16"
+    },
+    {
+      "version": "3.3",
+      "build": "19",
+      "iosBuild": "25",
+      "commit": "2f65a4f",
+      "status": "live",
+      "submitted": "2026-11-18",
+      "notes": "Founder friends and the OnMyLead Founder tag, plus everything planned for 3.2 (End Ride for Everyone in the Ride Mode Exit sheet, the steady rider line in Ride Mode and on CarPlay, location sharing that stops as soon as the ride ends). 3.2 (iOS 23/24, Android versionCode 17/18) never reached riders on the App Store; its App Store draft became 3.3. iOS build 25 submitted with automatic release and Android versionCode 19 sent to Play production as a full rollout 2026-11-18 ~04:20Z. Live on the App Store and Google Play 2026-11-18.",
+      "released": "2026-11-18"
     }
   ],
   "unreleased": [

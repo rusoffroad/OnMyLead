@@ -1,13 +1,12 @@
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Switch, Text, TextInput, View } from 'react-native';
+import { Text, TextInput, View } from 'react-native';
 
 import {
   AdminButton, AdminColors, AdminPage, Columns, ErrorNote, FilterChips, Loading, Panel, TrialSettings, useConfirm, useToast,
 } from '@/components/admin';
 import { font, themedStyles } from '@/constants/theme';
 import { fmtDateTime } from '@/core/admin-format';
-import { APP_FLAG_KEYS, APP_FLAGS, flagOffUntilSet, type AppFlag } from '@/core/app-settings';
 import * as admin from '@/lib/admin';
 
 const FEATURES: Record<string, { label: string; hint: string; allowance?: string; allowanceOnFree?: boolean }> = {
@@ -91,7 +90,8 @@ export default function Settings() {
           <Text style={styles.small}>Riders see these at the top of the home screen the next time the app checks (on opening, and every few minutes). Maintenance stays until you clear it or its date passes; riders can close an announcement, and new wording shows again.</Text>
 
           <Panel title="Feature Flags">
-            <Flags value={(v('flags') as Record<string, boolean>) ?? {}} onSaved={reload} />
+            <Text style={styles.text}>Turning features on and off for everyone, without an app update, has its own page now.</Text>
+            <AdminButton title="Open Features" small onPress={() => router.push('/admin/features')} style={{ alignSelf: 'flex-start' }} />
           </Panel>
         </>
       ) : null}
@@ -194,68 +194,6 @@ function NoticeEditor({ settingKey, value, updatedAt, onSaved, hint }: { setting
   );
 }
 
-function Flags({ value, onSaved }: { value: Record<string, boolean>; onSaved: () => void }) {
-  const [flags, setFlags] = useState(value);
-  const [name, setName] = useState('');
-  const [busy, setBusy] = useState(false);
-  const toast = useToast();
-  const confirm = useConfirm();
-  const keys = Object.keys(flags).filter((k) => !(k in APP_FLAGS)).sort();
-  // Most flags are on until switched off; a flag that needs setup first is off until switched on.
-  const isOn = (k: AppFlag) => (flagOffUntilSet(k) ? flags[k] === true : flags[k] !== false);
-  const changed = JSON.stringify(flags) !== JSON.stringify(value);
-  const newKey = name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
-
-  const save = async () => {
-    const r = await confirm({ title: 'Save Feature Flags?', message: 'Flags switch app features on or off for everyone the next time the app checks.', confirmLabel: 'Save Flags' });
-    if (!r.ok) return;
-    setBusy(true);
-    try {
-      await admin.setSetting('flags', flags);
-      toast('Flags saved.');
-      onSaved();
-    } catch (e) {
-      toast((e as Error).message, 'danger');
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  return (
-    <View style={{ gap: 10 }}>
-      <Text style={styles.small}>Switch an extra off for everyone without an app update. Everything stays on unless you switch it off here, except a feature that needs setting up first, which stays off until you switch it on. Safety features (Ride Mode, Help and SOS, Mechanical Issue, sharing, chat and joining) have no switch.</Text>
-      {APP_FLAG_KEYS.map((k) => (
-        <View key={k} style={styles.flag}>
-          <View style={{ flex: 1, gap: 2 }}>
-            <Text style={styles.label}>{APP_FLAGS[k].label}</Text>
-            <Text style={styles.small}>{APP_FLAGS[k].hint}</Text>
-          </View>
-          <Text style={[styles.small, { color: !isOn(k) ? AdminColors.danger : AdminColors.dim }]}>{isOn(k) ? 'On' : 'Off'}</Text>
-          <Switch value={isOn(k)} onValueChange={(on) => setFlags({ ...flags, [k]: on })} trackColor={{ true: AdminColors.red, false: AdminColors.raised }} thumbColor="#FFFFFF" {...({ activeThumbColor: '#FFFFFF' } as object)} accessibilityLabel={APP_FLAGS[k].label} />
-        </View>
-      ))}
-      {keys.length ? <Text style={[styles.label, { paddingTop: 6 }]}>Other Flags</Text> : null}
-      {keys.length ? <Text style={styles.small}>The app doesn&apos;t read these yet.</Text> : null}
-      {keys.map((k) => (
-        <View key={k} style={styles.flag}>
-          <Text style={[styles.label, { flex: 1 }]}>{k}</Text>
-          <Switch value={flags[k]} onValueChange={(on) => setFlags({ ...flags, [k]: on })} trackColor={{ true: AdminColors.red, false: AdminColors.raised }} thumbColor="#FFFFFF" {...({ activeThumbColor: '#FFFFFF' } as object)} accessibilityLabel={k} />
-          <AdminButton title="Remove" kind="danger" small onPress={() => {
-            const next = { ...flags };
-            delete next[k];
-            setFlags(next);
-          }} />
-        </View>
-      ))}
-      <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap', alignItems: 'center', paddingTop: 6 }}>
-        <TextInput value={name} onChangeText={setName} placeholder="new_flag_name" placeholderTextColor={AdminColors.faint} autoCapitalize="none" style={[styles.input, { width: 220 }]} accessibilityLabel="New flag name" />
-        <AdminButton title="Add Flag" small disabled={!newKey || newKey in flags || newKey in APP_FLAGS} onPress={() => { setFlags({ ...flags, [newKey]: false }); setName(''); }} />
-        <AdminButton title="Save Flags" kind="primary" small disabled={!changed} loading={busy} onPress={save} />
-      </View>
-    </View>
-  );
-}
-
 const styles = themedStyles(() => ({
   text: { fontFamily: font(500), fontSize: 14.5, lineHeight: 21, color: AdminColors.dim },
   small: { fontFamily: font(500), fontSize: 13, lineHeight: 18, color: AdminColors.faint },
@@ -263,5 +201,4 @@ const styles = themedStyles(() => ({
   feature: { flexDirection: 'row', alignItems: 'center', gap: 14, flexWrap: 'wrap', paddingVertical: 12, borderTopWidth: 1, borderTopColor: AdminColors.line },
   num: { width: 80, textAlign: 'center', fontFamily: font(700), fontSize: 16, color: AdminColors.text, backgroundColor: AdminColors.page, borderWidth: 1.5, borderColor: AdminColors.line, borderRadius: 10, paddingVertical: 6 },
   input: { fontFamily: font(500), fontSize: 15, color: AdminColors.text, backgroundColor: AdminColors.page, borderWidth: 1.5, borderColor: AdminColors.line, borderRadius: 10, paddingHorizontal: 12, paddingVertical: 9 },
-  flag: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 6, borderTopWidth: 1, borderTopColor: AdminColors.line },
 }));
