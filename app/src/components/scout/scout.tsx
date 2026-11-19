@@ -39,7 +39,7 @@ import { useDiscoverActivity } from '@/lib/activity';
  * distance away); `start="favorites"` opens on them.
  */
 export function Scout({ top, start = 'near' }: { top: React.ReactNode; start?: 'near' | 'favorites' }) {
-  // Activities (4.1): only the rider's activity while the switcher is on.
+  // Activities (4.0): only the rider's activity while the switcher is on.
   const activity = useDiscoverActivity();
   const layout = useLayout();
   const insets = useSafeAreaInsets();

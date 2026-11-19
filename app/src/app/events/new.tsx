@@ -26,7 +26,7 @@ import { useDiscoverActivity } from '@/lib/activity';
  * group rides are added on the event page once it exists, so this stays one short form.
  */
 export default function EventForm() {
-  // Activities (4.1): a new event is for the activity picked on Home (none while the switcher is off).
+  // Activities (4.0): a new event is for the activity picked on Home (none while the switcher is off).
   const activity = useDiscoverActivity();
   const { id } = useLocalSearchParams<{ id?: string }>();
   const { session, loading } = useSession();

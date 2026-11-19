@@ -124,7 +124,7 @@ export function StatusSheet({
   onEmergency: () => void;
   onClose: () => void;
   /**
-   * The ride's activity (4.1): Offroad (the default) is today's sheet exactly. Another activity
+   * The ride's activity (4.0): Offroad (the default) is today's sheet exactly. Another activity
    * names itself in its colour at the top, leaves out statuses that don't fit, and adds its own
    * quick messages (sent like a typed Ride Mode message, so every app build and Bluetooth carry them).
    */

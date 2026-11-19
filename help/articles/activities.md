@@ -3,7 +3,7 @@ title: Switch Activities
 summary: Use OnMyLead for offroad, motorcycle, road trip or snowmobile rides. Each activity has its own colors, buttons, rides, events and places.
 category: getting-started
 order: 35
-release: "4.1"
+release: "4.0"
 updated: 2026-11-19
 sources:
   - app/src/core/activities.ts

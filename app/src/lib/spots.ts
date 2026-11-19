@@ -23,7 +23,7 @@ const notYet = (message: string) => /riding_spots|schema cache|does not exist|co
 /** Places to ride within `miles` of a point, nearest first. Null when the server doesn't have Scout yet. */
 export async function spotsNear(at: LatLng, miles: number, kinds: SpotKind[] = [], activity?: ActivityId): Promise<Spot[] | null> {
   const args = { p_lat: at.lat, p_lng: at.lng, p_miles: miles, p_kinds: kinds.length ? kinds : null, p_limit: 400 };
-  // Activities (4.1): only the places that serve the rider's activity; left out, every place (as before).
+  // Activities (4.0): only the places that serve the rider's activity; left out, every place (as before).
   const { data, error } = activity
     ? await supabase.rpc('riding_spots_near_for', { ...args, p_activity: activity })
     : await supabase.rpc('riding_spots_near', args);

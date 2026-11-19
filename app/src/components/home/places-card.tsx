@@ -29,7 +29,7 @@ const PANEL = 'rgba(18,27,42,';
  * the scout flag is on.
  */
 export function PlacesCard({ compact, tight, line, activity }: { compact?: boolean; tight?: boolean; line?: string; activity?: ActivityId }) {
-  // Activities (4.1): the go button wears the activity's colour; Offroad keeps the red.
+  // Activities (4.0): the go button wears the activity's colour; Offroad keeps the red.
   const hue = activity ? activityHero(activity) : null;
   const [fresh, setFresh] = useState(false);
   useEffect(() => {

@@ -47,8 +47,7 @@ export const APP_FLAGS = {
   home_feed: { label: 'Home Feed', hint: 'The Feed on the home screen (friends’ rides, badges and trails). Riders’ feed settings are kept.' },
   activities: {
     label: 'Activities',
-    hint: 'The activity switcher on Home (Offroad, Motorcycle, Road Trip, Snowmobile): each activity’s colours, Home words, Ride Mode buttons, and rides, events and places for that activity. Off: everyone sees Offroad, as before. Off until switched on.',
-    offUntilSet: true,
+    hint: 'The activity switcher on Home (Offroad, Motorcycle, Road Trip, Snowmobile): each activity’s colours, Home words, Ride Mode buttons, and rides, events and places for that activity. Off: everyone sees Offroad, as before. On from 4.0 (Chris 2026-11-19).',
   },
   apple_web_sign_in: {
     label: 'Sign in with Apple on the Website and Android',

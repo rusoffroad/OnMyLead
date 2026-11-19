@@ -26,14 +26,14 @@ async function call<T>(fn: string, args: Record<string, unknown>): Promise<T> {
 
 export const photoUrl = (path: string | null | undefined) => eventPhotoUrl(supabaseUrl, path);
 
-/** `activity` (Activities, 4.1) lists only that activity's events; left out, every event (as before). */
+/** `activity` (Activities, 4.0) lists only that activity's events; left out, every event (as before). */
 export async function upcomingEvents(near?: LatLng | null, miles?: number | null, activity?: ActivityId): Promise<EventCard[]> {
   const args = { p_scope: 'upcoming', p_lat: near?.lat ?? null, p_lng: near?.lng ?? null, p_miles: near && miles ? miles : null };
   if (activity) return (await call<EventCard[] | null>('events_list_for', { ...args, p_activity: activity })) ?? [];
   return (await call<EventCard[] | null>('events_list', args)) ?? [];
 }
 
-/** Activities (4.1): labels a new event with the activity it was made in (hosts only). */
+/** Activities (4.0): labels a new event with the activity it was made in (hosts only). */
 export async function setEventActivity(eventId: string, activity: ActivityId) {
   await call('set_event_activity', { p_event: eventId, p_activity: activity });
 }

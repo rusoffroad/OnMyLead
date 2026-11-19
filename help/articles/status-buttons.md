@@ -208,7 +208,7 @@ Organizers, co-organizers and leaders see a white **Regroup Here** button at the
 
 Leaders can also tap **Regroup** on a separation alert. See [Ride Bubble](/help/ride-bubble).
 
-:::release 4.1
+:::release 4.0
 ### Buttons for Your Activity
 
 The **Tell the Group** sheet under **More** follows the ride's activity: a Snowmobile ride adds **Warming Up** and **Belt Broke** and leaves out **Flat Tire**, a Road Trip adds **Food Stop** and **Restroom Stop**, and a Motorcycle ride adds **Rest Stop**. The Ride Mode panel itself is the same in every activity. See [Switch Activities](/help/activities).

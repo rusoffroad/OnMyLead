@@ -1,5 +1,5 @@
 /**
- * Activities (4.1, Chris 2026-11-19): OnMyLead for more than offroad. A rider picks an activity
+ * Activities (4.0, Chris 2026-11-19): OnMyLead for more than offroad. A rider picks an activity
  * with the chip on Home; rides, events and places carry the activity they were made for, and the
  * app wears that activity's colour. Friends, groups and messages are about people and stay shared.
  *

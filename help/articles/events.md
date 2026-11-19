@@ -163,6 +163,6 @@ Signed-in riders can tap **Report This Event** at the bottom of the page. See [R
 
 On iPad and Android tablets (and wide browser windows), Events shows two or three events per row, and an event's page puts the details on the left and the agenda, group rides and who's going on the right.
 
-:::release 4.1
+:::release 4.0
 Events near you show the ones for your activity, and an event you create is for the activity you're in. See [Switch Activities](/help/activities).
 :::

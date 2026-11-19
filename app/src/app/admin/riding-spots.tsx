@@ -205,7 +205,7 @@ function DetailsEditor({ spot, busy, onSave }: { spot: api.AdminSpotRow; busy: b
 }
 
 /**
- * Activities (4.1): which activities' riders see this place in Places to Ride. Everything starts
+ * Activities (4.0): which activities' riders see this place in Places to Ride. Everything starts
  * as Offroad; a forest with sled trails in winter gets Snowmobile too. Saves on each tap.
  */
 function SpotActivities({ spot }: { spot: api.AdminSpotRow }) {

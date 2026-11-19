@@ -135,6 +135,6 @@ The **Home** tab also lists a few upcoming **Public Rides**. Tap **Find Rides on
 :::
 :::
 
-:::release 4.1
+:::release 4.0
 Public rides show the ones for your activity (Offroad, Motorcycle, Road Trip or Snowmobile). Switch activities with the colored button on Home to see the others. See [Switch Activities](/help/activities).
 :::

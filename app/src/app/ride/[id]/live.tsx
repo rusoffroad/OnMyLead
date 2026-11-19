@@ -224,7 +224,7 @@ export default function RideMode() {
   const me = session?.user.id;
 
   const [ride, setRide] = useState<Ride | null>(null);
-  // Activities (4.1): the More sheet follows the ride's activity while the switcher is on.
+  // Activities (4.0): the More sheet follows the ride's activity while the switcher is on.
   const { on: activitiesOn } = useActivity();
   const [members, setMembers] = useState<RideMember[]>([]);
   const [positions, setPositions] = useState<Record<string, Position>>({});

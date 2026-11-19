@@ -318,7 +318,7 @@ In landscape, and on a big window, Home has two columns: join, create, find, eve
 When you're signed in at onmylead.com, the **Rides** page is the same home screen.
 :::
 
-:::release 4.1
+:::release 4.0
 ### Your Activity
 
 The colored button at the top of Home, next to the bell, shows your activity (Offroad, Motorcycle, Road Trip or Snowmobile). Tap it to switch. Home's colors and words change to match, and public rides, events and places show the ones for that activity. See [Switch Activities](/help/activities).

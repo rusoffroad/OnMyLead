@@ -73,7 +73,7 @@ function FindTab() {
 }
 
 function FindRides({ top }: { top: React.ReactNode }) {
-  // Activities (4.1): only the rider's activity while the switcher is on.
+  // Activities (4.0): only the rider's activity while the switcher is on.
   const activity = useDiscoverActivity();
   const layout = useLayout();
   const insets = useSafeAreaInsets();

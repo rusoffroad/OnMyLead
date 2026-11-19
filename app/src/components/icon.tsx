@@ -108,7 +108,7 @@ const PATHS = {
   spotTrailhead: ['M11 21V3.5', 'M11 5h7.5l2 2.25-2 2.25H11', 'M11 12.5H5.5l-2 2.25 2 2.25H11', 'M8 21h6'],
   // Motocross track: a checkered flag.
   spotTrack: ['M4.5 21.5V3.5', 'M4.5 3.5h16v11h-16z'],
-  // Activities (4.1), one picture each for the switcher and the chip.
+  // Activities (4.0), one picture each for the switcher and the chip.
   // Offroad: two peaks with a trail switchback.
   actOffroad: ['M2.5 19.5L9 9l3.6 5.6L15.5 11l6 8.5z', 'M7.4 11.6l1.6 1.3 1.7-1.4'],
   // Motorcycle: from the side, two wheels, tank and bars.

@@ -67,7 +67,7 @@ export type NewRide = {
   freeride?: boolean;
   /** The rider's own invite code (core/share-code.ts). Left out, the database makes one. */
   inviteCode?: string | null;
-  /** Activities (4.1): the activity the ride is for; left out (Offroad) while Activities is off. */
+  /** Activities (4.0): the activity the ride is for; left out (Offroad) while Activities is off. */
   activity?: ActivityId | null;
 };
 
@@ -102,7 +102,7 @@ export async function createRide(r: NewRide): Promise<Ride> {
     ...(r.freeride ? { freeride: true } : {}),
     // Only sent when the rider typed one, so older databases and the made-up default are untouched.
     ...(r.inviteCode ? { invite_code: r.inviteCode } : {}),
-    // Activities (4.1): only sent while the switcher is on, so Offroad rides save exactly as before.
+    // Activities (4.0): only sent while the switcher is on, so Offroad rides save exactly as before.
     ...(r.activity ? { activity: r.activity } : {}),
   };
   let res = await supabase.from('rides').insert(row).select().single();
@@ -225,7 +225,7 @@ export async function myRides(): Promise<(RideMember & { rides: Ride })[]> {
 }
 
 /** Upcoming and live public rides, optionally only those whose meeting area is inside a box. */
-/** `activity` (Activities, 4.1) shows only that activity's rides; left out, every ride shows (as before). */
+/** `activity` (Activities, 4.0) shows only that activity's rides; left out, every ride shows (as before). */
 export async function discoverPublicRides(bounds?: Bounds, limit = 100, activity?: ActivityId): Promise<Ride[]> {
   let q = supabase
     .from('rides')

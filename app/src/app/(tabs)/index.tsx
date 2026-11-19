@@ -95,7 +95,7 @@ export default function HomeScreen() {
   const navOn = flagOn(settings, 'nav_mode');
   const feedOn = flagOn(settings, 'home_feed');
   const placesOn = flagOn(settings, 'scout');
-  // Activities (4.1): the rider's activity while the flag is on, else Offroad (today's app).
+  // Activities (4.0): the rider's activity while the flag is on, else Offroad (today's app).
   const { activity, on: activitiesOn } = useActivity();
   const act = activityById(activitiesOn ? activity : 'offroad');
   /** What discovery filters by: nothing while Activities is off, so every ride shows as before. */

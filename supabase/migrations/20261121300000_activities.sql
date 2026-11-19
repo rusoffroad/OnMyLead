@@ -1,4 +1,4 @@
--- Activities (4.1, Chris 2026-11-19): OnMyLead for more than offroad. Rides, events and places
+-- Activities (4.0, Chris 2026-11-19): OnMyLead for more than offroad. Rides, events and places
 -- carry the activity they're for (app/src/core/activities.ts lists them: offroad, motorcycle,
 -- road_trip, snowmobile). Everything that existed before is Offroad.
 --

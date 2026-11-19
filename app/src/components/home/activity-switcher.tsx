@@ -21,7 +21,7 @@ function fillFor(id: ActivityId) {
 }
 
 /**
- * The activity chip in Home's header (4.1, Chris 2026-11-19): filled in the activity's colour and
+ * The activity chip in Home's header (4.0, Chris 2026-11-19): filled in the activity's colour and
  * naming it, so a rider always knows which activity they're in. Tap to switch.
  */
 export function ActivityChip({ activity, name, onPress }: { activity: ActivityId; name: string; onPress: () => void }) {

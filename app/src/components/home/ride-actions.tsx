@@ -22,7 +22,7 @@ export function JoinHero({
   code, onCode, onOpen, compact, tight, activity,
 }: { code: string; onCode: (c: string) => void; onOpen: () => void; compact?: boolean; tight?: boolean; activity?: ActivityId }) {
   const ready = code.trim().length >= 4;
-  // Activities (4.1): the card wears the activity's colour; Offroad (and the flag off) keeps the red.
+  // Activities (4.0): the card wears the activity's colour; Offroad (and the flag off) keeps the red.
   const hue = activity ? activityHero(activity) : null;
   return (
     <View style={[styles.hero, compact && styles.heroCompact, hue && { borderColor: hue.edge }]}>

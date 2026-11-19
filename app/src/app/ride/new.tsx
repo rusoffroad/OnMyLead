@@ -50,7 +50,7 @@ type Kind = 'public' | 'private';
 type RoutePlan = 'mapped' | 'freeride';
 
 export default function NewRide() {
-  // Activities (4.1): the ride is for the activity picked on Home (Offroad while the switcher is off).
+  // Activities (4.0): the ride is for the activity picked on Home (Offroad while the switcher is off).
   const activity = useDiscoverActivity();
   const { type, copy, trail, group, event, spot, lat, lng, state } = useLocalSearchParams<{ type?: string; copy?: string; trail?: string; group?: string; event?: string; spot?: string; lat?: string; lng?: string; state?: string }>();
   const [fromSpot] = useState(() => (copy ? null : spotFromParams({ spot, lat, lng, state })));
