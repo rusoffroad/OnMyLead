@@ -4,7 +4,7 @@ summary: Find rallies, poker runs and ride weekends, see the agenda and join the
 category: joining
 order: 60
 release: "2.0"
-updated: 2026-11-14
+updated: 2026-11-19
 sources:
   - app/src/app/(tabs)/events-tab.tsx
   - app/src/components/meet-point-mapbox-map.tsx
@@ -62,7 +62,7 @@ The **+** (or **Create**) button at the top right creates an event while you're 
 :::
 
 :::release 3.0
-From 3.0, tap **Events** in the tab bar, or the **Events** tile on Home next to **Start a Ride**.
+From 3.0, tap **Events** in the tab bar, or the **Events** tile on Home next to **Start a Ride** (**Create a Ride** from 3.4).
 :::
 
 :::release 3.0

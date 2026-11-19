@@ -1,12 +1,40 @@
 [
   {
     "version": "3.4",
-    "title": "A Shorter Founder Tag",
-    "intro": "OnMyLead 3.4 shortens the tag beside the founder's name to App Founder, so the founder's whole name fits in Friends, Social and everywhere else the tag shows.",
-    "whatsNew": "What's new in 3.4:\n\n• The tag beside the founder's name now reads App Founder, so the whole name fits in Friends, Social and the Feed.",
+    "title": "Places to Ride",
+    "intro": "OnMyLead 3.4 adds Places to Ride to Home: find off-road parks, national forests and trails near you, see each place's address, phone, hours and rider reviews, open it in Map Mode and save your favorites. Every Home card now fits on one screen.",
+    "whatsNew": "What's new in 3.4:\n\n• Places to Ride: a new Home card to find off-road parks, national forests, OHV areas and trails near you.\n• Each place has a page with its address, phone, hours, fees, trails and rider reviews with photos.\n• Open any place in Map Mode, and save your Favorite Places.\n• Home fits on one screen, and Start a Ride is now Create a Ride.\n• The founder tag now reads App Founder.",
     "apple": null,
     "google": null,
     "notes": [
+      {
+        "kind": "new",
+        "text": "Places to Ride, a new card on Home: off-road parks, national forests, OHV areas, trail systems, trailheads and motocross tracks near you, on a map and in a list."
+      },
+      {
+        "kind": "new",
+        "text": "Every place has its own page: address, phone, hours, fees and season when we have them, its trails by level, directions, Call, Website, Share and Create a Ride Here."
+      },
+      {
+        "kind": "new",
+        "text": "Rider Reviews: give a place 1 to 5 stars, say how it was and add up to 4 photos. Reviews on Google opens the place on Google Maps."
+      },
+      {
+        "kind": "new",
+        "text": "Open in Map Mode opens Map Mode right on a place, so you can look over its trails and terrain before you go."
+      },
+      {
+        "kind": "new",
+        "text": "Favorite Places: tap Save on a place, then Favorites in Places to Ride to see them all."
+      },
+      {
+        "kind": "improved",
+        "text": "Every Home card now fits on one phone screen without scrolling, and Start a Ride is now Create a Ride, the same size as Events."
+      },
+      {
+        "kind": "improved",
+        "text": "New map pins for places to ride, coloured by kind with a picture of what you ride there."
+      },
       {
         "kind": "improved",
         "text": "The tag beside the founder's name now reads App Founder instead of OnMyLead Founder, so the founder's name no longer gets cut off in Friends, Social and other lists."

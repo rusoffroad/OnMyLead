@@ -121,3 +121,9 @@ export const SHOWCASE_QUICK_CREATE: boolean = true;
  * near you and your own, under one switch). Off until the app version with it (3.1) is live in the stores.
  */
 export const SHOWCASE_EVENTS_AND_RIDES: boolean = true;
+/**
+ * The showcase's Places to Ride card in its 3.4 words (its own Home card, a profile for each park
+ * with address, phone, hours and rider reviews, Favorite Places, Open in Map Mode). Off until the
+ * app version with it (3.4) is live in the stores.
+ */
+export const SHOWCASE_PLACES_TO_RIDE: boolean = false;
