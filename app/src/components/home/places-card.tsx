@@ -27,7 +27,7 @@ const PANEL = 'rgba(18,27,42,';
  * on the left, and the red go button. Opens /places (Scout on a page of its own). Shows only while
  * the scout flag is on.
  */
-export function PlacesCard({ compact }: { compact?: boolean }) {
+export function PlacesCard({ compact, tight }: { compact?: boolean; tight?: boolean }) {
   const [fresh, setFresh] = useState(false);
   useEffect(() => {
     AsyncStorage.getItem(SEEN_KEY).then((v) => setFresh(!v)).catch(() => {});
@@ -40,13 +40,13 @@ export function PlacesCard({ compact }: { compact?: boolean }) {
     track('home_places_opened');
     router.push('/places');
   };
-  const sub = t('Off-road parks, national forests and trails near you.');
+  const sub = t('Parks, forests and trails near you.');
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={`${t('Places to Ride')}. ${sub}`}
       onPress={open}
-      style={({ pressed }) => [styles.card, compact && styles.cardCompact, { transform: [{ scale: pressed ? 0.99 : 1 }] }]}>
+      style={({ pressed }) => [styles.card, compact && styles.cardCompact, tight && styles.cardTight, { transform: [{ scale: pressed ? 0.99 : 1 }] }]}>
       {PICTURE ? (
         <Image source={{ uri: PICTURE }} style={styles.picture} contentFit="cover" cachePolicy="disk" accessible={false} />
       ) : null}
@@ -62,8 +62,8 @@ export function PlacesCard({ compact }: { compact?: boolean }) {
           <Text style={styles.kickerText} numberOfLines={1}>{t('Find somewhere new')}</Text>
           {fresh ? <Text style={styles.newTag}>{t('New')}</Text> : null}
         </View>
-        <Text style={styles.title} accessibilityRole="header" numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8}>{t('Places to Ride')}</Text>
-        <Text style={styles.sub} numberOfLines={2}>{sub}</Text>
+        <Text style={[styles.title, tight && styles.titleTight]} accessibilityRole="header" numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8}>{t('Places to Ride')}</Text>
+        <Text style={styles.sub} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.85}>{sub}</Text>
       </View>
       <View style={styles.go}>
         <Icon name="chevron" size={20} color="#fff" strokeWidth={2.6} />
@@ -78,10 +78,12 @@ const styles = themedStyles(() => ({
     borderWidth: 1.5, borderColor: 'rgba(120,140,175,0.45)', boxShadow: '0px 18px 36px -14px rgba(0, 0, 0, 0.7)',
   },
   cardCompact: { minHeight: 114, paddingVertical: 12, paddingHorizontal: 14 },
+  cardTight: { minHeight: 100, paddingVertical: 10 },
+  titleTight: { fontSize: 30, lineHeight: 33 },
   picture: { position: 'absolute', top: 0, bottom: 0, right: 0, left: '38%' },
   pins: { position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 },
   pin: { position: 'absolute' },
-  words: { maxWidth: '68%', paddingRight: 4 },
+  words: { maxWidth: '72%', paddingRight: 4 },
   kicker: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   kickerText: { color: '#F27A74', fontFamily: font(600), fontSize: 13.5, flexShrink: 1 },
   newTag: {

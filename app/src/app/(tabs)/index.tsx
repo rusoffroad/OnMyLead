@@ -331,7 +331,7 @@ export default function HomeScreen() {
 
   const hero = (
     <HomeHero url={heroUrl} height={head.hero}>
-      <View style={[styles.heroInner, { maxWidth: layout.expanded ? 1200 : READABLE_WIDTH, paddingBottom: head.overlap + (head.greeting ? 18 : 10) }]}>
+      <View style={[styles.heroInner, { maxWidth: layout.expanded ? 1200 : READABLE_WIDTH, paddingBottom: head.overlap + (compact ? 4 : 18) }]}>
         {header}
         <View style={{ flex: 1 }} />
         {/* Badges at the very top, just above the greeting (Chris 2026-11-10). */}
@@ -374,15 +374,16 @@ export default function HomeScreen() {
   // its own card underneath). These always lead; the sections under them are the rider's to show,
   // hide and order (Customize Home). On a phone they sit a little tighter so they fit on one screen.
   const actions = (
-    <View style={{ gap: compact ? 10 : 12, marginTop: -head.overlap }}>
-      {navOn ? <MapModeBanner image={heroUrl} trailsNear={trailsNear} compact={compact} /> : null}
-      <JoinHero code={code} onCode={setCode} onOpen={openCode} compact={compact} />
+    <View style={{ gap: head.tight ? 8 : compact ? 10 : 12, marginTop: -head.overlap }}>
+      {navOn ? <MapModeBanner image={heroUrl} trailsNear={trailsNear} compact={compact} tight={head.tight} /> : null}
+      <JoinHero code={code} onCode={setCode} onOpen={openCode} compact={compact} tight={head.tight} />
       <ActionTiles
         compact={compact}
+        tight={head.tight}
         quota={session ? createQuota(ent) : null}
         onStart={() => (session ? requirePro('create_ride') && router.push('/ride/new') : router.push('/sign-in'))}
       />
-      {placesOn ? <PlacesCard compact={compact} /> : null}
+      {placesOn ? <PlacesCard compact={compact} tight={head.tight} /> : null}
       {nudgeAndLive}
       {!loading && !session ? (
         <Button title={t('Sign In or Create a Free Account')} kind="ghost" onPress={() => router.push('/sign-in?mode=create')} />
