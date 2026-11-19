@@ -3,7 +3,7 @@
     "version": "4.0",
     "title": "Places to Ride",
     "intro": "OnMyLead 4.0 adds Places to Ride to Home: find off-road parks, national forests and trails near you, see each place's address, phone, hours and rider reviews, open it in Map Mode and save your favorites. Every Home card now fits on one screen.",
-    "whatsNew": "What's new in 4.0:\n\n• Places to Ride: a new Home card to find off-road parks, national forests, OHV areas and trails near you.\n• Each place has a page with its address, phone, hours, fees, trails and rider reviews with photos.\n• Open any place in Map Mode, and save your Favorite Places.\n• Route builder: enter your average speed to see an estimated time.\n• Home fits on one screen, and Start a Ride is now Create a Ride.\n• The founder tag now reads App Founder.",
+    "whatsNew": "What's new in 4.0:\n\n• Places to Ride: a new Home card to find off-road parks, national forests, OHV areas and trails near you.\n• Each place has its address, phone, hours, trails and rider reviews.\n• Open any place in Map Mode, and save your Favorite Places.\n• Radio Sharing over your own Meshtastic radio, with no service.\n• Route builder: enter your average speed to see an estimated time.\n• Home fits on one screen, and Start a Ride is now Create a Ride.\n• The founder tag now reads App Founder.",
     "apple": null,
     "google": null,
     "notes": [
@@ -30,6 +30,10 @@
       {
         "kind": "new",
         "text": "Estimated Time in the route builder: type the average speed you expect to ride and see about how long the route takes. It's moving time only, so plan extra for stops and terrain."
+      },
+      {
+        "kind": "new",
+        "text": "Radio Sharing: pair your own Meshtastic radio under You, and in Ride Mode your spot, status taps, EMERGENCY and ride chat also go over it, so riders on your ride who have a radio too stay in touch miles apart with no service. Encrypted for your ride only."
       },
       {
         "kind": "improved",
