@@ -14,17 +14,20 @@ import { addDays, rideDayRange, startOfDay } from '@/core/calendar';
 import { eventPayload, minutesOf, type EventVisibility } from '@/core/events';
 import type { Place } from '@/core/places';
 import { minutesText, parseTime } from '@/core/time';
-import { getEvent, saveEvent } from '@/lib/events';
+import { getEvent, saveEvent, setEventActivity } from '@/lib/events';
 import { stateAt } from '@/lib/location';
 import { handleProError } from '@/lib/pro';
 import { useSession } from '@/lib/session';
 import { t } from '@/lib/i18n';
+import { useDiscoverActivity } from '@/lib/activity';
 
 /**
  * Create an Event (Pro) or Edit Event (any host, with ?id=). Photos, the agenda, co-hosts and the
  * group rides are added on the event page once it exists, so this stays one short form.
  */
 export default function EventForm() {
+  // Activities (4.1): a new event is for the activity picked on Home (none while the switcher is off).
+  const activity = useDiscoverActivity();
   const { id } = useLocalSearchParams<{ id?: string }>();
   const { session, loading } = useSession();
   const today = startOfDay(new Date());
@@ -98,6 +101,8 @@ export default function EventForm() {
     setBusy(true);
     try {
       const saved = await saveEvent(id ?? null, r.payload);
+      // Labelling is a second step so the event itself saves the same way on every server; if it fails, the event stays Offroad.
+      if (!id && activity && activity !== 'offroad') await setEventActivity(saved.id, activity).catch(() => {});
       if (id) router.back();
       else router.replace(`/e/${saved.share_code}?new=1`);
     } catch (e) {

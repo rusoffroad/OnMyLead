@@ -127,3 +127,10 @@ export const SHOWCASE_EVENTS_AND_RIDES: boolean = true;
  * app version with it (4.0) is live in the stores.
  */
 export const SHOWCASE_PLACES_TO_RIDE: boolean = false;
+
+/**
+ * Activities (Offroad, Motorcycle, Road Trip, Snowmobile, each with its own colours, Ride Mode
+ * buttons, rides, events and places). Off until the app version with it (4.1) is live in the
+ * stores and the activities flag is switched on.
+ */
+export const SHOWCASE_ACTIVITIES: boolean = false;

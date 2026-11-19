@@ -6,6 +6,7 @@ order: 15
 release: "2.1"
 updated: 2026-11-19
 sources:
+  - app/src/core/activities.ts
   - app/src/components/scout/scout.tsx
   - app/src/components/scout/mile-slider.tsx
   - app/src/app/spot/[id].tsx
@@ -130,3 +131,7 @@ You need to be signed in to suggest a place. We check every suggestion before it
 ## On a Tablet or the Website
 
 On an iPad, an Android tablet or a wide browser window, the slider, the filters and the list sit on the left and the map fills the rest of the screen. Tap **Full Map** to make the map fill the whole screen. On the website, Scout is at onmylead.com under **Find** once you sign in.
+
+:::release 4.1
+Places to Ride shows the places for your activity. A place can be listed for more than one, like a forest with OHV trails in summer and snowmobile trails in winter. See [Switch Activities](/help/activities).
+:::

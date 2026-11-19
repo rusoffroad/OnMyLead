@@ -26,6 +26,7 @@ import { currentPosition, stateAt } from '@/lib/location';
 import type { Ride } from '@/lib/types';
 
 import { t } from '@/lib/i18n';
+import { useDiscoverActivity } from '@/lib/activity';
 type Mode = 'near' | 'state';
 type Found = Ride & { distanceMi?: number };
 
@@ -72,6 +73,8 @@ function FindTab() {
 }
 
 function FindRides({ top }: { top: React.ReactNode }) {
+  // Activities (4.1): only the rider's activity while the switcher is on.
+  const activity = useDiscoverActivity();
   const layout = useLayout();
   const insets = useSafeAreaInsets();
   // Full Map: the map fills the screen (on a tablet, the list beside it tucks away). Starts off
@@ -117,11 +120,11 @@ function FindRides({ top }: { top: React.ReactNode }) {
     let live = true;
     const run = async () => {
       const search: (() => Promise<Found[]>) | null = area
-        ? () => publicRidesInArea(area, here)
+        ? () => publicRidesInArea(area, here, activity)
         : mode === 'near' && origin
-          ? () => publicRidesNear(origin, radius)
+          ? () => publicRidesNear(origin, radius, activity)
           : stateCode
-            ? () => publicRidesInState(stateCode)
+            ? () => publicRidesInState(stateCode, activity)
             : null;
       if (!search) return setRides(null);
       setLoading(true);
@@ -145,7 +148,7 @@ function FindRides({ top }: { top: React.ReactNode }) {
     return () => {
       live = false;
     };
-  }, [mode, origin, radius, stateCode, area]);
+  }, [mode, origin, radius, stateCode, area, activity]);
 
   const state = stateByCode(stateCode);
   // The map opens on the rider's state (or around a searched place); outside the US it falls back to the search radius.

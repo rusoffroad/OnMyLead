@@ -7,6 +7,7 @@ import { Pressable, Text, View } from 'react-native';
 import { Icon } from '@/components/icon';
 import { SpotPinArt } from '@/components/spot-pin';
 import { font, themedStyles } from '@/constants/theme';
+import { activityHero, type ActivityId } from '@/core/activities';
 import { staticMapUrl } from '@/core/home';
 import { track } from '@/lib/analytics';
 import { t } from '@/lib/i18n';
@@ -27,7 +28,9 @@ const PANEL = 'rgba(18,27,42,';
  * on the left, and the red go button. Opens /places (Scout on a page of its own). Shows only while
  * the scout flag is on.
  */
-export function PlacesCard({ compact, tight }: { compact?: boolean; tight?: boolean }) {
+export function PlacesCard({ compact, tight, line, activity }: { compact?: boolean; tight?: boolean; line?: string; activity?: ActivityId }) {
+  // Activities (4.1): the go button wears the activity's colour; Offroad keeps the red.
+  const hue = activity ? activityHero(activity) : null;
   const [fresh, setFresh] = useState(false);
   useEffect(() => {
     AsyncStorage.getItem(SEEN_KEY).then((v) => setFresh(!v)).catch(() => {});
@@ -40,7 +43,7 @@ export function PlacesCard({ compact, tight }: { compact?: boolean; tight?: bool
     track('home_places_opened');
     router.push('/places');
   };
-  const sub = t('Parks, forests and trails near you.');
+  const sub = line ?? t('Parks, forests and trails near you.');
   return (
     <Pressable
       accessibilityRole="button"
@@ -65,7 +68,7 @@ export function PlacesCard({ compact, tight }: { compact?: boolean; tight?: bool
         <Text style={[styles.title, tight && styles.titleTight]} accessibilityRole="header" numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8}>{t('Places to Ride')}</Text>
         <Text style={styles.sub} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.85}>{sub}</Text>
       </View>
-      <View style={styles.go}>
+      <View style={[styles.go, hue && { backgroundColor: hue.top, boxShadow: `0px 0px 0px 3px ${hue.edge}` }]}>
         <Icon name="chevron" size={20} color="#fff" strokeWidth={2.6} />
       </View>
     </Pressable>

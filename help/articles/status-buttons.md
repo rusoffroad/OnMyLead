@@ -4,8 +4,9 @@ summary: Tell the whole group what's happening with one tap, see who got it, and
 category: ride-mode
 order: 20
 release: "1.0"
-updated: 2026-11-16
+updated: 2026-11-19
 sources:
+  - app/src/core/activities.ts
   - app/src/components/ride-controls.tsx
   - app/src/app/ride/[id]/live.tsx
   - app/src/components/broadcast-card.tsx
@@ -206,3 +207,9 @@ Organizers, co-organizers and leaders see a white **Regroup Here** button at the
 - Setting a new regroup point replaces the old one.
 
 Leaders can also tap **Regroup** on a separation alert. See [Ride Bubble](/help/ride-bubble).
+
+:::release 4.1
+### Buttons for Your Activity
+
+The **Tell the Group** sheet under **More** follows the ride's activity: a Snowmobile ride adds **Warming Up** and **Belt Broke** and leaves out **Flat Tire**, a Road Trip adds **Food Stop** and **Restroom Stop**, and a Motorcycle ride adds **Rest Stop**. The Ride Mode panel itself is the same in every activity. See [Switch Activities](/help/activities).
+:::

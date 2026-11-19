@@ -7,6 +7,7 @@ import {
   EVENT_PHOTO_BUCKET, EVENT_PHOTO_QUALITY, eventPhotoPath, eventPhotoUrl, fitWithin, friendlyEventError,
   type EventCard, type EventDetail, type Rsvp,
 } from '@/core/events';
+import type { ActivityId } from '@/core/activities';
 import type { LatLng } from '@/core/geo';
 import { track } from './analytics';
 import { readPhotoBytes } from './photo-bytes';
@@ -25,10 +26,16 @@ async function call<T>(fn: string, args: Record<string, unknown>): Promise<T> {
 
 export const photoUrl = (path: string | null | undefined) => eventPhotoUrl(supabaseUrl, path);
 
-export async function upcomingEvents(near?: LatLng | null, miles?: number | null): Promise<EventCard[]> {
-  return (await call<EventCard[] | null>('events_list', {
-    p_scope: 'upcoming', p_lat: near?.lat ?? null, p_lng: near?.lng ?? null, p_miles: near && miles ? miles : null,
-  })) ?? [];
+/** `activity` (Activities, 4.1) lists only that activity's events; left out, every event (as before). */
+export async function upcomingEvents(near?: LatLng | null, miles?: number | null, activity?: ActivityId): Promise<EventCard[]> {
+  const args = { p_scope: 'upcoming', p_lat: near?.lat ?? null, p_lng: near?.lng ?? null, p_miles: near && miles ? miles : null };
+  if (activity) return (await call<EventCard[] | null>('events_list_for', { ...args, p_activity: activity })) ?? [];
+  return (await call<EventCard[] | null>('events_list', args)) ?? [];
+}
+
+/** Activities (4.1): labels a new event with the activity it was made in (hosts only). */
+export async function setEventActivity(eventId: string, activity: ActivityId) {
+  await call('set_event_activity', { p_event: eventId, p_activity: activity });
 }
 
 /** Events I host, co-host, or said Going or Interested to (including the last 30 days). */

@@ -1,5 +1,31 @@
 [
   {
+    "version": "4.1",
+    "title": "Activities",
+    "intro": "OnMyLead 4.1 is for more than offroad. Switch between Offroad, Motorcycle, Road Trip and Snowmobile from the button on Home. Each activity has its own colors, its own Ride Mode buttons, and its own rides, events and places.",
+    "whatsNew": "What's new in 4.1:\n\n• Activities: Offroad, Motorcycle, Road Trip and Snowmobile. Switch from the button at the top of Home.\n• Each activity has its own colors, so you always know which one you're in.\n• Ride Mode's Tell the Group sheet adds buttons for your activity, like Belt Broke for sleds and Food Stop on a road trip.\n• Public rides, events and places show the ones for your activity. Friends and groups stay with you.",
+    "apple": null,
+    "google": null,
+    "notes": [
+      {
+        "kind": "new",
+        "text": "Activities: Offroad, Motorcycle, Road Trip and Snowmobile. Tap the colored button at the top of Home to switch."
+      },
+      {
+        "kind": "new",
+        "text": "Each activity has its own color on Home and on every card's edge. Offroad keeps OnMyLead red; EMERGENCY and Need Help stay red everywhere."
+      },
+      {
+        "kind": "new",
+        "text": "Tell the Group in Ride Mode follows the ride's activity: Warming Up and Belt Broke for snowmobiles, Food Stop and Restroom Stop on a road trip, Rest Stop on a motorcycle. The Ride Mode panel is the same as before."
+      },
+      {
+        "kind": "new",
+        "text": "Public rides, events and Places to Ride show the ones for your activity, and new rides and events are made for it. Your friends, groups and messages stay the same."
+      }
+    ]
+  },
+  {
     "version": "4.0",
     "title": "Places to Ride",
     "intro": "OnMyLead 4.0 adds Places to Ride to Home: find off-road parks, national forests and trails near you, see each place's address, phone, hours and rider reviews, open it in Map Mode and save your favorites. Every Home card now fits on one screen.",

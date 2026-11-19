@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import type { ActivityId } from '@/core/activities';
 import type { LatLng } from '@/core/geo';
 import * as Crypto from 'expo-crypto';
 import * as ImageManipulator from 'expo-image-manipulator';
@@ -20,14 +21,12 @@ import { supabase } from './supabase';
 const notYet = (message: string) => /riding_spots|schema cache|does not exist|could not find the function/i.test(message);
 
 /** Places to ride within `miles` of a point, nearest first. Null when the server doesn't have Scout yet. */
-export async function spotsNear(at: LatLng, miles: number, kinds: SpotKind[] = []): Promise<Spot[] | null> {
-  const { data, error } = await supabase.rpc('riding_spots_near', {
-    p_lat: at.lat,
-    p_lng: at.lng,
-    p_miles: miles,
-    p_kinds: kinds.length ? kinds : null,
-    p_limit: 400,
-  });
+export async function spotsNear(at: LatLng, miles: number, kinds: SpotKind[] = [], activity?: ActivityId): Promise<Spot[] | null> {
+  const args = { p_lat: at.lat, p_lng: at.lng, p_miles: miles, p_kinds: kinds.length ? kinds : null, p_limit: 400 };
+  // Activities (4.1): only the places that serve the rider's activity; left out, every place (as before).
+  const { data, error } = activity
+    ? await supabase.rpc('riding_spots_near_for', { ...args, p_activity: activity })
+    : await supabase.rpc('riding_spots_near', args);
   if (error) {
     if (notYet(error.message)) return null;
     throw error;

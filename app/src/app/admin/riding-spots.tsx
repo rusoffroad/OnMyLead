@@ -7,6 +7,7 @@ import {
   AdminButton, AdminColors, AdminPage, Empty, ErrorNote, FilterChips, Loading, Pager, Panel, SearchBox, StatusBadge, useConfirm, useToast,
 } from '@/components/admin';
 import { font, themedStyles } from '@/constants/theme';
+import { ACTIVITIES, cleanPlaceActivities, type ActivityId } from '@/core/activities';
 import { fmtAgo } from '@/core/admin-format';
 import { phoneDigits, SPOT_KINDS, spotKindInfo, type SpotKind } from '@/core/spots';
 import { useAdminData } from '@/lib/admin';
@@ -132,6 +133,7 @@ function RidingSpots() {
             {s.website ? <AdminButton title="Website" small onPress={() => Linking.openURL(s.website!)} /> : null}
             {s.status === 'live' ? <AdminButton title="Open in App" small onPress={() => router.push(`/spot/${s.id}`)} /> : null}
           </View>
+          {editing === s.id ? <SpotActivities spot={s} /> : null}
           {editing === s.id ? (
             <DetailsEditor
               spot={s}
@@ -197,6 +199,41 @@ function DetailsEditor({ spot, busy, onSave }: { spot: api.AdminSpotRow; busy: b
           disabled={!changed.length || phoneBad || siteBad}
           onPress={() => onSave(Object.fromEntries(changed.map((f) => [f.key, draft[f.key].trim()])) as api.SpotFields)}
         />
+      </View>
+    </View>
+  );
+}
+
+/**
+ * Activities (4.1): which activities' riders see this place in Places to Ride. Everything starts
+ * as Offroad; a forest with sled trails in winter gets Snowmobile too. Saves on each tap.
+ */
+function SpotActivities({ spot }: { spot: api.AdminSpotRow }) {
+  const { data, error, reload } = useAdminData(() => api.spotActivities([spot.id]), [spot.id]);
+  const toast = useToast();
+  const [busy, setBusy] = useState(false);
+  const current = cleanPlaceActivities(data?.[spot.id] ?? ['offroad']);
+  const toggle = async (id: ActivityId) => {
+    const next = current.includes(id) ? current.filter((x) => x !== id) : [...current, id];
+    if (!next.length) return toast('A place needs at least one activity.', 'danger');
+    setBusy(true);
+    try {
+      await api.setSpotActivities(spot.id, next);
+      reload();
+    } catch (e) {
+      toast((e as Error).message, 'danger');
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <View style={styles.editor}>
+      <Text style={styles.label}>Activities (riders in these see the place)</Text>
+      {error ? <ErrorNote error={error} onRetry={reload} /> : null}
+      <View style={styles.actions}>
+        {ACTIVITIES.map((a) => (
+          <AdminButton key={a.id} title={a.name} small kind={current.includes(a.id) ? 'primary' : 'quiet'} disabled={busy || !data} onPress={() => toggle(a.id)} />
+        ))}
       </View>
     </View>
   );

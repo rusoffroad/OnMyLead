@@ -5,7 +5,8 @@ import Svg, { Circle, Defs, G, LinearGradient, Path, Rect, Stop } from 'react-na
 
 import { Icon, type IconName } from '@/components/icon';
 import { TextBox } from '@/components/keyboard';
-import { Colors, font, Spacing, themedStyles, TileSurface } from '@/constants/theme';
+import { Colors, currentScheme, font, Spacing, themedStyles, TileSurface } from '@/constants/theme';
+import { activityHero, activityInk, type ActivityId } from '@/core/activities';
 import { withAlpha } from '@/core/color';
 import { leadLinePoints, smoothPath, startRideDetail, weekCells, type Quota } from '@/core/home';
 import { showNotice } from '@/lib/confirm';
@@ -17,11 +18,15 @@ import { t } from '@/lib/i18n';
  * right in it and a QR button (Chris 2026-11-10: "Join a Ride should be the red"). No plan pill:
  * joining is always free.
  */
-export function JoinHero({ code, onCode, onOpen, compact, tight }: { code: string; onCode: (c: string) => void; onOpen: () => void; compact?: boolean; tight?: boolean }) {
+export function JoinHero({
+  code, onCode, onOpen, compact, tight, activity,
+}: { code: string; onCode: (c: string) => void; onOpen: () => void; compact?: boolean; tight?: boolean; activity?: ActivityId }) {
   const ready = code.trim().length >= 4;
+  // Activities (4.1): the card wears the activity's colour; Offroad (and the flag off) keeps the red.
+  const hue = activity ? activityHero(activity) : null;
   return (
-    <View style={[styles.hero, compact && styles.heroCompact]}>
-      <Gradient colors={['#EC2E36', '#D7222A']} radius={22} />
+    <View style={[styles.hero, compact && styles.heroCompact, hue && { borderColor: hue.edge }]}>
+      <Gradient colors={hue ? [hue.top, hue.bottom] : ['#EC2E36', '#D7222A']} radius={22} />
       <View style={styles.heroTop}>
         <View style={{ flex: 1, minWidth: 0 }}>
           <Text style={[styles.heroTitle, tight && styles.heroTitleTight]} accessibilityRole="header" numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75}>
@@ -50,7 +55,7 @@ export function JoinHero({ code, onCode, onOpen, compact, tight }: { code: strin
           placeholderTextColor="rgba(255,255,255,0.6)"
           selectionColor="#fff"
           accessibilityLabel={t('Got a code from the leader? Type it here.')}
-          style={[styles.codeInput, compact && styles.codeCompact, tight && styles.codeTight]}
+          style={[styles.codeInput, compact && styles.codeCompact, tight && styles.codeTight, hue && { backgroundColor: hue.well }]}
         />
         <Pressable
           accessibilityRole="button"
@@ -59,7 +64,7 @@ export function JoinHero({ code, onCode, onOpen, compact, tight }: { code: strin
           disabled={!ready}
           onPress={onOpen}
           style={({ pressed }) => [styles.codeGo, compact && styles.codeCompact, tight && styles.codeTight, { opacity: ready ? (pressed ? 0.85 : 1) : 0.6 }]}>
-          <Text style={styles.codeGoText}>{t('Join')}</Text>
+          <Text style={[styles.codeGoText, hue && { color: hue.joinText }]}>{t('Join')}</Text>
         </Pressable>
       </View>
     </View>
@@ -73,12 +78,15 @@ export function JoinHero({ code, onCode, onOpen, compact, tight }: { code: strin
  * "Start a Ride" became "Create a Ride", and both titles get two lines at the same size (the
  * one-line title used to shrink to fit, so it looked smaller than Events).
  */
-export function ActionTiles({ quota, onStart, compact, tight }: { quota: Quota | null; onStart: () => void; compact?: boolean; tight?: boolean }) {
-  const detail = startRideDetail(quota);
+export function ActionTiles({
+  quota, onStart, compact, tight, createLine, eventsLine, activity,
+}: { quota: Quota | null; onStart: () => void; compact?: boolean; tight?: boolean; createLine?: string; eventsLine?: string; activity?: ActivityId }) {
+  // An activity's own line (Road Trip: "Lead the convoy") shows when the plan has no count to show.
+  const detail = createLine && (!quota || quota.tone === 'pro') ? createLine : startRideDetail(quota);
   return (
     <View style={[styles.pair, compact && { gap: tight ? 8 : 10 }]}>
-      <Tile icon="flag" tone="red" title={t('Create a Ride')} detail={detail} compact={compact} tight={tight} onPress={quota?.tone === 'out' ? () => router.push('/pro') : onStart} />
-      <Tile icon="calendar" tone="gold" title={t('Events and Group Rides')} detail={t('Rallies and rides')} compact={compact} tight={tight} onPress={() => router.push('/events')} />
+      <Tile icon="flag" tone="red" activity={activity} title={t('Create a Ride')} detail={detail} compact={compact} tight={tight} onPress={quota?.tone === 'out' ? () => router.push('/pro') : onStart} />
+      <Tile icon="calendar" tone="gold" title={t('Events and Group Rides')} detail={eventsLine ?? t('Rallies and rides')} compact={compact} tight={tight} onPress={() => router.push('/events')} />
     </View>
   );
 }
@@ -91,10 +99,11 @@ export function ActionTiles({ quota, onStart, compact, tight }: { quota: Quota |
  * line; Events and Group Rides draws a week of calendar days with one marked.
  */
 function Tile({
-  icon, title, detail, onPress, tone, compact, tight,
-}: { icon: IconName; title: string; detail: string; onPress: () => void; tone: 'red' | 'gold'; compact?: boolean; tight?: boolean }) {
+  icon, title, detail, onPress, tone, compact, tight, activity,
+}: { icon: IconName; title: string; detail: string; onPress: () => void; tone: 'red' | 'gold'; compact?: boolean; tight?: boolean; activity?: ActivityId }) {
   const red = tone === 'red';
-  const ink = red ? '#FF5A60' : Colors.gold;
+  // Create a Ride's red line and edge take the activity's colour (Offroad: today's red).
+  const ink = red ? (activity ? activityInk(activity, currentScheme(), '#FF5A60') : '#FF5A60') : Colors.gold;
   return (
     <Pressable
       accessibilityRole="button"

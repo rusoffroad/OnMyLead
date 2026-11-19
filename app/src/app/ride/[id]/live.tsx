@@ -119,6 +119,8 @@ import { ProTag } from '@/components/pro-tag';
 import { t } from '@/lib/i18n';
 import { useScreenUsage } from '@/lib/usage';
 import { SheetModal } from '@/components/sheet-modal';
+import { activityOf } from '@/core/activities';
+import { useActivity } from '@/lib/activity';
 // If anything in Ride Mode still throws, show Expo Router's retry screen instead of closing the app.
 export { ErrorBoundary } from 'expo-router';
 
@@ -222,6 +224,8 @@ export default function RideMode() {
   const me = session?.user.id;
 
   const [ride, setRide] = useState<Ride | null>(null);
+  // Activities (4.1): the More sheet follows the ride's activity while the switcher is on.
+  const { on: activitiesOn } = useActivity();
   const [members, setMembers] = useState<RideMember[]>([]);
   const [positions, setPositions] = useState<Record<string, Position>>({});
   const [statuses, setStatuses] = useState<Record<string, TappedStatus>>({});
@@ -1960,6 +1964,7 @@ export default function RideMode() {
         onRegroup={canRegroup ? regroupHere : undefined}
         onEmergency={() => tapStatus('emergency')}
         onClose={() => setStatusesOpen(false)}
+        activity={activitiesOn ? activityOf(ride) : undefined}
       />
 
       <RideMessageSheet

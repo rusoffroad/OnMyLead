@@ -29,6 +29,7 @@ import { setSyncedItem } from '@/lib/settings-sync';
 import { useSession } from '@/lib/session';
 import type { Ride } from '@/lib/types';
 import { currentLocale, t } from '@/lib/i18n';
+import { useDiscoverActivity } from '@/lib/activity';
 
 type Near = Ride & { distanceMi?: number };
 
@@ -39,6 +40,8 @@ type Near = Ride & { distanceMi?: number };
  * events. `/events?show=rides` opens on Group Rides.
  */
 export default function EventsScreen({ inTab = false }: { inTab?: boolean } = {}) {
+  // Activities (4.1): only the rider's activity while the switcher is on.
+  const activity = useDiscoverActivity();
   const { session } = useSession();
   const { can } = useEntitlements();
   const layout = useLayout();
@@ -78,14 +81,14 @@ export default function EventsScreen({ inTab = false }: { inTab?: boolean } = {}
       positionIfAllowed()
         .then(async (at) => {
           setLocated(!!at);
-          setUpcoming(await upcomingEvents(at, radius || null));
+          setUpcoming(await upcomingEvents(at, radius || null, activity));
         })
         .catch((e) => {
           setUpcoming([]);
           setError(e instanceof Error ? e.message : String(e));
         });
       if (session) myEvents().then((m) => setMine(sortCards(m))).catch(() => setMine([]));
-    }, [radius, session]),
+    }, [radius, session, activity]),
   );
 
   // Group rides load when that view is open: nearest first with location, every public ride without.

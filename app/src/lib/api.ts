@@ -3,6 +3,7 @@ import Constants from 'expo-constants';
 import * as Crypto from 'expo-crypto';
 import { Platform } from 'react-native';
 
+import type { ActivityId } from '@/core/activities';
 import { boundsAround, inState, stateByCode, withinRadius, type Bounds } from '@/core/discovery';
 import { fuzzLocation, type LatLng } from '@/core/geo';
 import type { BubblePreset } from '@/core/bubble';
@@ -66,6 +67,8 @@ export type NewRide = {
   freeride?: boolean;
   /** The rider's own invite code (core/share-code.ts). Left out, the database makes one. */
   inviteCode?: string | null;
+  /** Activities (4.1): the activity the ride is for; left out (Offroad) while Activities is off. */
+  activity?: ActivityId | null;
 };
 
 export async function createRide(r: NewRide): Promise<Ride> {
@@ -99,6 +102,8 @@ export async function createRide(r: NewRide): Promise<Ride> {
     ...(r.freeride ? { freeride: true } : {}),
     // Only sent when the rider typed one, so older databases and the made-up default are untouched.
     ...(r.inviteCode ? { invite_code: r.inviteCode } : {}),
+    // Activities (4.1): only sent while the switcher is on, so Offroad rides save exactly as before.
+    ...(r.activity ? { activity: r.activity } : {}),
   };
   let res = await supabase.from('rides').insert(row).select().single();
   if (res.error && /meet_state|freeride/.test(res.error.message)) {
@@ -220,7 +225,8 @@ export async function myRides(): Promise<(RideMember & { rides: Ride })[]> {
 }
 
 /** Upcoming and live public rides, optionally only those whose meeting area is inside a box. */
-export async function discoverPublicRides(bounds?: Bounds, limit = 100): Promise<Ride[]> {
+/** `activity` (Activities, 4.1) shows only that activity's rides; left out, every ride shows (as before). */
+export async function discoverPublicRides(bounds?: Bounds, limit = 100, activity?: ActivityId): Promise<Ride[]> {
   let q = supabase
     .from('rides')
     .select('*')
@@ -234,25 +240,26 @@ export async function discoverPublicRides(bounds?: Bounds, limit = 100): Promise
       .gte('meet_area_lng', bounds.minLng)
       .lte('meet_area_lng', bounds.maxLng);
   }
+  if (activity) q = q.eq('activity', activity);
   return unwrap(await q.order('meet_at').limit(limit));
 }
 
 /** Public rides within `miles` of a point, nearest first. */
-export async function publicRidesNear(center: LatLng, miles: number) {
-  return withinRadius(await discoverPublicRides(boundsAround(center, miles), 300), center, miles);
+export async function publicRidesNear(center: LatLng, miles: number, activity?: ActivityId) {
+  return withinRadius(await discoverPublicRides(boundsAround(center, miles), 300, activity), center, miles);
 }
 
 /** Public rides inside a map area. With the rider's location they come nearest first, with distances. */
-export async function publicRidesInArea(area: Bounds, from: LatLng | null): Promise<(Ride & { distanceMi?: number })[]> {
-  const found = await discoverPublicRides(area, 300);
+export async function publicRidesInArea(area: Bounds, from: LatLng | null, activity?: ActivityId): Promise<(Ride & { distanceMi?: number })[]> {
+  const found = await discoverPublicRides(area, 300, activity);
   return from ? withinRadius(found, from, Infinity) : found;
 }
 
 /** Public rides in a US state, soonest first. */
-export async function publicRidesInState(code: string): Promise<Ride[]> {
+export async function publicRidesInState(code: string, activity?: ActivityId): Promise<Ride[]> {
   const state = stateByCode(code);
   if (!state) return [];
-  return inState(await discoverPublicRides(state, 300), state.code);
+  return inState(await discoverPublicRides(state, 300, activity), state.code);
 }
 
 export async function joinRide(opts: { rideId?: string; inviteCode?: string; vehicleId?: string | null; riders?: number }): Promise<MemberStatus> {

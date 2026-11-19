@@ -40,6 +40,11 @@ export const APP_FLAGS = {
   bluetooth_sharing: { label: 'Bluetooth Sharing', hint: 'Ride Mode passing spots and alerts between nearby riders over Bluetooth when there is no service (app 2.1). Off stops the Bluetooth radio; sharing and alerts over the internet are not affected.' },
   referrals: { label: 'Refer a Friend', hint: 'Invite Friends and the 50% off Pro Annual reward. Turn on only once the Apple offer codes and the Google Play referral-50 offer exist. Rewards already earned can still be claimed when it is off.' },
   home_feed: { label: 'Home Feed', hint: 'The Feed on the home screen (friends’ rides, badges and trails). Riders’ feed settings are kept.' },
+  activities: {
+    label: 'Activities',
+    hint: 'The activity switcher on Home (Offroad, Motorcycle, Road Trip, Snowmobile): each activity’s colours, Home words, Ride Mode buttons, and rides, events and places for that activity. Off: everyone sees Offroad, as before. Off until switched on.',
+    offUntilSet: true,
+  },
   apple_web_sign_in: {
     label: 'Sign in with Apple on the Website and Android',
     hint: 'Continue with Apple on onmylead.com and in the Android app, through Apple’s web sign-in. Off until the Apple Services ID and its secret are set up in Supabase (docs/web-sign-in-with-apple.md); on before that, the button fails.',
