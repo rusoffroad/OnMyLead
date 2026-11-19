@@ -17,14 +17,14 @@ import { t } from '@/lib/i18n';
  * right in it and a QR button (Chris 2026-11-10: "Join a Ride should be the red"). No plan pill:
  * joining is always free.
  */
-export function JoinHero({ code, onCode, onOpen }: { code: string; onCode: (c: string) => void; onOpen: () => void }) {
+export function JoinHero({ code, onCode, onOpen, compact, tight }: { code: string; onCode: (c: string) => void; onOpen: () => void; compact?: boolean; tight?: boolean }) {
   const ready = code.trim().length >= 4;
   return (
-    <View style={styles.hero}>
+    <View style={[styles.hero, compact && styles.heroCompact]}>
       <Gradient colors={['#EC2E36', '#D7222A']} radius={22} />
       <View style={styles.heroTop}>
         <View style={{ flex: 1, minWidth: 0 }}>
-          <Text style={styles.heroTitle} accessibilityRole="header" numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75}>
+          <Text style={[styles.heroTitle, tight && styles.heroTitleTight]} accessibilityRole="header" numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75}>
             {t('Join a Ride')}
           </Text>
           <Text style={styles.heroHelp}>{t('Enter the code from your ride leader.')}</Text>
@@ -50,7 +50,7 @@ export function JoinHero({ code, onCode, onOpen }: { code: string; onCode: (c: s
           placeholderTextColor="rgba(255,255,255,0.6)"
           selectionColor="#fff"
           accessibilityLabel={t('Got a code from the leader? Type it here.')}
-          style={styles.codeInput}
+          style={[styles.codeInput, compact && styles.codeCompact, tight && styles.codeTight]}
         />
         <Pressable
           accessibilityRole="button"
@@ -58,7 +58,7 @@ export function JoinHero({ code, onCode, onOpen }: { code: string; onCode: (c: s
           accessibilityState={{ disabled: !ready }}
           disabled={!ready}
           onPress={onOpen}
-          style={({ pressed }) => [styles.codeGo, { opacity: ready ? (pressed ? 0.85 : 1) : 0.6 }]}>
+          style={({ pressed }) => [styles.codeGo, compact && styles.codeCompact, tight && styles.codeTight, { opacity: ready ? (pressed ? 0.85 : 1) : 0.6 }]}>
           <Text style={styles.codeGoText}>{t('Join')}</Text>
         </Pressable>
       </View>
@@ -67,16 +67,18 @@ export function JoinHero({ code, onCode, onOpen }: { code: string; onCode: (c: s
 }
 
 /**
- * Start a Ride and Events and Group Rides, side by side under Join (approved mock v4; renamed in
- * 3.1). Start shows how many rides a Free rider has left (and opens Pro when they're out); the
- * other opens rallies, ride weekends and public group rides near you.
+ * Create a Ride and Events and Group Rides, side by side under Join (approved mock v4; renamed in
+ * 3.1). Create shows how many rides a Free rider has left (and opens Pro when they're out); the
+ * other opens rallies, ride weekends and public group rides near you. 3.4 (Chris 2026-11-18):
+ * "Start a Ride" became "Create a Ride", and both titles get two lines at the same size (the
+ * one-line title used to shrink to fit, so it looked smaller than Events).
  */
-export function ActionTiles({ quota, onStart }: { quota: Quota | null; onStart: () => void }) {
+export function ActionTiles({ quota, onStart, compact, tight }: { quota: Quota | null; onStart: () => void; compact?: boolean; tight?: boolean }) {
   const detail = startRideDetail(quota);
   return (
-    <View style={styles.pair}>
-      <Tile icon="flag" tone="red" title={t('Start a Ride')} detail={detail} onPress={quota?.tone === 'out' ? () => router.push('/pro') : onStart} />
-      <Tile icon="calendar" tone="gold" title={t('Events and Group Rides')} lines={2} detail={t('Rallies and rides')} onPress={() => router.push('/events')} />
+    <View style={[styles.pair, compact && { gap: tight ? 8 : 10 }]}>
+      <Tile icon="flag" tone="red" title={t('Create a Ride')} detail={detail} compact={compact} tight={tight} onPress={quota?.tone === 'out' ? () => router.push('/pro') : onStart} />
+      <Tile icon="calendar" tone="gold" title={t('Events and Group Rides')} detail={t('Rallies and rides')} compact={compact} tight={tight} onPress={() => router.push('/events')} />
     </View>
   );
 }
@@ -89,8 +91,8 @@ export function ActionTiles({ quota, onStart }: { quota: Quota | null; onStart: 
  * line; Events and Group Rides draws a week of calendar days with one marked.
  */
 function Tile({
-  icon, title, detail, onPress, tone, lines = 1,
-}: { icon: IconName; title: string; detail: string; onPress: () => void; tone: 'red' | 'gold'; lines?: 1 | 2 }) {
+  icon, title, detail, onPress, tone, compact, tight,
+}: { icon: IconName; title: string; detail: string; onPress: () => void; tone: 'red' | 'gold'; compact?: boolean; tight?: boolean }) {
   const red = tone === 'red';
   const ink = red ? '#FF5A60' : Colors.gold;
   return (
@@ -98,14 +100,14 @@ function Tile({
       accessibilityRole="button"
       accessibilityLabel={`${title}. ${detail}`}
       onPress={onPress}
-      style={({ pressed }) => [styles.tile, { borderColor: withAlpha(ink, 0.55), transform: [{ scale: pressed ? 0.98 : 1 }] }]}>
+      style={({ pressed }) => [styles.tile, compact && styles.tileCompact, { borderColor: withAlpha(ink, 0.55), transform: [{ scale: pressed ? 0.98 : 1 }] }]}>
       <Gradient colors={[withAlpha(ink, red ? 0.2 : 0.15), withAlpha(ink, 0.03)]} angle="diagonal" radius={20} overlay />
       <View>
         <View style={styles.tileKicker}>
           <Icon name={icon} size={15} color={ink} strokeWidth={2.2} />
           <Text style={[styles.tileDetail, { color: ink }]} numberOfLines={1}>{detail}</Text>
         </View>
-        <Text style={styles.tileTitle} numberOfLines={lines} adjustsFontSizeToFit minimumFontScale={0.8}>{title}</Text>
+        <Text style={[styles.tileTitle, tight && styles.tileTitleTight]} numberOfLines={2} adjustsFontSizeToFit minimumFontScale={0.8}>{title}</Text>
       </View>
       <View style={styles.tileFoot}>
         <TileArt tone={tone} ink={ink} />
@@ -185,6 +187,10 @@ const styles = themedStyles(() => ({
     borderRadius: 22, paddingHorizontal: 18, paddingTop: 18, paddingBottom: 18, overflow: 'hidden', gap: 16,
     borderWidth: 1.5, borderColor: 'rgba(255,175,175,0.6)', boxShadow: '0px 20px 40px -12px rgba(0, 0, 0, 0.6)',
   },
+  heroCompact: { paddingTop: 14, paddingBottom: 14, gap: 12 },
+  codeCompact: { minHeight: 50 },
+  codeTight: { minHeight: 46 },
+  heroTitleTight: { fontSize: 33, lineHeight: 35 },
   heroTop: { flexDirection: 'row', alignItems: 'flex-start', gap: Spacing.three },
   heroTitle: { color: '#fff', fontFamily: font(700, 'display'), fontSize: 38, lineHeight: 40 },
   heroHelp: { color: 'rgba(255,255,255,0.85)', fontFamily: font(500), fontSize: 14.5, lineHeight: 20, marginTop: 4 },
@@ -201,6 +207,8 @@ const styles = themedStyles(() => ({
   codeGoText: { color: '#B81C23', fontFamily: font(700), fontSize: 17 },
   pair: { flexDirection: 'row', alignItems: 'stretch', gap: 12 },
   tile: { flex: 1, minHeight: 150, borderRadius: 20, padding: 16, overflow: 'hidden', justifyContent: 'space-between', gap: 14, ...TileSurface },
+  tileCompact: { minHeight: 0, padding: 14, gap: 6 },
+  tileTitleTight: { fontSize: 24, lineHeight: 25 },
   tileKicker: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   tileDetail: { flexShrink: 1, fontFamily: font(600), fontSize: 13.5, lineHeight: 18 },
   tileTitle: { color: Colors.text, fontFamily: font(700, 'display'), fontSize: 26, lineHeight: 28, marginTop: 4 },

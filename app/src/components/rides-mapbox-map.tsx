@@ -7,7 +7,7 @@ import { circlePolygon } from '@/core/terrain';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import type { Ride } from '@/lib/types';
 import { MapboxMap, MapboxMarker, type MapFill, type MapboxMapHandle } from './mapbox-map';
-import { mapFrameStyle, MapControls, MapOverlay, RideBubble, RidePin, SpotBubble, SpotPin, type RidesMapProps } from './rides-map-chrome';
+import { mapFrameStyle, MapControls, MapOverlay, RideBubble, RidePin, SpotBubble, SpotPin, SPOT_ANCHOR, type RidesMapProps } from './rides-map-chrome';
 import { t } from '@/lib/i18n';
 
 const FIT = { top: 24, right: 24, bottom: 24, left: 24 };
@@ -78,14 +78,14 @@ export function RidesMapboxMap({
           </MapboxMarker>
         ))}
         {spots?.map((s) => (
-          <MapboxMarker key={`spot-${s.id}`} at={{ lat: s.lat, lng: s.lng }}>
+          <MapboxMarker key={`spot-${s.id}`} at={{ lat: s.lat, lng: s.lng }} anchor={SPOT_ANCHOR}>
             <Pressable accessibilityRole="button" accessibilityLabel={s.name} onPress={() => setOpen((o) => (o === `spot:${s.id}` ? null : `spot:${s.id}`))}>
               <SpotPin spot={s} />
             </Pressable>
           </MapboxMarker>
         ))}
         {pickedSpot ? (
-          <MapboxMarker at={{ lat: pickedSpot.lat, lng: pickedSpot.lng }} anchor={{ x: 0.5, y: 1.1 }}>
+          <MapboxMarker at={{ lat: pickedSpot.lat, lng: pickedSpot.lng }} anchor={{ x: 0.5, y: 1.45 }}>
             <Pressable accessibilityRole="button" accessibilityLabel={t('Open {name}', { name: pickedSpot.name })} onPress={() => onOpenSpot?.(pickedSpot)}>
               <SpotBubble spot={pickedSpot} />
             </Pressable>

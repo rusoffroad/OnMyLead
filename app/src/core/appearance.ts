@@ -72,8 +72,8 @@ export const skinById = (id: SkinId) => SKINS.find((s) => s.id === id) ?? SKINS[
 
 /** Brand colours, tuned per scheme so they read on dark and on light surfaces. */
 const BRAND: Record<Scheme, { accent: string; sky: string; danger: string; gold: string; amber: string; softRed: string; scout: string; onScout: string }> = {
-  dark: { accent: '#E5262E', sky: '#3B86F7', danger: '#F03E3E', gold: '#E6C27A', amber: '#F2B233', softRed: '#FF6B70', scout: '#2EE6C4', onScout: '#06261F' },
-  light: { accent: '#D61F27', sky: '#1F6FE5', danger: '#D42A2A', gold: '#8A6512', amber: '#9A6300', softRed: '#C8242B', scout: '#007A68', onScout: '#FFFFFF' },
+  dark: { accent: '#E5262E', sky: '#3B86F7', danger: '#F03E3E', gold: '#E6C27A', amber: '#F2B233', softRed: '#FF6B70', scout: '#E5262E', onScout: '#FFFFFF' },
+  light: { accent: '#D61F27', sky: '#1F6FE5', danger: '#D42A2A', gold: '#8A6512', amber: '#9A6300', softRed: '#C8242B', scout: '#D61F27', onScout: '#FFFFFF' },
 };
 
 /** Rider status (Ride Bubble), roles and the dots on the map. */

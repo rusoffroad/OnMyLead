@@ -1,5 +1,5 @@
-import { router } from 'expo-router';
-import { useEffect, useMemo, useState } from 'react';
+import { router, useFocusEffect } from 'expo-router';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -7,6 +7,7 @@ import { Icon } from '@/components/icon';
 import { PlaceSearch } from '@/components/place-search';
 import { awayText, SpotPin } from '@/components/rides-map-chrome';
 import { RidesMap } from '@/components/rides-map';
+import { SPOT_INK } from '@/components/spot-pin-art';
 import { RowGroup } from '@/components/ride-row';
 import { ThemedText } from '@/components/themed-text';
 import { TwoPane } from '@/components/two-pane';
@@ -16,13 +17,14 @@ import { boundsAround } from '@/core/discovery';
 import type { LatLng } from '@/core/geo';
 import { sideColumnWidth } from '@/core/layout';
 import type { Place } from '@/core/places';
-import { filterKinds, kindCounts, placeLine, SCOUT_DEFAULT_MILES, SPOT_KINDS, spotKindInfo, toggleKind, type Spot, type SpotKind } from '@/core/spots';
+import { boundsOfSpots, filterKinds, kindCounts, placeLine, SCOUT_DEFAULT_MILES, SPOT_KINDS, spotKindInfo, toggleKind, type Spot, type SpotKind } from '@/core/spots';
 import { useFullMap } from '@/hooks/use-full-map';
 import { useLayout } from '@/hooks/use-layout';
 import { track } from '@/lib/analytics';
 import { t } from '@/lib/i18n';
 import { currentPosition } from '@/lib/location';
-import { readScoutMiles, saveScoutMiles, spotsNear } from '@/lib/spots';
+import { useSession } from '@/lib/session';
+import { favoriteSpots, readScoutMiles, saveScoutMiles, spotsNear } from '@/lib/spots';
 import { MileSlider } from './mile-slider';
 
 /**
@@ -31,8 +33,11 @@ import { MileSlider } from './mile-slider';
  * nearest first, on a map and in a list. Searching a town or park looks around there instead.
  * Tapping a place opens its page (app/spot/[id].tsx) with directions, rides there and Create a Ride
  * Here. On a tablet the controls and the list sit beside a full-height map.
+ *
+ * Favorite Places (3.4): the heart chip shows only the places the rider saved (newest first, any
+ * distance away); `start="favorites"` opens on them.
  */
-export function Scout({ top }: { top: React.ReactNode }) {
+export function Scout({ top, start = 'near' }: { top: React.ReactNode; start?: 'near' | 'favorites' }) {
   const layout = useLayout();
   const insets = useSafeAreaInsets();
   const fullMap = useFullMap(null);
@@ -49,6 +54,18 @@ export function Scout({ top }: { top: React.ReactNode }) {
   const [notYet, setNotYet] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { session } = useSession();
+  const [onlyFavs, setOnlyFavs] = useState(start === 'favorites');
+  const [favs, setFavs] = useState<Spot[] | null>(null);
+
+  // Favorites reload each time Scout comes back into view (a place page may have saved or unsaved one).
+  useFocusEffect(
+    useCallback(() => {
+      if (!session) return setFavs([]);
+      favoriteSpots(here).then(setFavs).catch(() => setFavs((f) => f ?? []));
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [session?.user.id, here?.lat, here?.lng]),
+  );
 
   useEffect(() => {
     readScoutMiles().then(setSavedMiles).catch(() => setSavedMiles(SCOUT_DEFAULT_MILES));
@@ -101,12 +118,23 @@ export function Scout({ top }: { top: React.ReactNode }) {
     saveScoutMiles(m);
   };
 
-  const shown = useMemo(() => filterKinds(spots ?? [], kinds), [spots, kinds]);
-  const counts = useMemo(() => kindCounts(spots ?? []), [spots]);
+  const pool = onlyFavs ? favs : spots;
+  const shown = useMemo(() => filterKinds(pool ?? [], kinds), [pool, kinds]);
+  const counts = useMemo(() => kindCounts(pool ?? []), [pool]);
   // Like the search, the map waits for the saved distance so it doesn't frame 250 mi and then jump.
   const ready = origin && savedMiles != null ? origin : null;
-  const frame = useMemo(() => (ready ? boundsAround(ready, miles) : null), [ready, miles]);
-  const ring = useMemo(() => (ready ? { center: ready, miles } : null), [ready, miles]);
+  const favFrame = useMemo(() => boundsOfSpots(favs ?? []), [favs]);
+  const frame = useMemo(
+    () => (onlyFavs && favFrame ? favFrame : ready ? boundsAround(ready, miles) : null),
+    [onlyFavs, favFrame, ready, miles],
+  );
+  const ring = useMemo(() => (ready && !onlyFavs ? { center: ready, miles } : null), [ready, miles, onlyFavs]);
+  const toggleFavs = () => {
+    if (!session) return router.push('/sign-in');
+    setKinds([]);
+    setOnlyFavs((on) => !on);
+    track('spot_favorites_viewed');
+  };
   const open = (s: Pick<Spot, 'id'>) => router.push(`/spot/${s.id}`);
 
   const map = frame ? (
@@ -116,7 +144,7 @@ export function Scout({ top }: { top: React.ReactNode }) {
       onOpenSpot={open}
       onOpen={() => {}}
       frame={frame}
-      frameKey={`${place?.id ?? 'here'}:${miles}`}
+      frameKey={onlyFavs ? `favs:${favs?.length ?? 0}` : `${place?.id ?? 'here'}:${miles}`}
       circle={ring}
       title={place?.name ?? null}
       height={layout.wide || fullMap.full ? '100%' : 340}
@@ -135,16 +163,26 @@ export function Scout({ top }: { top: React.ReactNode }) {
           <Button title={here ? t('Back to Near Me') : t('Clear')} kind="ghost" onPress={() => setPlace(null)} />
         </View>
       ) : null}
-      {!origin ? (
+      {!origin && !onlyFavs ? (
         <Card>
           <ThemedText>{locating ? t('Finding where you are…') : t('Turn on location to see places to ride near you, or search a town or park above.')}</ThemedText>
           {!locating && locError ? <ThemedText type="small" themeColor="textSecondary">{locError}</ThemedText> : null}
           {!locating ? <Button title={t('Use My Location')} onPress={locate} /> : null}
         </Card>
       ) : null}
-      <MileSlider miles={miles} onChange={changeMiles} />
-      {spots?.length ? (
+      {onlyFavs ? null : <MileSlider miles={miles} onChange={changeMiles} />}
+      {spots?.length || favs?.length || onlyFavs ? (
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.kindScroll} contentContainerStyle={styles.kinds} accessibilityRole="toolbar">
+          <Pressable
+            accessibilityRole="checkbox"
+            accessibilityState={{ checked: onlyFavs }}
+            accessibilityLabel={`${t('Favorite Places')}${favs?.length ? `, ${favs.length}` : ''}`}
+            onPress={toggleFavs}
+            style={({ pressed }) => [styles.kind, onlyFavs && styles.kindOn, pressed && { opacity: 0.7 }]}>
+            <Icon name="heart" size={15} color={onlyFavs ? Colors.onScout : Colors.scout} strokeWidth={2.4} />
+            <Text style={[styles.kindText, onlyFavs && styles.kindTextOn]}>{t('Favorites')}</Text>
+            {favs?.length ? <Text style={[styles.kindCount, onlyFavs && styles.kindTextOn]}>{favs.length}</Text> : null}
+          </Pressable>
           {SPOT_KINDS.filter((k) => counts[k.kind] > 0).map((k) => {
             const on = kinds.includes(k.kind);
             return (
@@ -155,7 +193,7 @@ export function Scout({ top }: { top: React.ReactNode }) {
                 accessibilityLabel={`${t(k.label)}, ${counts[k.kind]}`}
                 onPress={() => setKinds((ks) => toggleKind(ks, k.kind))}
                 style={({ pressed }) => [styles.kind, on && styles.kindOn, pressed && { opacity: 0.7 }]}>
-                <Icon name={k.icon} size={15} color={on ? Colors.onScout : Colors.scout} strokeWidth={2.4} />
+                <Icon name={k.icon} size={15} color={on ? Colors.onScout : SPOT_INK[k.kind]} strokeWidth={2.4} />
                 <Text style={[styles.kindText, on && styles.kindTextOn]}>{t(k.label)}</Text>
                 <Text style={[styles.kindCount, on && styles.kindTextOn]}>{counts[k.kind]}</Text>
               </Pressable>
@@ -169,8 +207,20 @@ export function Scout({ top }: { top: React.ReactNode }) {
 
   const list = (
     <>
-      {loading ? <ThemedText themeColor="textSecondary">{t('Looking for places to ride…')}</ThemedText> : null}
-      {spots && !loading ? (
+      {loading && !onlyFavs ? <ThemedText themeColor="textSecondary">{t('Looking for places to ride…')}</ThemedText> : null}
+      {onlyFavs ? (
+        favs === null ? (
+          <ThemedText themeColor="textSecondary">{t('Loading your favorite places…')}</ThemedText>
+        ) : favs.length === 0 ? (
+          <Card>
+            <ThemedText>{t('No favorite places yet. Open a place and tap Save to keep it here.')}</ThemedText>
+          </Card>
+        ) : (
+          <ThemedText type="heading">
+            {favs.length === 1 ? t('1 Favorite Place') : t('{n} Favorite Places', { n: favs.length })}
+          </ThemedText>
+        )
+      ) : spots && !loading ? (
         notYet ? (
           <Card>
             <ThemedText>{t('Places to Ride is almost here. Check back after the next update.')}</ThemedText>
@@ -187,9 +237,9 @@ export function Scout({ top }: { top: React.ReactNode }) {
           </ThemedText>
         )
       ) : null}
-      {shown.length ? <RowGroup>{shown.slice(0, 150).map((s) => <SpotRow key={s.id} spot={s} onPress={() => open(s)} />)}</RowGroup> : null}
+      {shown.length ? <RowGroup>{shown.slice(0, 150).map((s) => <SpotRow key={s.id} spot={s} onPress={() => open(s)} away={!onlyFavs || !!here} />)}</RowGroup> : null}
       {shown.length > 150 ? <ThemedText type="small" themeColor="textSecondary">{t('Showing the nearest 150. Zoom the map or shorten the distance to see the rest.')}</ThemedText> : null}
-      {spots && !notYet ? (
+      {spots && !notYet && !onlyFavs ? (
         <Pressable accessibilityRole="button" onPress={() => router.push('/spot/suggest')} style={({ pressed }) => [styles.suggest, pressed && { opacity: 0.7 }]}>
           <Icon name="plus" size={18} color={Colors.sky} />
           <View style={{ flex: 1 }}>
@@ -230,7 +280,7 @@ export function Scout({ top }: { top: React.ReactNode }) {
 }
 
 /** One place in the list: its sign, name, where it is, how far, and rides coming up there. */
-export function SpotRow({ spot, onPress }: { spot: Spot; onPress: () => void }) {
+export function SpotRow({ spot, onPress, away = true }: { spot: Spot; onPress: () => void; away?: boolean }) {
   const where = placeLine(spot);
   return (
     <Pressable accessibilityRole="link" onPress={onPress} style={({ pressed }) => [styles.row, pressed && { backgroundColor: Colors.backgroundSelected }]}>
@@ -246,7 +296,7 @@ export function SpotRow({ spot, onPress }: { spot: Spot; onPress: () => void }) 
           </ThemedText>
         ) : null}
       </View>
-      <Text style={styles.away}>{awayText(spot.distanceMi)}</Text>
+      {away ? <Text style={styles.away}>{awayText(spot.distanceMi)}</Text> : null}
       <Icon name="chevron" size={18} color={Colors.textSecondary} />
     </Pressable>
   );
