@@ -36,6 +36,9 @@ export const SYNCED_SETTINGS: Record<string, string> = {
   'map.layers.v1': 'Base map (Satellite, Topo, ...) and the trail layer switch',
   'map.riderTrails.v1': 'Show trails other riders shared',
   'map.parkTrails.v1': 'Show the trails of offroad parks',
+  'map.activityLayers.v1': "Map Features for the rider's activity (Snow on the Ground, Twisty Roads, ...)",
+  'map.weatherRadar.v1': 'Weather Radar on live maps',
+  'map.weatherForecast.v1': 'Forecast Where You Are on live maps',
   'map.followMe.v1': 'Follow Me on live maps',
   'map.intersectionZoom.v1': 'Zoom In at Intersections on live maps',
   'map.edgeZoomOut.v1': 'Zoom Out at the Edge on live maps',
@@ -64,6 +67,7 @@ export const SYNCED_SETTINGS: Record<string, string> = {
   'starlink.autoConnect.v1': 'Starlink page connects by itself',
   'onmylead.dismissedNotices': 'Announcements the rider closed',
   'promo.inviteFriends.v1': 'The one-time Invite Friends pop-up was seen',
+  'tour.welcome.v1': 'The Welcome Tour (or What’s New) was shown',
   // Appearance (themes thread; lib/appearance applies a change from another device)
   'onmylead.appearance': 'Theme, Dark/Light/Match Phone and Color Blind Mode',
   // Activities (lib/activity applies a change from another device at launch)

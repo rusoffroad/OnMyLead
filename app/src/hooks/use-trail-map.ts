@@ -22,7 +22,9 @@ import { supabase } from '@/lib/supabase';
 import { identifyTrail, loadOsmView, loadSeasonalClosures } from '@/lib/trail-tiles';
 import { identifyLand } from '@/lib/trail-lookup';
 import { agencyLayersFor } from '@/core/car-layers';
+import { useActivityMap, type ActivityMap } from './use-activity-map';
 import { useCan } from '@/lib/pro';
+import { useMapWeather, type MapWeather } from '@/hooks/use-map-weather';
 import { onSyncedChange, setSyncedItem } from '@/lib/settings-sync';
 
 /** The rider's map style and Map Features (every map in the app, and the car map). */
@@ -57,6 +59,8 @@ export type TrailMap = {
   setFeatures: (changes: { id: MapFeatureId; on: boolean }[]) => void;
   /** The agencies' trail and land layers to draw for the features that are on. */
   agencyLayers: AgencyLayer[];
+  /** The rider's activity's own map look (Snow on the Ground, Twisty Roads, ...; core/activity-layers). Never on the car map. */
+  activityMap: ActivityMap;
   /** Whose land a tap landed on (land features on and no trail under the finger). */
   land: LandInfo | null;
   clearLand: () => void;
@@ -106,6 +110,10 @@ export type TrailMap = {
   info: TrailInfo | null;
   looking: boolean;
   clearInfo: () => void;
+  /** Weather Radar (Pro) and Forecast Where You Are (hooks/use-map-weather): the switches and the radar to draw. */
+  weather: MapWeather;
+  /** The middle of the map, rounded to about half a mile (the forecast falls back to it without location). */
+  center: { lat: number; lng: number } | null;
   /** Look up the trail under a point (for maps where a plain tap already does something else). */
   identifyAt: (lat: number, lng: number) => void;
   /** Spread onto the MapView. */
@@ -520,6 +528,8 @@ export function useTrailMap(): TrailMap {
   const closedShown = useMemo(() => outsideParks(closed, parksDrawn), [closed, parksDrawn]);
 
   const agencyLayers = useMemo<AgencyLayer[]>(() => agencyLayersFor(features, offline), [features, offline]);
+  const activityMap = useActivityMap({ pro: layersPro, offline, viewBox, zoom, where });
+  const weather = useMapWeather({ pro: layersPro, offline });
 
   // Free riders get satellite (map layers are Pro); 3D Terrain picked but not offered any more
   // (switched off, or a build without Mapbox) is plain satellite too.
@@ -539,6 +549,7 @@ export function useTrailMap(): TrailMap {
     setFeature,
     setFeatures,
     agencyLayers,
+    activityMap,
     land,
     clearLand: () => setLand(null),
     zoomInHint: trails && zoom < TRAILS_MIN_Z,
@@ -566,6 +577,8 @@ export function useTrailMap(): TrailMap {
     pickedPark: parkOn ? pickedPark : null,
     pickPark: setPickedPark,
     onRegion,
+    weather,
+    center: where,
     info,
     looking,
     clearInfo: () => setInfo(null),

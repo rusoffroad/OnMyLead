@@ -1,11 +1,12 @@
 import { tc } from './i18n';
+import type { WeatherPeriod } from './weather';
 
 /**
  * Ride day: when the sun comes up and goes down at the meeting spot, what the weather is doing,
  * and how long until the ride starts. Pure functions so they run offline and in tests.
  *
- * The forecast comes from Open-Meteo (free, no key, no account). It is asked about the ride's
- * public meeting area, which is already rounded to about a mile, never the exact meeting point.
+ * The forecast comes from the National Weather Service (core/weather; free for any app, U.S. only).
+ * It is asked about the ride's public meeting area, rounded again, never the exact meeting point.
  */
 
 const DAY_MS = 86_400_000;
@@ -83,8 +84,8 @@ export function daylightBar(sun: { sunrise: Date; sunset: Date }, start: Date, f
 // Forecast
 // ---------------------------------------------------------------------------
 
-/** Open-Meteo forecasts this many days ahead. */
-export const FORECAST_DAYS = 16;
+/** The National Weather Service forecasts this many days ahead. */
+export const FORECAST_DAYS = 7;
 
 export type DayForecast = {
   /** The day at the meeting spot, YYYY-MM-DD. */
@@ -94,6 +95,7 @@ export type DayForecast = {
   lowF: number;
   rainChance: number | null;
   windMph: number | null;
+  /** Gusts, when a source gives them (the Weather Service's 7-day forecast doesn't). */
   gustMph: number | null;
 };
 
@@ -103,56 +105,36 @@ export function forecastInRange(meetAt: Date, now: Date): boolean {
   return ahead > -DAY_MS && ahead < (FORECAST_DAYS - 1) * DAY_MS;
 }
 
-const ymd = (d: Date) => d.toISOString().slice(0, 10);
-
-/** The Open-Meteo request for the days around the meet (the meeting spot's day can differ from UTC's). */
-export function forecastUrl(lat: number, lng: number, meetAt: Date): string {
-  const q = new URLSearchParams({
-    latitude: lat.toFixed(2),
-    longitude: lng.toFixed(2),
-    daily: 'weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max',
-    temperature_unit: 'fahrenheit',
-    wind_speed_unit: 'mph',
-    timezone: 'auto',
-    start_date: ymd(new Date(meetAt.getTime() - DAY_MS)),
-    end_date: ymd(new Date(meetAt.getTime() + DAY_MS)),
-  });
-  return `https://api.open-meteo.com/v1/forecast?${q}`;
+/** "-07:00" in an ISO time → minutes east of UTC (-420). */
+function offsetMinutes(iso: string): number {
+  const m = /([+-])(\d\d):(\d\d)$/.exec(iso);
+  if (!m) return 0;
+  return (m[1] === '-' ? -1 : 1) * (Number(m[2]) * 60 + Number(m[3]));
 }
 
-type OpenMeteo = {
-  utc_offset_seconds?: number;
-  daily?: {
-    time?: string[];
-    weather_code?: (number | null)[];
-    temperature_2m_max?: (number | null)[];
-    temperature_2m_min?: (number | null)[];
-    precipitation_probability_max?: (number | null)[];
-    wind_speed_10m_max?: (number | null)[];
-    wind_gusts_10m_max?: (number | null)[];
-  };
-};
-
-/** The meet day's forecast out of an Open-Meteo response, or null if it isn't there. */
-export function parseForecast(json: unknown, meetAt: Date): DayForecast | null {
-  const r = json as OpenMeteo | null;
-  const d = r?.daily;
-  if (!d?.time?.length) return null;
-  const localDay = ymd(new Date(meetAt.getTime() + (r?.utc_offset_seconds ?? 0) * 1000));
-  const i = d.time.indexOf(localDay);
-  if (i < 0) return null;
-  const hi = d.temperature_2m_max?.[i];
-  const lo = d.temperature_2m_min?.[i];
-  if (hi == null || lo == null) return null;
-  const round = (v: number | null | undefined) => (v == null ? null : Math.round(v));
+/**
+ * The meet day's forecast out of the Weather Service's day and night periods (core/weather
+ * parsePeriods), or null if the day isn't in it. The day is the meeting spot's own, from the
+ * periods' clock. When only the night is left (an evening ride), it stands in for both.
+ */
+export function dayForecastFrom(periods: WeatherPeriod[], meetAt: Date): DayForecast | null {
+  if (!periods.length) return null;
+  const localDay = new Date(meetAt.getTime() + offsetMinutes(periods[0].start) * 60_000).toISOString().slice(0, 10);
+  const day = periods.find((p) => p.day && p.start.slice(0, 10) === localDay);
+  const night = periods.find((p) => !p.day && p.start.slice(0, 10) === localDay);
+  const main = day ?? night;
+  if (!main) return null;
+  const both = [day, night].filter((p): p is WeatherPeriod => !!p);
+  const chances = both.map((p) => p.precip).filter((v): v is number => v != null);
+  const winds = both.map((p) => p.windMph).filter((v): v is number => v != null);
   return {
     date: localDay,
-    summary: weatherWords(d.weather_code?.[i] ?? null),
-    highF: Math.round(hi),
-    lowF: Math.round(lo),
-    rainChance: round(d.precipitation_probability_max?.[i]),
-    windMph: round(d.wind_speed_10m_max?.[i]),
-    gustMph: round(d.wind_gusts_10m_max?.[i]),
+    summary: main.summary || tc('Forecast'),
+    highF: day?.tempF ?? main.tempF,
+    lowF: night?.tempF ?? main.tempF,
+    rainChance: chances.length ? Math.max(...chances) : null,
+    windMph: winds.length ? Math.max(...winds) : null,
+    gustMph: null,
   };
 }
 
@@ -174,9 +156,10 @@ export function weatherWords(code: number | null): string {
 /** Things worth a heads-up before loading the trailer. Empty when the day looks fine. */
 export function weatherWarnings(f: DayForecast): string[] {
   const out: string[] = [];
-  if (f.summary === 'Thunderstorms') out.push('Thunderstorms in the forecast. Watch for lightning and flash floods in washes.');
+  if (/thunder/i.test(f.summary)) out.push('Thunderstorms in the forecast. Watch for lightning and flash floods in washes.');
   else if ((f.rainChance ?? 0) >= 60) out.push(`${f.rainChance}% chance of rain. Trails can turn to mud.`);
   if ((f.gustMph ?? 0) >= 35) out.push(`Gusts up to ${f.gustMph} mph. Expect dust and blowing sand.`);
+  else if ((f.windMph ?? 0) >= 25) out.push(`Wind up to ${f.windMph} mph. Expect dust and blowing sand.`);
   if (f.highF >= 100) out.push(`${f.highF}°F high. Bring extra water and watch for overheating.`);
   if (f.lowF <= 32) out.push(`Freezing at ${f.lowF}°F. Dress in layers.`);
   return out;

@@ -10,6 +10,7 @@ import { SpotPinArt } from '@/components/spot-pin';
 import { font, themedStyles } from '@/constants/theme';
 import { activityHero, type ActivityId } from '@/core/activities';
 import { staticMapUrl } from '@/core/home';
+import type { SpotKind } from '@/core/spots';
 import { track } from '@/lib/analytics';
 import { t } from '@/lib/i18n';
 import { MAPBOX_TOKEN } from '@/lib/terrain';
@@ -29,9 +30,18 @@ const PANEL = 'rgba(18,27,42,';
  * on the left, and the red go button. Opens /places (Scout on a page of its own). Shows only while
  * the scout flag is on.
  */
+const PINS: Record<ActivityId, [SpotKind, SpotKind, SpotKind]> = {
+  offroad: ['park', 'trail_system', 'ohv_area'],
+  snowmobile: ['snow_area', 'trailhead', 'trail_system'],
+  motorcycle: ['scenic_drive', 'campground', 'track'],
+  road_trip: ['scenic_drive', 'campground', 'scenic_drive'],
+};
+
 export function PlacesCard({ compact, tight, line, activity }: { compact?: boolean; tight?: boolean; line?: string; activity?: ActivityId }) {
   // Activities (4.0): the go button wears the activity's colour; Offroad keeps the red.
   const hue = activity ? activityHero(activity) : null;
+  // The pins show the activity's own kinds of place; Offroad keeps its park, forest and OHV pins.
+  const pins = PINS[activity ?? 'offroad'] ?? PINS.offroad;
   const [fresh, setFresh] = useState(false);
   useEffect(() => {
     AsyncStorage.getItem(SEEN_KEY).then((v) => setFresh(!v)).catch(() => {});
@@ -56,9 +66,9 @@ export function PlacesCard({ compact, tight, line, activity }: { compact?: boole
       ) : null}
       <Gradient colors={[`${PANEL}1)`, `${PANEL}0.92)`, `${PANEL}0.35)`]} angle="across" overlay />
       <View pointerEvents="none" style={styles.pins} accessible={false} importantForAccessibility="no-hide-descendants">
-        <View style={[styles.pin, { right: 118, top: 14 }]}><SpotPinArt kind="park" scale={0.62} /></View>
-        <View style={[styles.pin, { right: 74, top: 40 }]}><SpotPinArt kind="trail_system" scale={0.56} /></View>
-        <View style={[styles.pin, { right: 30, top: 10 }]}><SpotPinArt kind="ohv_area" scale={0.56} /></View>
+        <View style={[styles.pin, { right: 118, top: 14 }]}><SpotPinArt kind={pins[0]} scale={0.62} /></View>
+        <View style={[styles.pin, { right: 74, top: 40 }]}><SpotPinArt kind={pins[1]} scale={0.56} /></View>
+        <View style={[styles.pin, { right: 30, top: 10 }]}><SpotPinArt kind={pins[2]} scale={0.56} /></View>
       </View>
       <View style={styles.words}>
         <View style={styles.kicker}>

@@ -500,6 +500,7 @@ export default function You() {
           onPress={() => openHelpCenter()}
           right={<Icon name="external" size={18} color={Colors.sky} />}
         />
+        <MenuRow icon="map" color={Colors.accent} title={t('Take the Tour')} detail={t('A quick look at what OnMyLead can do')} onPress={() => router.push('/tour')} />
         {session ? (
           <MenuRow icon="flagged" color={Colors.danger} title={t('Report a Rider')} detail={t('Harassment, threats or abuse. Goes to the OnMyLead team')} onPress={() => router.push('/report-rider')} />
         ) : null}

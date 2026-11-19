@@ -17,7 +17,13 @@ import {
 import { OSM_TILEJSON } from '@/core/osm-trails';
 import { FEATURE_BY_ID, osmFeatureLayers, type AgencyLayer } from '@/core/map-features';
 import { LAND_FADE_IN, TRAIL_INK } from '@/core/trails';
+import { RADAR_MAX_Z, RADAR_OPACITY, RADAR_TILE_SIZE, type RadarLayer } from '@/core/weather';
 import type { TrailMap } from '@/hooks/use-trail-map';
+import type { ActivityMap } from '@/hooks/use-activity-map';
+import {
+  CAMP_FILTER, CAMP_INK, CAMPS_MIN_Z, OSM_POI_LAYER, OSM_ROADS_LAYER, SLED_INK, STATIONS_MIN_Z, TWISTY_COLOR, TWISTY_FILTER, TWISTY_MIN_Z, twistyGeoJSON,
+  twistyPieces, webRasterPaint,
+} from '@/core/activity-layers';
 import { MAPBOX_TOKEN } from '@/lib/terrain';
 import type { MapFill, MapIdle, MapLine, MapboxMapHandle, MapboxOwnFix } from './mapbox-map-types';
 import { OwnPuck, useOwnPuckStore } from './own-puck';
@@ -131,6 +137,101 @@ function syncAgency(m: MapboxMap_, want: AgencyLayer[], offline: boolean) {
     const before = a.land ? want.find((b) => !b.land && m.getLayer(`oml-agency-${b.key}`)) : undefined;
     m.addLayer({ id, type: 'raster', source: id, minzoom: a.minZ, paint: { 'raster-fade-duration': 0, 'raster-opacity': a.land ? (LAND_FADE_IN as never) : 1 } }, before ? `oml-agency-${before.key}` : AGENCY_ANCHOR);
   }
+}
+
+
+/** The rider's activity's look (core/activity-layers.ts), mirroring activity-map-layers.tsx in the apps. */
+const ACT = 'oml-act-';
+const ACT_OSM = `${ACT}osm`;
+const ACT_FONT = ['DIN Pro Bold', 'Arial Unicode MS Bold'];
+const ACT_LABEL = { 'text-color': '#FFFFFF', 'text-halo-color': 'rgba(10,22,38,0.9)', 'text-halo-width': 1.6 };
+
+function activitySignature(a: ActivityMap): string {
+  return JSON.stringify([a.rasters.map((r) => r.key), !!a.avalanche, !!a.stations, a.twisty, a.camps]);
+}
+
+function syncActivity(m: MapboxMap_, a: ActivityMap, below: string | undefined, drawnSig: { current: string }, twisty: GeoJSON.FeatureCollection | null) {
+  const sig = activitySignature(a);
+  const setData = (id: string, data: unknown) => (m.getSource(id) as { setData?: (d: unknown) => void } | undefined)?.setData?.(data);
+  if (sig !== drawnSig.current || !m.getLayer(`${ACT}mark`)) {
+    for (const l of [...(m.getStyle()?.layers ?? [])].reverse()) if (l.id.startsWith(ACT)) m.removeLayer(l.id);
+    for (const id of Object.keys(m.getStyle()?.sources ?? {})) if (id.startsWith(ACT)) m.removeSource(id);
+    drawnSig.current = sig;
+    const top = m.getLayer('oml-tracks-hike') ? 'oml-tracks-hike' : undefined;
+    const under = below && m.getLayer(below) ? below : AGENCY_ANCHOR;
+    // A marker, so a style change (which wipes everything) is noticed.
+    m.addSource(`${ACT}mark`, { type: 'geojson', data: EMPTY_LINES });
+    m.addLayer({ id: `${ACT}mark`, type: 'line', source: `${ACT}mark`, paint: { 'line-opacity': 0 } }, top);
+    for (const r of a.rasters) {
+      const id = `${ACT}${r.key}`;
+      m.addSource(id, { type: 'raster', tiles: [r.template], tileSize: r.tileSize, minzoom: Math.max(0, r.minZ - 1), maxzoom: r.maxZ });
+      m.addLayer({ id, type: 'raster', source: id, minzoom: r.minZ, paint: webRasterPaint(r.paint) as never }, r.under ? under : top);
+    }
+    if (a.avalanche) {
+      m.addSource(`${ACT}avalanche`, { type: 'geojson', data: a.avalanche });
+      m.addLayer({ id: `${ACT}avalanche-fill`, type: 'fill', source: `${ACT}avalanche`, filter: ['get', 'rated'], paint: { 'fill-color': ['get', 'color'], 'fill-opacity': 0.26 } }, under);
+      m.addLayer({ id: `${ACT}avalanche-line`, type: 'line', source: `${ACT}avalanche`, paint: { 'line-color': ['case', ['get', 'rated'], ['get', 'color'], 'rgba(255,255,255,0.45)'], 'line-width': 1.6, 'line-dasharray': [3, 2] } }, under);
+      m.addLayer({ id: `${ACT}avalanche-name`, type: 'symbol', source: `${ACT}avalanche`, minzoom: 6, layout: { 'text-field': ['get', 'label'], 'text-size': 12, 'text-font': ACT_FONT }, paint: ACT_LABEL }, top);
+    }
+    if (a.twisty || a.camps) m.addSource(ACT_OSM, { type: 'vector', url: OSM_TILEJSON });
+    if (a.twisty) {
+      m.addLayer({ id: `${ACT}roads`, type: 'line', source: ACT_OSM, 'source-layer': OSM_ROADS_LAYER, minzoom: TWISTY_MIN_Z, filter: TWISTY_FILTER as never, paint: { 'line-opacity': 0 } }, top);
+      m.addSource(`${ACT}twisty`, { type: 'geojson', data: twisty ?? EMPTY_LINES });
+      m.addLayer({ id: `${ACT}twisty-case`, type: 'line', source: `${ACT}twisty`, minzoom: TWISTY_MIN_Z, layout: { 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': 'rgba(10,22,38,0.8)', 'line-width': 7 } }, top);
+      m.addLayer({ id: `${ACT}twisty-line`, type: 'line', source: `${ACT}twisty`, minzoom: TWISTY_MIN_Z, layout: { 'line-join': 'round', 'line-cap': 'round' }, paint: { 'line-color': TWISTY_COLOR as never, 'line-width': 4 } }, top);
+    }
+    if (a.camps) {
+      m.addLayer({
+        id: `${ACT}camps`, type: 'circle', source: ACT_OSM, 'source-layer': OSM_POI_LAYER, minzoom: CAMPS_MIN_Z, filter: CAMP_FILTER as never,
+        paint: { 'circle-radius': ['interpolate', ['linear'], ['zoom'], 9, 3.5, 14, 7], 'circle-color': CAMP_INK, 'circle-stroke-color': '#3B2A05', 'circle-stroke-width': 1.5 },
+      }, top);
+      m.addLayer({
+        id: `${ACT}camps-name`, type: 'symbol', source: ACT_OSM, 'source-layer': OSM_POI_LAYER, minzoom: 12, filter: CAMP_FILTER as never,
+        layout: { 'text-field': ['get', 'name'], 'text-size': 11, 'text-offset': [0, 1.2], 'text-anchor': 'top', 'text-font': ACT_FONT },
+        paint: { ...ACT_LABEL, 'text-color': CAMP_INK, 'text-halo-width': 1.4 },
+      }, top);
+    }
+    if (a.stations) {
+      m.addSource(`${ACT}stations`, { type: 'geojson', data: a.stations });
+      m.addLayer({
+        id: `${ACT}stations-dot`, type: 'circle', source: `${ACT}stations`, minzoom: STATIONS_MIN_Z,
+        paint: { 'circle-radius': 5, 'circle-color': ['case', ['get', 'bare'], 'rgba(255,255,255,0.35)', '#FFFFFF'], 'circle-stroke-color': SLED_INK, 'circle-stroke-width': 2 },
+      }, top);
+      m.addLayer({
+        id: `${ACT}stations-depth`, type: 'symbol', source: `${ACT}stations`, minzoom: 7, filter: ['!', ['get', 'bare']],
+        layout: { 'text-field': ['get', 'label'], 'text-size': 12, 'text-offset': [0, -1.3], 'text-font': ACT_FONT }, paint: ACT_LABEL,
+      }, top);
+    }
+    return;
+  }
+  if (a.avalanche) setData(`${ACT}avalanche`, a.avalanche);
+  if (a.stations) setData(`${ACT}stations`, a.stations);
+  if (a.twisty) setData(`${ACT}twisty`, twisty ?? EMPTY_LINES);
+}
+
+/** Twisty Roads from the roads the map has loaded (see core/activity-layers twistyPieces). */
+function scoreTwisty(m: MapboxMap_): GeoJSON.FeatureCollection | null {
+  if (m.getZoom() < TWISTY_MIN_Z || !m.getSource(ACT_OSM)) return null;
+  try {
+    const fs = m.querySourceFeatures(ACT_OSM, { sourceLayer: OSM_ROADS_LAYER, filter: TWISTY_FILTER as never });
+    return twistyGeoJSON(twistyPieces(fs.map((f) => ({ geometry: f.geometry as never }))));
+  } catch {
+    return null;
+  }
+}
+
+/** Weather Radar (core/weather): one raster layer over the agency squares, under every line; a new one each 5-minute slot. */
+function syncRadar(m: MapboxMap_, radar: RadarLayer | null) {
+  const want = radar ? `oml-${radar.key}` : null;
+  for (const l of m.getStyle()?.layers ?? []) {
+    if (l.id.startsWith('oml-radar-') && l.id !== want) {
+      m.removeLayer(l.id);
+      if (m.getSource(l.id)) m.removeSource(l.id);
+    }
+  }
+  if (!radar || !want || m.getLayer(want)) return;
+  m.addSource(want, { type: 'raster', tiles: [radar.template], tileSize: RADAR_TILE_SIZE, maxzoom: RADAR_MAX_Z });
+  m.addLayer({ id: want, type: 'raster', source: want, paint: { 'raster-fade-duration': 0, 'raster-opacity': RADAR_OPACITY } }, AGENCY_ANCHOR);
 }
 
 /**
@@ -350,9 +451,11 @@ export function MapboxMap({
 
   // Trail layers follow the rider's choices, like the flat maps.
   const { trails, offline, osmLines, closedLines, labels, riderTrails, features, agencyLayers, parkTrails, parkLabels, parks } = trail;
+  const radar = trail.weather.radar;
   useEffect(() => {
     if (!map || !styled) return;
     syncAgency(map, agencyLayers, offline);
+    syncRadar(map, radar);
     for (const id of TRAIL_LAYER_IDS) {
       if (!map.getLayer(id)) continue;
       map.setLayoutProperty(id, 'visibility', trails ? 'visible' : 'none');
@@ -368,7 +471,34 @@ export function MapboxMap({
     src('oml-park-trails')?.setData?.(linesGeoJSON(parkPieces(parkTrails).map((p) => ({ key: p.key, points: p.points, props: { color: p.color, closed: p.closed, road: p.road } }))));
     src('oml-park-names')?.setData?.(pointsGeoJSON(parkLabels.map((l) => ({ key: `pl-${l.key}`, at: l.at, props: { name: l.closed ? `${l.name} · Closed` : l.name, closed: l.closed } }))));
     src('oml-park-titles')?.setData?.(pointsGeoJSON(parks.map((p) => ({ key: `park-${p.parkOsmId}`, at: p.center, props: { name: p.parkName, sub: parkSummaryLine(p) } }))));
-  }, [map, styled, trails, offline, osmLines, closedLines, labels, riderTrails, features, agencyLayers, parkTrails, parkLabels, parks]);
+  }, [map, styled, trails, offline, osmLines, closedLines, labels, riderTrails, features, agencyLayers, parkTrails, parkLabels, parks, radar]);
+
+  // The activity's look, and Twisty Roads scored each time the map rests.
+  const act = trail.activityMap;
+  const actSig = useRef('');
+  const [twisty, setTwisty] = useState<GeoJSON.FeatureCollection | null>(null);
+  useEffect(() => {
+    if (!map || !styled) return;
+    const firstAgency = !offline && agencyLayers[0] ? `oml-agency-${agencyLayers[0].key}` : undefined;
+    syncActivity(map, act, firstAgency, actSig, act.twisty ? twisty : null);
+  }, [map, styled, act, offline, agencyLayers, twisty]);
+  useEffect(() => {
+    if (!map || !act.twisty) return;
+    // 'idle' comes again after the new lines draw: only a different set of pieces is set.
+    let last = '';
+    const rescore = () => {
+      const fc = scoreTwisty(map);
+      const key = fc ? fc.features.map((f) => f.properties?.key).join('|') : '';
+      if (!fc || key === last) return;
+      last = key;
+      setTwisty(fc);
+    };
+    map.on('idle', rescore);
+    rescore();
+    return () => {
+      map.off('idle', rescore);
+    };
+  }, [map, act.twisty]);
 
   // The screen's own fills and lines. A line or fill whose look is unchanged only gets new data
   // (setData), so a growing Leader Trackline doesn't tear down and re-add the route on every spot;

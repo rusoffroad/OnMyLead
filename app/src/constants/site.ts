@@ -145,6 +145,12 @@ export const SHOWCASE_ROUTE_ETA: boolean = false;
  * pro_plan_4 server switch, so the table always matches what riders get (core/pro.ts COMPARISON_4).
  */
 export const SHOWCASE_PRO_PLAN_4: boolean = false;
+/**
+ * Weather on the map: Weather Radar (Pro) over Ride Mode and Map Mode and the free Forecast Where
+ * You Are button (NOAA and the National Weather Service). Off until the app version with it (4.0)
+ * is live in the stores.
+ */
+export const SHOWCASE_WEATHER: boolean = false;
 
 /**
  * Activities (Offroad, Motorcycle, Road Trip, Snowmobile, each with its own colours, Ride Mode

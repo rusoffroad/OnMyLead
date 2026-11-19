@@ -40,6 +40,9 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
 - Phone code sign-in exists in `lib/session.ts` but has no screen (not a feature).
 - `/auth-callback` finishes email links (Open in the App / Continue on the Website).
 - Delete Account (in-app, `delete-account` function), Sign Out.
+- Welcome Tour (4.0): up to 12 cards shown once on Home to a new account, a What's New card to riders
+  who had the app before, You > Help > Take the Tour any time; Admin flag `welcome_tour`.
+  `core/welcome-tour.ts`, `lib/welcome-tour.ts`, `components/welcome-tour.tsx`, `app/tour.tsx`.
 
 ### Profile and Settings (You tab)
 - Ride name (`/ride-name`) with live preview; opt-in social profile (name/photo from Apple, Google
@@ -76,7 +79,7 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
 - Invite card: Share, Text, Email, Copy Link, Show QR Code.
 - Find a Ride **[flag]**: Near Me / By State, place search, radius, map with search this area.
 - Scout, Places to Ride (2.1) **[flag scout]**: Find tab switch; off-road parks, OHV areas, trail systems, trailheads and motocross tracks within 10-1,000 mi (250 default), kind filters, place pages with Create a Ride Here, directions and nearby public rides; Suggest a Place reviewed in Admin > Places to Ride. Data: USFS, BLM, OpenStreetMap (riding_spots).
-- Activities (4.0) **[flag activities, on]**: chip in Home's header switches Offroad, Motorcycle, Road Trip, Snowmobile; each repaints the accent and card edges, changes Home's card lines and Ride Mode's Tell the Group buttons (the panel is unchanged), and filters public rides, events and Places to Ride; new rides and events carry the activity. Places get activities in Admin > Places to Ride.
+- Activities (4.0) **[flag activities, on]**: chip in Home's header switches Offroad, Motorcycle, Road Trip, Snowmobile; each repaints the accent and card edges, changes Home's card lines and Ride Mode's Tell the Group buttons (the panel is unchanged), and filters public rides, events and Places to Ride; new rides and events carry the activity. Places get activities in Admin > Places to Ride. Switching shows a short splash. Each activity adds Pro Map Features (Snowmobile: Snow on the Ground, Sled Trails, Avalanche Danger, Snow Depth Stations, Falling Snow; Motorcycle: Twisty Roads; Road Trip: Scenic Byways, Campgrounds), Home shows Snow Near You in Snowmobile, and Places to Ride searches the activity's kinds of place (Snowmobile Area, Scenic Drive, Campground).
 - Universal Links for onmylead.com/r/*, /g/* **[iOS-only]**; **[Android gap]** no App Links.
 
 ### Ride Mode and Live Tracking

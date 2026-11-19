@@ -9,12 +9,15 @@ import type { LatLng } from '@/core/geo';
 import { difficultyColor, difficultyLabel, feetOrMiles, mappedBy, RIDER_TRAIL_INK, vehicleLabel, type PublicTrail } from '@/core/nav-trails';
 import { formatBytes, IMAGERY_ATTRIBUTION, statusLine, type OfflineChoice } from '@/core/offline-maps';
 import { OSM_ATTRIBUTION } from '@/core/osm-trails';
+import { RADAR_ATTRIBUTION } from '@/core/weather';
 import { PARK_LEVEL_COLORS, PARK_LEVEL_LEGEND, PARK_TRAILS_ATTRIBUTION, parkLevelLabel, parkTrailColor, parkTrailLength, type ParkTrail } from '@/core/park-trails';
 import {
   FEATURE_GROUPS, FEATURE_INK, featuresChanged, MAP_FEATURES, QUICK_LAYERS, quickLayerOn, quickLayerToggle, type MapFeature, type MapFeatureId, type QuickLayer,
 } from '@/core/map-features';
 import { TOPO_ATTRIBUTION, TRAIL_INK, type BaseMap, type LandInfo, type TrailInfo } from '@/core/trails';
 import type { TrailMap } from '@/hooks/use-trail-map';
+import { activityById } from '@/core/activities';
+import { TWISTY_INK, type ActivityLayerDef } from '@/core/activity-layers';
 import { downloadRide, pauseDownload, planRide, resumeDownload, rideDownload, useOfflineMaps } from '@/lib/offline-maps';
 import { can, type FeatureKey } from '@/core/entitlements';
 import { currentEntitlements, PRO_PROMPT_WAITS_FOR_DISMISS, requirePro, useCan } from '@/lib/pro';
@@ -42,6 +45,7 @@ import { setTiltShown, useTiltSettings } from '@/lib/tilt';
 
 import { t as tr } from '@/lib/i18n';
 import { SheetModal } from '@/components/sheet-modal';
+import { WeatherCorner, WeatherSettings } from '@/components/map-weather';
 const SAND = '#ECCD91';
 const WEB = Platform.OS === 'web';
 
@@ -91,6 +95,8 @@ export function TrailMapOverlay({
   const credit = [
     trail.base === 'topo' ? TOPO_ATTRIBUTION : trail.offline ? IMAGERY_ATTRIBUTION : null,
     ...trail.agencyLayers.map((a) => a.attribution),
+    ...trail.activityMap.attribution,
+    trail.weather.radar && trail.mapbox ? RADAR_ATTRIBUTION : null,
     osmOn ? OSM_ATTRIBUTION : trail.parkTrailsOn ? PARK_TRAILS_ATTRIBUTION : null,
   ]
     .filter(Boolean)
@@ -120,6 +126,7 @@ export function TrailMapOverlay({
             <Text style={styles.offlineSub}>{tr('Downloaded Map')}</Text>
           </View>
         ) : null}
+        <WeatherCorner trail={trail} forecast={controls} />
       </View>
       <MapSettingsSheet
         visible={open}
@@ -278,6 +285,8 @@ function MapSettingsSheet({
                 </Text>
               ) : null}
             </View>
+
+            <WeatherSettings trail={trail} pro={() => pro('map_layers')} forecastHere={controls} />
 
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>{tr('On the Map')}</Text>
@@ -586,8 +595,27 @@ function MapFeaturesList({ trail, lookupHint }: { trail: TrailMap; lookupHint: s
     // Rider Trails and Park Trails are free for everyone; the rest are part of map layers (Pro).
     if (id === 'riderTrails' || id === 'parkTrails' || pro('map_layers')) trail.setFeature(id, on);
   };
+  const act = trail.activityMap;
   return (
     <View style={{ gap: 14 }}>
+      {act.defs.length ? (
+        // The rider's activity's own features first (core/activity-layers): none for Offroad.
+        <View style={styles.group} accessibilityRole="list" accessibilityLabel={tr(activityById(act.activity).name)}>
+          <View style={styles.groupHead}>
+            <Text style={styles.groupTitle}>{tr(activityById(act.activity).name)}</Text>
+          </View>
+          {act.defs.map((d) => (
+            <ActivityFeatureRow key={d.id} def={d} on={act.unlocked && act.isOn(d.id)} onToggle={(on) => pro('map_layers') && act.setLayer(d.id, on)} />
+          ))}
+          <Text style={styles.fine}>
+            {act.activity === 'snowmobile'
+              ? tr('Snow, sled trails and avalanche danger come from NOAA, the Forest Service and the local avalanche centers. Always read the full avalanche forecast before you ride.')
+              : act.activity === 'motorcycle'
+                ? tr('Twisty Roads are worked out on your device from the paved roads on screen. Zoom in to see more of them.')
+                : tr('Byways come from the US DOT and campgrounds from OpenStreetMap. Call ahead for open dates and spaces.')}
+          </Text>
+        </View>
+      ) : null}
       {FEATURE_GROUPS.map((g) => {
         const list = MAP_FEATURES.filter((f) => f.group === g.id);
         const allOn = list.every((f) => trail.features[f.id]);
@@ -672,6 +700,69 @@ function TracklineRow({ sw }: { sw: TracklineSwitch }) {
 }
 
 /** One feature: its sample, its name and what it is, and whether it shows. The whole row is the switch. */
+function ActivityFeatureRow({ def, on, onToggle }: { def: ActivityLayerDef; on: boolean; onToggle: (on: boolean) => void }) {
+  return (
+    <Pressable
+      accessibilityRole="switch"
+      accessibilityState={{ checked: on }}
+      accessibilityLabel={tr(def.name)}
+      accessibilityHint={tr(def.line)}
+      onPress={() => onToggle(!on)}
+      style={({ pressed }) => [styles.feature, on && styles.featureOn, pressed && { opacity: 0.85 }]}>
+      <ActivitySample def={def} on={on} />
+      <View style={{ flex: 1, gap: 1 }}>
+        <Text style={[styles.featureName, !on && { color: Colors.textSecondary }]} numberOfLines={1}>{tr(def.name)}</Text>
+        <Text style={styles.featureDetail} numberOfLines={2}>{tr(def.line)}</Text>
+      </View>
+      <View style={[styles.tick, on && styles.tickOn]}>
+        {on ? (
+          <Svg width={14} height={14} viewBox="0 0 24 24" fill="none">
+            <Path d="M5 12.5l4.5 4.5L19 7.5" stroke="#FFFFFF" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
+          </Svg>
+        ) : null}
+      </View>
+    </Pressable>
+  );
+}
+
+/** A small square of map drawn the way each activity feature looks on the map. */
+function ActivitySample({ def, on }: { def: ActivityLayerDef; on: boolean }) {
+  const c = on ? def.swatch : '#7B8794';
+  const ground = '#1B2A1E';
+  const curve = 'M2 24 C12 24 14 8 24 8 S36 16 42 10';
+  return (
+    <Svg width={44} height={32} viewBox="0 0 44 32" style={styles.sample}>
+      <Rect width={44} height={32} fill={ground} />
+      {def.id === 'snowDepth' ? (
+        <Path d="M0 32 L0 14 C8 10 14 16 22 11 S36 6 44 10 L44 32 Z" fill={c} fillOpacity={0.7} />
+      ) : def.id === 'avalanche' ? (
+        <Path d="M6 5 L38 7 L40 27 L4 26 Z" fill={c} fillOpacity={0.35} stroke={c} strokeWidth={1.4} strokeDasharray="3 2" />
+      ) : def.id === 'snowStations' || def.id === 'campgrounds' ? (
+        <>
+          <Ellipse cx={14} cy={20} rx={4} ry={4} fill={c} stroke={def.id === 'snowStations' ? '#7CC4FF' : '#3B2A05'} strokeWidth={1.6} />
+          <Ellipse cx={31} cy={12} rx={4} ry={4} fill={c} stroke={def.id === 'snowStations' ? '#7CC4FF' : '#3B2A05'} strokeWidth={1.6} />
+        </>
+      ) : def.id === 'fallingSnow' ? (
+        <>
+          {[[8, 7], [20, 13], [33, 6], [14, 24], [28, 22], [39, 17], [5, 17]].map(([x, y]) => (
+            <Ellipse key={`${x}-${y}`} cx={x} cy={y} rx={1.6} ry={1.6} fill={c} />
+          ))}
+        </>
+      ) : def.id === 'twistyRoads' ? (
+        <>
+          <Path d="M2 26 C8 26 8 6 14 6 S20 26 26 26 S32 6 38 6 L42 6" stroke="rgba(10,22,38,0.8)" strokeWidth={5.5} fill="none" strokeLinecap="round" />
+          <Path d="M2 26 C8 26 8 6 14 6 S20 26 26 26 S32 6 38 6 L42 6" stroke={on ? TWISTY_INK[1] : c} strokeWidth={3} fill="none" strokeLinecap="round" />
+        </>
+      ) : (
+        <>
+          <Path d={curve} stroke="rgba(10,22,38,0.8)" strokeWidth={5.5} fill="none" strokeLinecap="round" />
+          <Path d={curve} stroke={c} strokeWidth={3} fill="none" strokeLinecap="round" />
+        </>
+      )}
+    </Svg>
+  );
+}
+
 function FeatureRow({ feature, on, onToggle }: { feature: MapFeature; on: boolean; onToggle: (on: boolean) => void }) {
   return (
     <Pressable

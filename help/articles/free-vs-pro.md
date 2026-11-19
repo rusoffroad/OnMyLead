@@ -143,6 +143,7 @@ This is the same comparison as the **Free and Pro** table on the Pro screen.
 | Live Tracking, EMERGENCY, Need Help, Crash Alert and Ride Bubble | Yes | Yes |
 | Ride Chat, Group Chat, Messages and Poll Voting | Yes | Yes |
 | Friends, Badges, the Feed and Events | Yes | Yes |
+| Forecast and Weather Alerts Where You Are | Yes | Yes |
 | Map Mode | 5 Hours a Month | Unlimited |
 | Create Rides | No | Unlimited |
 | Draw Routes, Waypoints and Directions | No | Yes |
@@ -150,6 +151,7 @@ This is the same comparison as the **Free and Pro** table on the Pro screen.
 | Bluetooth Sharing With No Service | No | Yes |
 | CarPlay | No | Yes |
 | Map Layers, Map Features and 3D Terrain | No | Yes |
+| Weather Radar on the Map | No | Yes |
 | Draw, Record, Save, Rate and Share Trails | No | Yes |
 | Track Line and Named Spots | No | Yes |
 | Import GPX Routes and Offline Maps | No | Yes |
@@ -238,6 +240,13 @@ Free accounts get 5 hours of Map Mode every calendar month (UTC time). Pro has n
 - **Waypoints and Planned Stops:** drop waypoints and plan stops with symbols for fuel, camp, hazards and more. Seeing the leader's waypoints on a ride stays free. See [Waypoints and Planned Stops](/help/waypoints-and-planned-stops).
 - **Directions:** hand any spot to Apple Maps or Google Maps for turn-by-turn directions. Directions to a rider who needs help stay free. See [Get Directions in Apple Maps or Google Maps](/help/directions).
 - **Map Layers:** switch between satellite, topo and the trails layer with trail names and closures. The standard map stays free. See [Map Layers and Trails](/help/map-layers).
+:::
+
+:::release 4.0
+- **Weather Radar:** rain and snow from NOAA radar over the map in Ride Mode and Map Mode. **Forecast Where You Are**, with weather alerts, stays free. See [Weather Radar and Forecast](/help/weather).
+:::
+
+:::release 2.0
 - **Unlimited Map Mode:** Free includes 8 hours of Map Mode a month. Pro has no limit.
 - **Map a Custom Trail:** draw a trail on the map and measure distances along it. Following trails stays free.
 - **Record, Save, Rate and Share Trails:** record your line, keep your trails in My Trails, rate trails and share yours on the public map. Seeing and following other riders' trails stays free. See [Navigate Offroad and Map Your Own Trails](/help/navigation-mode).
@@ -276,6 +285,8 @@ New in Pro with 4.0:
 - **Trip Planner** and **Starlink**: trips you already saved are kept. See [Trip Planner](/help/trip-planner) and [Starlink](/help/starlink).
 - **Co-Host Events:** a co-host's tools (edit, photos, agenda, rides) need Pro. Seeing events and saying you're going stay free. See [Events](/help/events).
 - **Leaderboard Filters:** the leaderboard for your country or state, and Where You Ride. The leaderboard for everyone stays free. See [Badge Leaderboard](/help/badge-leaderboard).
+
+The Welcome Tour, Activities and Forecast Where You Are are free on every plan. Weather Radar and each activity's Map Features are Pro.
 :::
 
 :::release 2.1

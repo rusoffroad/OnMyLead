@@ -59,6 +59,18 @@ export const APP_FLAGS = {
     hint: 'Average Speed and Estimated Time under the route builder (app 4.0). Off hides them; drawing and saving routes is not affected.',
     since: '4.0',
   },
+  weather_radar: {
+    group: 'maps',
+    label: 'Weather Radar',
+    hint: 'The Weather Radar switch in Map Settings (Pro): NOAA rain and snow radar over Ride Mode, Map Mode and the route builder (app 4.0). Off takes the radar off every map at once; free, no account.',
+    since: '4.0',
+  },
+  weather_forecast: {
+    group: 'maps',
+    label: 'Forecast Where You Are',
+    hint: 'The forecast button on Ride Mode and Map Mode (free): the temperature, the next hours, 7 days and official weather alerts from the National Weather Service (app 4.0). Off hides it; Ride Day weather on ride pages is not affected.',
+    since: '4.0',
+  },
   trail_ratings: {
     group: 'maps',
     label: 'Rate Trails',
@@ -109,6 +121,12 @@ export const APP_FLAGS = {
   starlink: { group: 'extras', label: 'Starlink', hint: 'The Starlink page in the home screen toolkit.' },
   starlink_mount_ad: { group: 'extras', label: 'Starlink Mount Ad', hint: 'The RUS Starlink Mini Mount V2 ad on the Starlink page.' },
   rus_gear: { group: 'extras', label: 'RUS Gear Suggestions', hint: 'Product suggestions in the Garage and on trip checklists.' },
+  welcome_tour: {
+    group: 'account',
+    label: 'Welcome Tour',
+    hint: 'The short tour of the app that shows once on Home: the whole tour for new riders, a What’s New card for riders who had the app before (app 4.0). Off stops it showing by itself; You > Help > Take the Tour still works.',
+    since: '4.0',
+  },
   referrals: { group: 'account', label: 'Refer a Friend', hint: 'Invite Friends and the 50% off Pro Annual reward. Turn on only once the Apple offer codes and the Google Play referral-50 offer exist. Rewards already earned can still be claimed when it is off.' },
   apple_web_sign_in: {
     group: 'account',

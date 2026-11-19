@@ -3,7 +3,7 @@ import Head from 'expo-router/head';
 import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from 'react';
 
 import { storeLink } from '@/lib/found-us';
-import { APP_STORE_URL, COMPANY, PLAY_STORE_URL, PRO_PRICES, RUS_URL, SHOWCASE_3D_TERRAIN, SHOWCASE_COMMENT_REPLIES, SHOWCASE_EMERGENCY_SIREN, SHOWCASE_GROUP_PHOTOS, SHOWCASE_INTERSECTION_ZOOM, SHOWCASE_LEADER_TRACKLINE, SHOWCASE_MAP_FEATURES, SHOWCASE_NO_SERVICE, SHOWCASE_PARK_TRAILS, SHOWCASE_PHOTO_CROP, SHOWCASE_REDESIGN_3, SHOWCASE_EASY_LEAVE, SHOWCASE_END_RIDE_IN_MODE, SHOWCASE_FOUNDER_FRIENDS, SHOWCASE_QUICK_CREATE, SHOWCASE_EVENTS_AND_RIDES, SHOWCASE_PLACES_TO_RIDE, SHOWCASE_RADIO_SHARING, SHOWCASE_ROUTE_ETA, SHOWCASE_PRO_PLAN_4, SHOWCASE_ACTIVITIES, SHOWCASE_SPREAD_RULER, TRIAL_DAYS } from '@/constants/site';
+import { APP_STORE_URL, COMPANY, PLAY_STORE_URL, PRO_PRICES, RUS_URL, SHOWCASE_3D_TERRAIN, SHOWCASE_COMMENT_REPLIES, SHOWCASE_EMERGENCY_SIREN, SHOWCASE_GROUP_PHOTOS, SHOWCASE_INTERSECTION_ZOOM, SHOWCASE_LEADER_TRACKLINE, SHOWCASE_MAP_FEATURES, SHOWCASE_NO_SERVICE, SHOWCASE_PARK_TRAILS, SHOWCASE_PHOTO_CROP, SHOWCASE_REDESIGN_3, SHOWCASE_EASY_LEAVE, SHOWCASE_END_RIDE_IN_MODE, SHOWCASE_FOUNDER_FRIENDS, SHOWCASE_QUICK_CREATE, SHOWCASE_EVENTS_AND_RIDES, SHOWCASE_PLACES_TO_RIDE, SHOWCASE_RADIO_SHARING, SHOWCASE_ROUTE_ETA, SHOWCASE_PRO_PLAN_4, SHOWCASE_WEATHER, SHOWCASE_ACTIVITIES, SHOWCASE_SPREAD_RULER, TRIAL_DAYS } from '@/constants/site';
 import type { SocialProvider } from '@/core/auth-link';
 import { FREE_MAP_HOURS, FREE_MAP_HOURS_4 } from '@/core/pro';
 import { REFERRAL_PRICE, referralsSwitchedOn } from '@/core/referrals';
@@ -318,6 +318,9 @@ export function Showcase() {
               {SHOWCASE_PARK_TRAILS ? (
                 <li><b>Offroad Park Trails.</b> The trails of Hidden Falls, Katemcy Rocks, Hollister Hills, Hungry Valley, Ocotillo Wells, Interlake, SMORR and about fifty more parks and OHV areas, drawn on every map in the park’s own levels: green for 1 and 2, blue 3, white 4, red 5, with the park’s name from far out and trail names up close. Tap one for its level and length.</li>
               ) : null}
+              {SHOWCASE_WEATHER ? (
+                <li><b>Weather Radar and Forecast.</b> Turn on Weather Radar (Pro) in Map Settings to see rain and snow moving over the map in Ride Mode and Map Mode, from NOAA radar, fresh every 5 minutes. The free forecast button shows the temperature where you are; tap it for the next 12 hours, 7 days and any National Weather Service alerts, kept on your phone for when signal drops.</li>
+              ) : null}
               {SHOWCASE_3D_TERRAIN ? (
                 <li><b>3D Terrain.</b> Pick it in Map Settings in Ride Mode and Map Mode to see satellite on the real shape of the ridges and canyons, with contour lines and peak heights in feet. Tilt and turn it, and save it in Offline Maps for no-signal riding.</li>
               ) : null}
@@ -361,6 +364,9 @@ export function Showcase() {
               )}
               {SHOWCASE_ACTIVITIES ? (
                 <Feature title="Offroad, Motorcycle, Road Trip and Snowmobile, New in 4.0">One app for every way you ride. Tap the activity button on Home to switch, and OnMyLead changes color so you always know where you are. Each activity gets its own Ride Mode buttons, like Belt Broke and Warming Up on a sled or Food Stop on a road trip, and shows the rides, events and places for it. Your friends and groups come with you, EMERGENCY stays red and reaches everyone nearby, and Pro covers them all.</Feature>
+              ) : null}
+              {SHOWCASE_ACTIVITIES ? (
+                <Feature title="A Map for Every Activity, New in 4.0">Switch to Snowmobile and the map shows where there’s snow on the ground today, sled trails, avalanche danger and snow depth stations, with snow falling when it’s snowing. Motorcycle marks the twistiest paved roads around you, and Road Trip shows scenic byways and campgrounds. Places to Ride finds snowmobile areas, scenic drives and campgrounds for your activity.</Feature>
               ) : null}
               <Feature title="Ride Again">Ran a great ride? One tap copies it, meeting point and route included. Pick the new day and send the invite.</Feature>
               <Feature title="Planned Stops">The leader marks where the whole ride will stop for fuel, lunch or camp, with a time. Everyone on the ride sees them numbered on the map, in order, and nobody else does.</Feature>
@@ -813,6 +819,7 @@ const FREE_4 = [
   'Ride Chat, Group Chat, Messages and Poll Voting',
   `Map Mode: ${FREE_MAP_HOURS_4} Hours a Month`,
   'Friends, Badges, the Feed and Events',
+  'Forecast and Weather Alerts Where You Are',
   'Garage: 1 Machine',
   'Ride History: Last 5 Rides',
 ];
@@ -824,6 +831,7 @@ const PRO_4 = [
   'Bluetooth Sharing With No Service',
   'CarPlay',
   'Map Layers, Map Features and 3D Terrain',
+  'Weather Radar on the Map',
   'Draw, Record, Save, Rate and Share Trails',
   'Track Line and Named Spots',
   'Import GPX Routes and Offline Maps',
@@ -848,12 +856,14 @@ const FREE_BEFORE_4 = [
   'Social Feed: See, Like and Read Comments',
   'Badges, Events and Friends',
   'Ride History: Last 5 Rides',
+  ...(SHOWCASE_WEATHER ? ['Forecast and Weather Alerts Where You Are'] : []),
 ];
 const PRO_BEFORE_4 = [
   'Unlimited Rides and Unlimited Map Mode',
   'iPad, Android Tablets and the Website',
   'Draw Routes, Waypoints and Directions',
   'Satellite, Topo and Trail Map Layers',
+  ...(SHOWCASE_WEATHER ? ['Weather Radar on the Map'] : []),
   'Draw, Record, Save, Rate and Share Trails',
   'Track Line and Named Spots',
   'Group Rides on Your Trails',

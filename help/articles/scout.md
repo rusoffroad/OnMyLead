@@ -52,6 +52,8 @@ Places show on the map as teal signs, with a picture of the kind of place (a fla
 :::
 :::release 4.0
 Places show on the map as pins, coloured by the kind of place with a white picture of what you ride there: red with a 4x4 for an off-road park, blue with an ATV for an OHV area, green with a pine tree for a trail system, green with a trail sign for a trailhead and gold with a dirt bike for a motocross track. They're also in a list under the map (beside it on a tablet or a wide screen), nearest first.
+
+Places to Ride looks for the kind of place your [activity](/help/activities) rides: ice blue with a snowflake for a snowmobile area, orange with a winding road for a scenic drive, and brown with a tent for a campground. Snowmobile shows snowmobile areas; Motorcycle shows scenic drives, campgrounds and motocross tracks; Road Trip shows scenic drives and campgrounds. Offroad shows the same places as before. **Suggest a Place** offers the kinds for your activity.
 :::
  Each place shows what kind it is, where it is, how far away it is and how many public rides are coming up there.
 

@@ -53,6 +53,7 @@ import { startLanguageSync } from '@/lib/language-sync';
 import { backupMapWaypointsNow } from '@/lib/map-waypoints';
 import { backupTrailsNow } from '@/lib/trail-backup';
 import { t as tr, takeLanguageReturnPath, useLanguage } from '@/lib/i18n';
+import { ActivitySplash } from '@/components/activity-splash';
 
 // The activity log a bug report carries: errors, failed requests, screens (lib/app-log.ts).
 startAppLog();
@@ -183,6 +184,7 @@ function RootLayout() {
         <Stack.Screen name="ride/new" options={{ title: tr('Create a Ride') }} />
         <Stack.Screen name="r/[code]" options={{ title: '' }} />
         <Stack.Screen name="invite-friends" options={{ title: tr('Invite Friends') }} />
+        <Stack.Screen name="tour" options={{ title: tr('Take the Tour'), headerShown: false, presentation: 'fullScreenModal' }} />
         <Stack.Screen name="events/index" options={{ title: tr('Events and Group Rides') }} />
         <Stack.Screen name="places" options={{ title: tr('Places to Ride') }} />
         <Stack.Screen name="spot/[id]" options={{ title: tr('Place to Ride') }} />
@@ -255,6 +257,8 @@ function RootLayout() {
       <TabletProGate />
       <ProGateHost />
       <DirectionsHost />
+      {/* Activities (4.0): the quick splash after switching activity. */}
+      <ActivitySplash />
       <EmergencySiren />
       {/* Before You Ride: the safety and liability agreement, until the rider agrees. */}
       <RiderAgreementGate />

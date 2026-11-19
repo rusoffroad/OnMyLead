@@ -30,9 +30,30 @@ const subscribe = (l: () => void) => {
 };
 const get = () => chosen;
 
-/** Switches activity: saves it, sends it to the account, and redraws the app in its colours. */
+/** The splash shown after a switch (components/activity-splash.tsx), kept here so the redraw in new colours can't lose it. */
+let splash: { id: ActivityId; at: number } | null = null;
+const splashListeners = new Set<() => void>();
+export const getSplash = () => splash;
+export function subscribeSplash(l: () => void) {
+  splashListeners.add(l);
+  return () => {
+    splashListeners.delete(l);
+  };
+}
+/** Ends the splash that started at `at` (a later switch's splash stays). */
+export function dismissSplash(at: number) {
+  if (!splash || splash.at !== at) return;
+  splash = null;
+  splashListeners.forEach((l) => l());
+}
+
+/** Switches activity: saves it, sends it to the account, shows its splash, and redraws the app in its colours. */
 export function setActivity(id: ActivityId) {
   if (id === chosen && paintedActivity() === id) return;
+  if (id !== chosen) {
+    splash = { id, at: Date.now() };
+    splashListeners.forEach((l) => l());
+  }
   chosen = id;
   writeActivityFile(id);
   setSyncedItem(ACTIVITY_KEY, id).catch(() => {});
