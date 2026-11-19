@@ -55,6 +55,15 @@ export type SpotFields = Partial<Pick<AdminSpotRow,
 export const saveSpot = (id: string | null, fields: SpotFields) =>
   adminRpc<string>('admin_save_riding_spot', { p_id: id, p_fields: fields });
 
+// ---- Activities (4.0): which activities each place serves (migration 20261121300000) ---------
+
+/** id -> activities for the places on screen. Places from before Activities are ['offroad']. */
+export const spotActivities = (ids: string[]) =>
+  adminRpc<Record<string, string[]>>('admin_riding_spot_activities', { p_ids: ids });
+
+export const setSpotActivities = (id: string, activities: string[]) =>
+  adminRpc<null>('admin_set_riding_spot_activities', { p_id: id, p_activities: activities });
+
 // ---- Rider reviews of places (4.0) ----------------------------------------------------------
 
 export type ReviewStatus = 'live' | 'hidden';

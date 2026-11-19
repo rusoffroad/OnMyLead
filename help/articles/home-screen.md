@@ -6,6 +6,7 @@ order: 15
 release: "2.0"
 updated: 2026-11-19
 sources:
+  - app/src/core/activities.ts
   - app/src/components/found-us-card.tsx
   - app/src/lib/found-us.ts
   - app/src/app/leaderboard.tsx
@@ -315,4 +316,10 @@ In landscape, and on a big window, Home has two columns: join, create, find, eve
 ## On the Website
 
 When you're signed in at onmylead.com, the **Rides** page is the same home screen.
+:::
+
+:::release 4.0
+### Your Activity
+
+The colored button at the top of Home, next to the bell, shows your activity (Offroad, Motorcycle, Road Trip or Snowmobile). Tap it to switch. Home's colors and words change to match, and public rides, events and places show the ones for that activity. See [Switch Activities](/help/activities).
 :::

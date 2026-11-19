@@ -3,7 +3,9 @@ import type { ReactNode } from 'react';
 import { Platform, Pressable, ScrollView, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Colors, font, Glass, Radius, Spacing, themedStyles } from '@/constants/theme';
+import { Colors, currentScheme, font, Glass, Radius, Spacing, themedStyles } from '@/constants/theme';
+import { ACTIVITY_ICON } from './home/activity-switcher';
+import { activityById, activityInk, DEFAULT_ACTIVITY, statusesFor, type ActivityId } from '@/core/activities';
 import { QUICK_REPLIES, type QuickReply } from '@/core/chat';
 import type { RiderStatusKind } from '@/lib/types';
 import { Icon, type IconName } from './icon';
@@ -109,20 +111,38 @@ export function PanelActions({ onRegroup, onEmergency }: { onRegroup?: () => voi
  * Regroup and Emergency. Sending one closes the sheet so the Sending card shows at once.
  */
 export function StatusSheet({
-  visible, tablet, labels, myStatus, lastReply, onReply, onStatus, onRegroup, onEmergency, onClose,
+  visible, tablet, labels, myStatus, lastReply, onReply, onStatus, onRegroup, onEmergency, onClose, activity = DEFAULT_ACTIVITY,
 }: {
   visible: boolean;
   tablet: boolean;
   labels: Record<RiderStatusKind, string>;
   myStatus?: RiderStatusKind;
   lastReply: string | null;
-  onReply: (q: QuickReply) => void;
+  onReply: (q: string) => void;
   onStatus: (k: RiderStatusKind) => void;
   onRegroup?: () => void;
   onEmergency: () => void;
   onClose: () => void;
+  /**
+   * The ride's activity (4.0): Offroad (the default) is today's sheet exactly. Another activity
+   * names itself in its colour at the top, leaves out statuses that don't fit, and adds its own
+   * quick messages (sent like a typed Ride Mode message, so every app build and Bluetooth carry them).
+   */
+  activity?: ActivityId;
 }) {
   const insets = useSafeAreaInsets();
+  const act = activityById(activity);
+  const ink = act.colors ? activityInk(act.id, currentScheme(), Colors.accent) : null;
+  const extra = (label: string, section: 'move' | 'trouble') => (
+    <QuickTile
+      key={`${section}:${label}`}
+      label={t(label)}
+      on={lastReply === t(label)}
+      onPress={pick(() => onReply(t(label)))}
+      a11y={t('Send to the group: {q}', { q: t(label) })}
+      style={[styles.third, ink ? { borderColor: ink } : null]}
+    />
+  );
   const pick = (f: () => void) => () => {
     onClose();
     f();
@@ -138,7 +158,15 @@ export function StatusSheet({
           accessibilityViewIsModal>
           <View style={styles.grab} />
           <View style={styles.head}>
-            <Text style={styles.title} accessibilityRole="header">{t('Tell the Group')}</Text>
+            <View style={{ flex: 1, gap: 2 }}>
+              <Text style={styles.title} accessibilityRole="header">{t('Tell the Group')}</Text>
+              {ink ? (
+                <View style={styles.actRow}>
+                  <Icon name={ACTIVITY_ICON[act.id]} size={15} color={ink} strokeWidth={2.2} />
+                  <Text style={[styles.actText, { color: ink }]}>{t('{activity} Ride', { activity: t(act.name) })}</Text>
+                </View>
+              ) : null}
+            </View>
             <Pressable onPress={onClose} hitSlop={12} accessibilityRole="button" accessibilityLabel={t('Done')}>
               <Text style={styles.done}>{t('Done')}</Text>
             </Pressable>
@@ -155,12 +183,13 @@ export function StatusSheet({
                   style={styles.third}
                 />
               ))}
+              {act.moveReplies.map((l) => extra(l, 'move'))}
               {MOVE_STATUSES.map((k) => (
                 <QuickTile key={k} label={labels[k]} on={myStatus === k} onPress={pick(() => onStatus(k))} a11y={t('Send status {v}', { v: labels[k] })} style={styles.third} />
               ))}
             </Section>
             <Section label={t('Trouble')}>
-              {TROUBLE_STATUSES.map((k) => (
+              {statusesFor(act.id, TROUBLE_STATUSES).map((k) => (
                 <QuickTile
                   key={k}
                   label={labels[k]}
@@ -171,6 +200,7 @@ export function StatusSheet({
                   style={styles.third}
                 />
               ))}
+              {act.troubleReplies.map((l) => extra(l, 'trouble'))}
             </Section>
             <PanelActions onRegroup={onRegroup ? pick(onRegroup) : undefined} onEmergency={pick(onEmergency)} />
           </ScrollView>
@@ -236,6 +266,8 @@ export function QuickRow({
 
 const styles = themedStyles(() => ({
   row: { flexDirection: 'row', gap: 8 },
+  actRow: { flexDirection: 'row', alignItems: 'center', gap: 5 },
+  actText: { fontFamily: font(700), fontSize: 13 },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   quarter: { flex: 1 },
   third: { flexBasis: '30%', flexGrow: 1, minHeight: 52 },

@@ -5,6 +5,7 @@ import { Platform, Pressable, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AppNotices } from '@/components/app-notices';
+import { ActivityChip, ActivitySheet } from '@/components/home/activity-switcher';
 import { HeroBadges } from '@/components/badge-strip';
 import { FeedList, FeedSheet } from '@/components/home/feed';
 import { GroupCard, NoGroupCard } from '@/components/home/group-card';
@@ -32,6 +33,7 @@ import { ROW_ACTION_HINT, SwipeRow } from '@/components/swipe-row';
 import { ThemedText } from '@/components/themed-text';
 import { Button, ErrorText, Screen } from '@/components/ui';
 import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
+import { activityById } from '@/core/activities';
 import { flagOn } from '@/core/app-settings';
 import { DEFAULT_HOME_LAYOUT, HOME_LAYOUT_KEY, parseHomeLayout, serializeHomeLayout, shownSections, type HomeLayout, type HomeSection } from '@/core/home-layout';
 import { READABLE_WIDTH } from '@/core/layout';
@@ -46,6 +48,7 @@ import { rowActionFor } from '@/core/row-swipe';
 import { useLayout } from '@/hooks/use-layout';
 import { useTheme } from '@/hooks/use-theme';
 import { deleteRide, discoverPublicRides, getMembers, leaveRide, myRideName, myRides, publicRidesNear } from '@/lib/api';
+import { setActivity, useActivity, wearActivity } from '@/lib/activity';
 import { useAppSettings } from '@/lib/app-settings';
 import { appVersionLabel } from '@/lib/app-update';
 import { fetchMyBadges } from '@/lib/badges';
@@ -92,6 +95,14 @@ export default function HomeScreen() {
   const navOn = flagOn(settings, 'nav_mode');
   const feedOn = flagOn(settings, 'home_feed');
   const placesOn = flagOn(settings, 'scout');
+  // Activities (4.0): the rider's activity while the flag is on, else Offroad (today's app).
+  const { activity, on: activitiesOn } = useActivity();
+  const act = activityById(activitiesOn ? activity : 'offroad');
+  /** What discovery filters by: nothing while Activities is off, so every ride shows as before. */
+  const discoverFor = activitiesOn ? activity : undefined;
+  const [activityOpen, setActivityOpen] = useState(false);
+  // Only while Home is on screen, so a flag change never redraws the app under a rider in Ride Mode.
+  useFocusEffect(useCallback(() => wearActivity(activitiesOn), [activitiesOn]));
   const head = homeHeader(layout.height, !layout.expanded);
   const compact = !layout.expanded;
   const tools = toolkitFor({ trip_planner: flagOn(settings, 'trip_planner'), starlink: flagOn(settings, 'starlink') });
@@ -190,9 +201,9 @@ export default function HomeScreen() {
     // Never asks for location here: with it, rides sort by distance; without it, every public ride.
     const at = await positionIfAllowed();
     setLocated(!!at);
-    if (at && mi > 0) return publicRidesNear(at, mi);
-    return discoverPublicRides();
-  }, []);
+    if (at && mi > 0) return publicRidesNear(at, mi, discoverFor);
+    return discoverPublicRides(undefined, 100, discoverFor);
+  }, [discoverFor]);
 
   useFocusEffect(
     useCallback(() => {
@@ -309,6 +320,7 @@ export default function HomeScreen() {
       <View style={styles.topRight}>
         {/* Signed-out riders can switch language before they have an account; signed in, it's in You. */}
         {session ? null : <LanguageButton />}
+        {activitiesOn ? <ActivityChip activity={activity} name={t(act.name)} onPress={() => setActivityOpen(true)} /> : null}
         {session ? (
           <>
             <InboxBell compact onMap />
@@ -375,15 +387,18 @@ export default function HomeScreen() {
   // hide and order (Customize Home). On a phone they sit a little tighter so they fit on one screen.
   const actions = (
     <View style={{ gap: head.tight ? 8 : compact ? 10 : 12, marginTop: -head.overlap }}>
-      {navOn ? <MapModeBanner image={heroUrl} trailsNear={trailsNear} compact={compact} tight={head.tight} /> : null}
-      <JoinHero code={code} onCode={setCode} onOpen={openCode} compact={compact} tight={head.tight} />
+      {navOn ? <MapModeBanner image={heroUrl} trailsNear={trailsNear} compact={compact} tight={head.tight} line={t(act.mapLine)} /> : null}
+      <JoinHero code={code} onCode={setCode} onOpen={openCode} compact={compact} tight={head.tight} activity={activitiesOn ? activity : undefined} />
       <ActionTiles
         compact={compact}
         tight={head.tight}
         quota={session ? createQuota(ent) : null}
+        createLine={act.createLine ? t(act.createLine) : undefined}
+        eventsLine={t(act.eventsLine)}
+        activity={activitiesOn ? activity : undefined}
         onStart={() => (session ? requirePro('create_ride') && router.push('/ride/new') : router.push('/sign-in'))}
       />
-      {placesOn ? <PlacesCard compact={compact} tight={head.tight} /> : null}
+      {placesOn ? <PlacesCard compact={compact} tight={head.tight} line={t(act.placesLine)} activity={activitiesOn ? activity : undefined} /> : null}
       {nudgeAndLive}
       {!loading && !session ? (
         <Button title={t('Sign In or Create a Free Account')} kind="ghost" onPress={() => router.push('/sign-in?mode=create')} />
@@ -407,7 +422,7 @@ export default function HomeScreen() {
             swipeRow(m, <RideRow ride={m.rides} note={m.status === 'joined' ? t(roleLabel(m.role)) : m.status.replace('_', ' ')} />))}
         </RowGroup>
       ) : null}
-      <EventsCard signedIn={!!session} radius={radius} />
+      <EventsCard signedIn={!!session} radius={radius} activity={discoverFor} />
       {going.length && ROW_ACTION_HINT ? <Text style={[homeStyles.muted, { fontSize: 12 }]}>{ROW_ACTION_HINT}</Text> : null}
     </Block>
   );
@@ -501,6 +516,17 @@ export default function HomeScreen() {
     <>
       <CustomizeHomeSheet visible={customizing} layout={homeLayout} onClose={() => setCustomizing(false)} onSave={saveLayout} />
       <RadiusSheet visible={radiusOpen} radius={radius ?? 0} located={located} onPick={pickRadius} onClose={() => setRadiusOpen(false)} />
+      {activitiesOn ? (
+        <ActivitySheet
+          visible={activityOpen}
+          activity={activity}
+          onPick={(id) => {
+            setActivityOpen(false);
+            setActivity(id);
+          }}
+          onClose={() => setActivityOpen(false)}
+        />
+      ) : null}
       {session && feedOn ? (
         <FeedSheet
           visible={feedOpen}

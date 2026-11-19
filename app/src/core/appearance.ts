@@ -135,14 +135,25 @@ export function resolveScheme(mode: AppearanceMode, system: string | null | unde
   return mode;
 }
 
-export function buildPalette(a: Appearance, system?: string | null): Palette {
+/**
+ * Builds the palette. `activity` (core/activities.ts activityPalette) repaints the accent and the
+ * tile edges for an activity other than Offroad; it never touches danger, Glass red (Regroup,
+ * EMERGENCY) or the ride and map inks.
+ */
+export function buildPalette(
+  a: Appearance,
+  system?: string | null,
+  activity?: (scheme: Scheme, baseEdge: string) => Partial<Pick<Palette['colors'], 'accent' | 'onAccent' | 'scout' | 'onScout' | 'tileEdge'>> | null,
+): Palette {
   const scheme = resolveScheme(a.mode, system);
   const s = skinById(a.skin)[scheme];
   const b = BRAND[scheme];
   const dark = scheme === 'dark';
+  const edge = tileEdgeFor(s, dark);
+  const over = activity?.(scheme, edge) ?? {};
   return {
     scheme,
-    colors: { ...s, tileEdge: tileEdgeFor(s, dark), textSoft: mix(s.text, s.textSecondary, 0.5), accent: b.accent, onAccent: '#FFFFFF', sky: b.sky, danger: b.danger, gold: b.gold, scout: b.scout, onScout: b.onScout, scrim: dark ? 'rgba(3,9,18,0.72)' : 'rgba(10,22,38,0.42)' },
+    colors: { ...s, tileEdge: edge, textSoft: mix(s.text, s.textSecondary, 0.5), accent: b.accent, onAccent: '#FFFFFF', sky: b.sky, danger: b.danger, gold: b.gold, scout: b.scout, onScout: b.onScout, scrim: dark ? 'rgba(3,9,18,0.72)' : 'rgba(10,22,38,0.42)', ...over },
     glass: {
       panel: withAlpha(s.backgroundElement, dark ? 0.95 : 0.96),
       tile: dark ? 'rgba(255,255,255,0.06)' : 'rgba(10,22,38,0.05)',
