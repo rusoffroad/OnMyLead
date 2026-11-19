@@ -7,6 +7,7 @@ import { Icon } from '@/components/icon';
 import { PlaceSearch } from '@/components/place-search';
 import { awayText, SpotPin } from '@/components/rides-map-chrome';
 import { RidesMap } from '@/components/rides-map';
+import { SPOT_INK } from '@/components/spot-pin-art';
 import { RowGroup } from '@/components/ride-row';
 import { ThemedText } from '@/components/themed-text';
 import { TwoPane } from '@/components/two-pane';
@@ -192,7 +193,7 @@ export function Scout({ top, start = 'near' }: { top: React.ReactNode; start?: '
                 accessibilityLabel={`${t(k.label)}, ${counts[k.kind]}`}
                 onPress={() => setKinds((ks) => toggleKind(ks, k.kind))}
                 style={({ pressed }) => [styles.kind, on && styles.kindOn, pressed && { opacity: 0.7 }]}>
-                <Icon name={k.icon} size={15} color={on ? Colors.onScout : Colors.scout} strokeWidth={2.4} />
+                <Icon name={k.icon} size={15} color={on ? Colors.onScout : SPOT_INK[k.kind]} strokeWidth={2.4} />
                 <Text style={[styles.kindText, on && styles.kindTextOn]}>{t(k.label)}</Text>
                 <Text style={[styles.kindCount, on && styles.kindTextOn]}>{counts[k.kind]}</Text>
               </Pressable>
