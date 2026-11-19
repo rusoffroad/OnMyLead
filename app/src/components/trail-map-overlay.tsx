@@ -45,7 +45,7 @@ import { setTiltShown, useTiltSettings } from '@/lib/tilt';
 
 import { t as tr } from '@/lib/i18n';
 import { SheetModal } from '@/components/sheet-modal';
-import { WeatherCorner, WeatherSettings } from '@/components/map-weather';
+import { WeatherCorner, weatherCornerShows, WeatherSettings } from '@/components/map-weather';
 const SAND = '#ECCD91';
 const WEB = Platform.OS === 'web';
 
@@ -104,29 +104,33 @@ export function TrailMapOverlay({
   // A small dot on the Map Settings button says the map isn't showing the standard set.
   // A Free rider's map shows only the free features (the rest read as off), so only those count.
   const layersPro = useCan('map_layers');
+  const weatherRow = weatherCornerShows(trail, controls);
   const changed = trail.base !== 'satellite' || featuresChanged(trail.features, layersPro ? undefined : FREE_FEATURES);
 
   return (
     <>
       <View pointerEvents="box-none" style={[styles.corner, { top, left: left ?? insets.left + 12 }]}>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel={tr('Map Settings')}
-          accessibilityHint={tr('Map style, roads, trails, land and the buttons on the map')}
-          accessibilityState={{ expanded: open }}
-          hitSlop={6}
-          onPress={() => setOpen(true)}
-          style={({ pressed }) => [styles.fab, pressed && styles.fabPressed]}>
-          <SettingsIcon color={Colors.text} />
-          {changed ? <View style={styles.fabDot} /> : null}
-        </Pressable>
+        <View pointerEvents="box-none" style={styles.cornerRow}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={tr('Map Settings')}
+            accessibilityHint={tr('Map style, roads, trails, land and the buttons on the map')}
+            accessibilityState={{ expanded: open }}
+            hitSlop={6}
+            onPress={() => setOpen(true)}
+            style={({ pressed }) => [styles.fab, pressed && styles.fabPressed]}>
+            <SettingsIcon color={Colors.text} />
+            {changed ? <View style={styles.fabDot} /> : null}
+          </Pressable>
+          {/* Beside Map Settings, not under it: the panels on the map cover the space below. */}
+          <WeatherCorner trail={trail} forecast={controls} />
+        </View>
         {trail.offline && !hideOfflineTag ? (
           <View style={styles.offline} accessible accessibilityLabel={tr('No signal. The map is showing what\'s downloaded on this phone.')}>
             <Text style={styles.offlineText}>{tr('No Signal')}</Text>
             <Text style={styles.offlineSub}>{tr('Downloaded Map')}</Text>
           </View>
         ) : null}
-        <WeatherCorner trail={trail} forecast={controls} />
       </View>
       <MapSettingsSheet
         visible={open}
@@ -141,7 +145,7 @@ export function TrailMapOverlay({
       />
 
       {(trail.zoomInHint || trail.landZoomHint || trail.closerForTracks) && !bare ? (
-        <View pointerEvents="none" style={[styles.hint, { top: top + 6 }]}>
+        <View pointerEvents="none" style={[styles.hint, { top: top + 6 + (weatherRow ? 54 : 0) }]}>
           <Text style={styles.hintText}>
             {trail.zoomInHint ? tr('Zoom In to See Trails') : trail.landZoomHint ? tr('Zoom In to See Land Boundaries') : tr('Zoom In for Park and Local Trails')}
           </Text>
@@ -1118,6 +1122,7 @@ const glass = GlassSurface;
 
 const styles = themedStyles(() => ({
   corner: { position: 'absolute', alignItems: 'flex-start', gap: 8, zIndex: 20 },
+  cornerRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   fab: {
     width: 46, height: 46, borderRadius: 23, alignItems: 'center', justifyContent: 'center', ...glass,
     shadowColor: '#000', shadowOpacity: 0.28, shadowRadius: 10, shadowOffset: { width: 0, height: 4 }, elevation: 6,
