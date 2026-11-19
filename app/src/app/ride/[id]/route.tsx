@@ -2,7 +2,7 @@ import * as DocumentPicker from 'expo-document-picker';
 import * as Haptics from 'expo-haptics';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Animated, Platform, Pressable, Text, View } from 'react-native';
+import { ActivityIndicator, Animated, Platform, Pressable, Text, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BarChip, BarReadout, FullMapBar } from '@/components/full-map';
@@ -23,7 +23,7 @@ import { OSM_ATTRIBUTION } from '@/core/osm-trails';
 import type { Place } from '@/core/places';
 import { miles, routeFromGpx, type RideRoute } from '@/core/route';
 import { routeFromLegs } from '@/core/route-legs';
-import { cleanSpeedText, formatEta, parseSpeed } from '@/core/route-eta';
+import { cleanSpeedText, formatEta, panelLift, parseSpeed } from '@/core/route-eta';
 import { trailAsRoute } from '@/core/nav-trails';
 import { loadTrails, trailLine } from '@/lib/nav-trails';
 import { useRememberedToggle } from '@/hooks/use-remembered-toggle';
@@ -95,10 +95,15 @@ export default function RouteBuilder() {
   const fold = usePanelFold('route.panelOpen.v1', true, wide ? 'up' : 'down', true, fullMap.enter);
   const open = fold.open;
   // The time estimate's speed box: while it's being typed in, the panel rides up above the keyboard
-  // (a panel hanging from the top on a wide tablet is already clear of it).
+  // (a panel hanging from the top on a wide tablet is already clear of it), but never past the bar
+  // with the ride's name and the status bar (core/route-eta panelLift).
   const [typingSpeed, setTypingSpeed] = useState(false);
+  const [panelH, setPanelH] = useState(0);
   const keyboard = useKeyboardHeight();
-  const lift = typingSpeed && !wide && keyboard > 0 ? Math.max(0, keyboard - (floating ? 0 : insets.bottom)) : 0;
+  const windowH = useWindowDimensions().height;
+  const lift = typingSpeed && !wide
+    ? panelLift({ keyboard, panelH, windowH, topInset: insets.top, bottomInset: insets.bottom, bottomGap: floating ? 12 : 0 })
+    : 0;
 
   useEffect(() => {
     Promise.all([getRide(id), getPrivateDetails(id).catch(() => null), getRideRoute(id)])
@@ -269,6 +274,7 @@ export default function RouteBuilder() {
       {full ? null : (
       <Animated.View
         {...fold.panHandlers}
+        onLayout={(e) => setPanelH(e.nativeEvent.layout.height)}
         style={[styles.panel, wide && [styles.panelWide, { top: Math.max(88, insets.top + 72) }], floating && styles.panelFloating, lift ? { bottom: (floating ? 12 : 0) + lift } : null, { transform: [{ translateY: fold.drag }] }]}>
       <SafeAreaView edges={['bottom']} style={[styles.panelInner, !open && styles.panelFolded]}>
         <PanelHandle open={open} onToggle={() => fold.setOpen(!open)} what="Route Tools" fromTop={wide} onFullMap={fullMap.enter} />
