@@ -4,7 +4,7 @@ summary: Choose which ride, chat, group and account notifications you get, set a
 category: account
 order: 30
 release: "1.0"
-updated: 2026-11-16
+updated: 2026-11-19
 sources:
   - supabase/functions/rider-email/index.ts
   - supabase/functions/_shared/rider-email.ts

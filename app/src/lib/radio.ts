@@ -145,8 +145,8 @@ let ham = false;
 let loraProblem: RadioProblem = null;
 const sent = new Map<string, RadioSent>();
 const airLog: [number, number][] = [];
-/** roundKeys heard from the radio, with when, so they aren't sent back to it. */
-const fromRadio = new Map<string, number>();
+/** Items heard from the radio by roundKey: the item's own time and when it was heard, so that copy isn't sent back to it. */
+const fromRadio = new Map<string, { at: number; heardAt: number }>();
 /** Other radios heard carrying this ride's packets, with when. */
 const peers = new Map<number, number>();
 
@@ -392,7 +392,10 @@ function heardPacket(from: number, payload: Uint8Array) {
   if (!mesh) return;
   const item = openFrame(mesh.keys.rideKey, payload, Math.floor(now / 1000));
   if (!item) return;
-  fromRadio.set(roundKey(item), now);
+  // A copy of this rider's own packet relayed back: nothing to note (the mesh drops it too).
+  if (item.userId === ride?.myId) return;
+  const k = roundKey(item);
+  if ((fromRadio.get(k)?.at ?? -1) < item.at) fromRadio.set(k, { at: item.at, heardAt: now });
   peers.set(from, now);
   publish({ heard: view.heard + 1, lastHeardAt: now });
   try {
@@ -412,7 +415,7 @@ function round() {
   // The radio's own queue is nearly full: let it catch up.
   if (queueFree != null && queueFree < RADIO_QUEUE_LOW) return;
   const now = Date.now();
-  for (const [k, t] of fromRadio) if (now - t > 30 * 60_000) fromRadio.delete(k);
+  for (const [k, h] of fromRadio) if (now - h.heardAt > 30 * 60_000) fromRadio.delete(k);
   for (const [n, t] of peers) if (now - t > PEER_MS) peers.delete(n);
   const nowSec = Math.floor(now / 1000);
   const sealed = new Map<NearbyItem, Uint8Array>();
@@ -426,12 +429,15 @@ function round() {
   };
   let picks: ReturnType<typeof pick>;
   try {
+    const items = mesh.live(now);
+    // Only the copy the radio already carried stays off it; a newer one (heard over phone Bluetooth) goes.
+    const carried = new Set(items.filter((i) => (fromRadio.get(roundKey(i))?.at ?? -1) >= i.at).map(roundKey));
     picks = pick({
-      items: mesh.live(now),
+      items,
       myId: r.myId,
       now,
       preset: view.preset ?? 'LONG_FAST',
-      fromRadio: new Set(fromRadio.keys()),
+      fromRadio: carried,
       sent,
       usedMs: usedLastMinute(airLog, now),
       radioPeers: peers.size,

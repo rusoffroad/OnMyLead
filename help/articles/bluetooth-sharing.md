@@ -4,7 +4,7 @@ summary: With no cell service, riders on the same ride pass spots, status taps a
 category: ride-mode
 order: 25
 release: "2.1"
-updated: 2026-11-16
+updated: 2026-11-19
 sources:
   - app/src/core/nearby.ts
   - app/src/lib/nearby.ts

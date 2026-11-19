@@ -1,4 +1,4 @@
-import { Stack } from 'expo-router';
+import { Redirect, Stack } from 'expo-router';
 import { useEffect } from 'react';
 import { View } from 'react-native';
 
@@ -9,7 +9,7 @@ import { Colors, Radius, RideColors, Spacing, themedStyles } from '@/constants/t
 import { radioStatus } from '@/core/radio-status';
 import { t } from '@/lib/i18n';
 import { useBluetoothSharingSetting } from '@/lib/nearby';
-import { forgetRadio, pairRadio, radioPageOpen, startRadioScan, stopRadioScan, useRadio } from '@/lib/radio';
+import { forgetRadio, pairRadio, radioAvailable, radioPageOpen, startRadioScan, stopRadioScan, useRadio } from '@/lib/radio';
 
 /**
  * You > Radio Sharing: pair the rider's own Meshtastic radio, see whether it's connected and its
@@ -17,6 +17,12 @@ import { forgetRadio, pairRadio, radioPageOpen, startRadioScan, stopRadioScan, u
  * (lib/radio.ts). Only shown when the Admin switch radio_sharing is on and the build has the module.
  */
 export default function RadioScreen() {
+  // The website and builds without the module have no radio: back to You.
+  if (!radioAvailable) return <Redirect href="/profile" />;
+  return <RadioPage />;
+}
+
+function RadioPage() {
   const r = useRadio();
   const [bluetoothOn] = useBluetoothSharingSetting();
   useEffect(() => {
