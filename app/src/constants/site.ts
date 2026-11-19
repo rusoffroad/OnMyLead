@@ -107,7 +107,7 @@ export const SHOWCASE_EASY_LEAVE: boolean = true;
 export const SHOWCASE_END_RIDE_IN_MODE: boolean = true;
 /**
  * True once 3.3 is in the stores: every rider starts out friends with OnMyLead's founder, whose
- * name carries a Founder tag (App Founder from 3.4). Until then the showcase's Friends line doesn't mention it.
+ * name carries an OnMyLead Founder tag. Until then the showcase's Friends line doesn't mention it.
  */
 export const SHOWCASE_FOUNDER_FRIENDS: boolean = true;
 /**
