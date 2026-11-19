@@ -127,3 +127,9 @@ export const SHOWCASE_EVENTS_AND_RIDES: boolean = true;
  * app version with it (4.0) is live in the stores.
  */
 export const SHOWCASE_PLACES_TO_RIDE: boolean = false;
+/**
+ * The Radio Sharing (Meshtastic) lines in the showcase's No Service section. Off until Radio
+ * Sharing is tested with real radios, the Admin switch radio_sharing is on, and Meshtastic has
+ * answered about using its name (docs/feature-parity.md F139).
+ */
+export const SHOWCASE_RADIO_SHARING: boolean = false;
