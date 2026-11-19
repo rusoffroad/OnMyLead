@@ -968,7 +968,8 @@ export default function NavMode() {
       />
       <ImportDoneBar
         done={wpImport.done}
-        bottom={full ? insets.bottom + FULL_MAP_BAR_H + 12 : wide ? 24 : (panelH && panelH > 0 ? panelH : open ? 340 : 180) + 12}
+        // Clear of Center on Me, Follow Me and Music, which sit just above the panel.
+        bottom={wide ? 24 : locatePos.bottom + 120}
         onUndone={(d) => d.where === 'ride' && void groupRide.wp.reload()}
         onGone={() => wpImport.setDone(null)}
       />

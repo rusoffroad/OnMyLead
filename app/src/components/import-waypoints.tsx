@@ -316,7 +316,7 @@ const styles = themedStyles(() => ({
   note: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 13, lineHeight: 18 },
   done: {
     minHeight: 50, flexDirection: 'row', alignItems: 'center', gap: 10,
-    paddingHorizontal: 14, borderRadius: Radius.control, backgroundColor: Glass.panel, borderWidth: 1, borderColor: Glass.edge,
+    paddingHorizontal: 14, borderRadius: Radius.control, backgroundColor: Colors.backgroundElement, borderWidth: 1, borderColor: Colors.border, zIndex: 50, elevation: 8,
   },
   doneFloat: { position: 'absolute', left: 12, right: 12, maxWidth: 420, marginHorizontal: 'auto' },
   doneText: { flex: 1, color: Colors.text, fontFamily: font(700), fontSize: 15 },

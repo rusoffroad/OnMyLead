@@ -55,6 +55,10 @@ The track's name from the file is kept with the route. Very long tracks are simp
 Waypoints inside a GPX file aren't added as OnMyLead waypoints. To mark camp, fuel or a planned stop, see [Waypoints and Planned Stops](/help/waypoints-and-planned-stops).
 :::
 
+:::release 4.0
+To bring the waypoints in a file onto your map, use **Import Waypoints** instead. See [Import Waypoints From Another App](/help/import-waypoints).
+:::
+
 ## Change an Imported Route
 
 An imported track is shown as it is, so you can't drag or add points to it.
