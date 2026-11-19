@@ -138,6 +138,12 @@ export const SHOWCASE_RADIO_SHARING: boolean = false;
  * the stores.
  */
 export const SHOWCASE_ROUTE_ETA: boolean = false;
+/**
+ * Weather on the map: Weather Radar (Pro) over Ride Mode and Map Mode and the free Forecast Where
+ * You Are button (NOAA and the National Weather Service). Off until the app version with it (4.0)
+ * is live in the stores.
+ */
+export const SHOWCASE_WEATHER: boolean = false;
 
 /**
  * Activities (Offroad, Motorcycle, Road Trip, Snowmobile, each with its own colours, Ride Mode

@@ -90,7 +90,7 @@ export function RideDay({ ride }: { ride: Ride }) {
       ) : null}
 
       {forecast ? (
-        <ThemedText type="small" themeColor="textSecondary" style={{ fontSize: 12 }}>{t('Forecast for {v}. Weather data by Open-Meteo.com.', { v: ride.meet_area_label ? t('the area near {place}', { place: ride.meet_area_label }) : t('the meeting area') })}</ThemedText>
+        <ThemedText type="small" themeColor="textSecondary" style={{ fontSize: 12 }}>{t('Forecast for {v}, from the National Weather Service.', { v: ride.meet_area_label ? t('the area near {place}', { place: ride.meet_area_label }) : t('the meeting area') })}</ThemedText>
       ) : null}
     </Card>
   );
