@@ -168,20 +168,19 @@ export function WeatherCorner({ trail, forecast }: { trail: TrailMap; forecast: 
       ) : null}
       {w.radar && trail.mapbox ? (
         <View style={styles.radarKey} accessible accessibilityLabel={tr('Weather Radar. Light rain or snow is blue, heavy is red.')}>
-          <Text style={styles.radarTitle}>{tr('Weather Radar')}</Text>
-          <Svg width={KEY_W} height={6} style={{ borderRadius: 3 }}>
+          <Svg width={6} height={KEY_H} style={{ borderRadius: 3 }}>
             <Defs>
-              <LinearGradient id="radar-key" x1="0" y1="0" x2="1" y2="0">
+              <LinearGradient id="radar-key" x1="0" y1="1" x2="0" y2="0">
                 {RADAR_KEY_COLORS.map((c, i) => (
                   <Stop key={c} offset={i / (RADAR_KEY_COLORS.length - 1)} stopColor={c} />
                 ))}
               </LinearGradient>
             </Defs>
-            <Rect width={KEY_W} height={6} rx={3} fill="url(#radar-key)" />
+            <Rect width={6} height={KEY_H} rx={3} fill="url(#radar-key)" />
           </Svg>
           <View style={styles.radarScale}>
-            <Text style={styles.radarScaleText}>{tr('Light')}</Text>
             <Text style={styles.radarScaleText}>{tr('Heavy')}</Text>
+            <Text style={styles.radarScaleText}>{tr('Light')}</Text>
           </View>
         </View>
       ) : null}
@@ -191,7 +190,8 @@ export function WeatherCorner({ trail, forecast }: { trail: TrailMap; forecast: 
   );
 }
 
-const KEY_W = 92;
+/** The radar key is a small upright square so it stays clear of the middle of the map, where the rider's dot is. */
+const KEY_H = 30;
 
 /** Why there's no forecast: outside the United States, or no service and nothing saved yet. */
 function NoForecastSheet({ visible, onClose }: { visible: boolean; onClose: () => void }) {
@@ -328,10 +328,9 @@ const styles = themedStyles(() => ({
   forecastSampleText: { color: Colors.text, fontFamily: font(800, 'display'), fontSize: 16 },
   tick: { width: 22, height: 22, borderRadius: 11, borderWidth: 1.5, borderColor: Colors.textSecondary, alignItems: 'center', justifyContent: 'center' },
   tickOn: { backgroundColor: Colors.sky, borderColor: Colors.sky },
-  radarKey: { height: 46, justifyContent: 'center', paddingHorizontal: 10, borderRadius: 14, gap: 3, ...glass },
-  radarTitle: { color: Colors.text, fontFamily: font(700), fontSize: 11, lineHeight: 13 },
-  radarScale: { flexDirection: 'row', justifyContent: 'space-between', width: KEY_W },
-  radarScaleText: { color: Colors.textSecondary, fontFamily: font(500), fontSize: 10, lineHeight: 12 },
+  radarKey: { height: 46, flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 8, borderRadius: 14, ...glass },
+  radarScale: { height: KEY_H + 2, justifyContent: 'space-between' },
+  radarScaleText: { color: Colors.text, fontFamily: font(600), fontSize: 10, lineHeight: 12 },
   chip: {
     minWidth: 46, height: 46, borderRadius: 23, paddingHorizontal: 10, alignItems: 'center', justifyContent: 'center', ...glass,
     shadowColor: '#000', shadowOpacity: 0.28, shadowRadius: 10, shadowOffset: { width: 0, height: 4 }, elevation: 6,
