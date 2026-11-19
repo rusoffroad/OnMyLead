@@ -21,6 +21,17 @@ export type AdminSpotRow = {
   area_name: string | null;
   description: string | null;
   website: string | null;
+  /** 3.4 place details (migration 20261119100000_places_to_ride.sql); missing on an older server. */
+  address?: string | null;
+  phone?: string | null;
+  /** One line per day range. */
+  hours?: string | null;
+  fees?: string | null;
+  season?: string | null;
+  details_source?: string | null;
+  details_checked?: string | null;
+  /** Rider reviews showing on the place. */
+  reviews?: number;
   status: SpotStatus;
   edited_by_admin: boolean;
   suggestion_note: string | null;
@@ -37,8 +48,36 @@ export type AdminSpotsPage = { total: number; rows: AdminSpotRow[]; counts: Reco
 export const spots = (status: SpotFilter, search: string, page: number, size = 30) =>
   adminRpc<AdminSpotsPage>('admin_riding_spots', { p_status: status, p_search: search, p_page: page + 1, p_size: size });
 
-export type SpotFields = Partial<Pick<AdminSpotRow, 'name' | 'kind' | 'lat' | 'lng' | 'state' | 'area_name' | 'description' | 'website' | 'status'>>;
+export type SpotFields = Partial<Pick<AdminSpotRow,
+  'name' | 'kind' | 'lat' | 'lng' | 'state' | 'area_name' | 'description' | 'website' | 'status' | 'address' | 'phone' | 'hours' | 'fees' | 'season' | 'details_source'>>;
 
 /** Approve, hide, fix, or (with a null id) add a place. */
 export const saveSpot = (id: string | null, fields: SpotFields) =>
   adminRpc<string>('admin_save_riding_spot', { p_id: id, p_fields: fields });
+
+// ---- Rider reviews of places (3.4) ----------------------------------------------------------
+
+export type ReviewStatus = 'live' | 'hidden';
+export type AdminPlaceReview = {
+  id: string;
+  spot_id: string;
+  spot_name: string;
+  stars: number;
+  body: string | null;
+  photos: string[];
+  status: ReviewStatus;
+  created_at: string;
+  updated_at: string;
+  user_id: string;
+  rider: string;
+  email: string | null;
+};
+export type AdminPlaceReviewsPage = { total: number; rows: AdminPlaceReview[]; counts: Record<ReviewStatus, number> };
+
+/** page is 0-based here; the server counts from 1. */
+export const placeReviews = (status: 'all' | ReviewStatus, page: number, size = 30) =>
+  adminRpc<AdminPlaceReviewsPage>('admin_riding_spot_reviews', { p_status: status, p_page: page + 1, p_size: size });
+
+/** Hide a review that breaks the rider rules, or put it back. Logged in the audit log. */
+export const setPlaceReviewStatus = (id: string, status: ReviewStatus) =>
+  adminRpc<null>('admin_set_riding_spot_review_status', { p_id: id, p_status: status });
