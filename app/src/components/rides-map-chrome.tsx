@@ -34,6 +34,8 @@ export type RidesMapProps = {
   /** Scout: places to ride, drawn as Scout signs. With these, the count chip counts places, not rides. */
   spots?: Spot[];
   onOpenSpot?: (spot: Spot) => void;
+  /** A spinner over the map until it has drawn, so a slow first load isn't an empty box (Places to Ride). */
+  cover?: boolean;
 };
 
 /** The map's frame: a rounded card in the page, or square corners when it fills the screen. */
