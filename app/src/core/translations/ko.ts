@@ -3662,6 +3662,12 @@ const dict: Record<string, string> = {
   "Level 4": "레벨 4",
   "Level 5": "레벨 5",
   "Unrated": "등급 없음",
+  "mph": "mph",
+  "Estimated Time": "예상 시간",
+  "Enter Your Speed": "속도 입력",
+  "Average speed in miles per hour": "시속 마일 단위 평균 속도",
+  "Estimated time {v}": "예상 시간 {v}",
+  "A rough guess of moving time at that average speed. Terrain, weather, stops and regroups all add time, so plan extra.": "그 평균 속도로 달렸을 때의 대략적인 주행 시간입니다. 지형, 날씨, 정차, 재집결로 시간이 더 걸리니 여유 있게 계획하세요.",
 };
 
 export default dict;
