@@ -1,5 +1,5 @@
 import { useEffect, useState, useSyncExternalStore } from 'react';
-import { AccessibilityInfo, Animated, Easing, Pressable, StyleSheet, Text, View } from 'react-native';
+import { AccessibilityInfo, Animated, Easing, Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import Svg, { Circle, Defs, G, LinearGradient, Path, Stop } from 'react-native-svg';
 
 import { font } from '@/constants/theme';
@@ -136,6 +136,10 @@ export function ActivitySplash() {
 function SplashScene({ id, at, calm }: { id: ActivityId; at: number; calm: boolean }) {
   const scene = SCENES[id] ?? SCENES.offroad;
   const v = VEHICLE_AT[id] ?? VEHICLE_AT.offroad;
+  // The scene is drawn tall. On a wide screen (tablet landscape) the backdrop stretches to fill and the
+  // vehicle keeps its shape at the same height, so it doesn't fill the screen or cover the words.
+  const { width, height } = useWindowDimensions();
+  const wide = width > height;
   const name = tr(activityById(id).name);
   const line = tr(scene.line);
   // The app redraws in the new colours under it, which can remount this: carry on from `at`.
@@ -169,7 +173,7 @@ function SplashScene({ id, at, calm }: { id: ActivityId; at: number; calm: boole
         onPress={() => dismissSplash(at)}
         accessibilityRole="button"
         accessibilityLabel={tr('{name}. Tap to continue.', { name })}>
-        <Svg width="100%" height="100%" viewBox="0 0 268 536" preserveAspectRatio="xMidYMid slice" style={StyleSheet.absoluteFill}>
+        <Svg width="100%" height="100%" viewBox="0 0 268 536" preserveAspectRatio={wide ? 'none' : 'xMidYMid slice'} style={StyleSheet.absoluteFill}>
           <Defs>
             <LinearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
               <Stop offset="0" stopColor={scene.sky[0]} />
@@ -184,7 +188,7 @@ function SplashScene({ id, at, calm }: { id: ActivityId; at: number; calm: boole
             StyleSheet.absoluteFill,
             { transform: [{ translateX: drive.interpolate({ inputRange: [-1, 0], outputRange: [-420, 0] }) }] },
           ]}>
-          <Svg width="100%" height="100%" viewBox="0 0 268 536" preserveAspectRatio="xMidYMid slice">
+          <Svg width="100%" height="100%" viewBox="0 0 268 536" preserveAspectRatio={wide ? 'xMidYMid meet' : 'xMidYMid slice'}>
             <G transform={`translate(${v.x} ${v.y}) scale(${v.s})`}>
               <Vehicle id={id} />
             </G>
