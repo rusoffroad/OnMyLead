@@ -18,6 +18,7 @@ import {
 import { OSM_TILEJSON } from '@/core/osm-trails';
 import { FEATURE_BY_ID, osmFeatureLayers, rnStyle } from '@/core/map-features';
 import { LAND_FADE_IN, TRAIL_INK } from '@/core/trails';
+import { RADAR_MAX_Z, RADAR_OPACITY, RADAR_TILE_SIZE } from '@/core/weather';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import { MAPBOX_TOKEN, mapboxBuilt } from '@/lib/terrain';
 import type { MapFill, MapIdle, MapLine, MapboxMapHandle, MapboxOwnFix } from './mapbox-map-types';
@@ -471,6 +472,7 @@ const OSM_LAYERS = osmFeatureLayers();
  */
 const TrailLayers = memo(function TrailLayers({ trail }: { trail: TrailMap }) {
   const { trails, offline, osmLines, closedLines, labels, riderTrails, features, agencyLayers, parkTrails, parkLabels, parks } = trail;
+  const radar = trail.weather.radar;
   const native = nativeTracks(trails, offline);
   const anyOsm = !offline && OSM_LAYERS.some((l) => features[l.feature]);
   // Where Mapbox draws the tracks itself, the app's own copies stop at that zoom.
@@ -496,6 +498,12 @@ const TrailLayers = memo(function TrailLayers({ trail }: { trail: TrailMap }) {
             </Mapbox.RasterSource>
           ))
         : null}
+      {radar ? (
+        // Weather Radar (core/weather): over the land and agency squares, under every line.
+        <Mapbox.RasterSource key={radar.key} id={`oml-${radar.key}`} tileUrlTemplates={[radar.template]} tileSize={RADAR_TILE_SIZE} maxZoomLevel={RADAR_MAX_Z}>
+          <Mapbox.RasterLayer id={`oml-${radar.key}-layer`} sourceID={`oml-${radar.key}`} style={{ rasterOpacity: RADAR_OPACITY, rasterFadeDuration: 0 }} />
+        </Mapbox.RasterSource>
+      ) : null}
       {anyOsm ? (
         <Mapbox.VectorSource id={OSM_SOURCE_ID} url={OSM_TILEJSON}>
           {OSM_LAYERS.filter((l) => features[l.feature]).map((l) =>

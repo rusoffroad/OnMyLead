@@ -17,6 +17,7 @@ import {
 import { OSM_TILEJSON } from '@/core/osm-trails';
 import { FEATURE_BY_ID, osmFeatureLayers, type AgencyLayer } from '@/core/map-features';
 import { LAND_FADE_IN, TRAIL_INK } from '@/core/trails';
+import { RADAR_MAX_Z, RADAR_OPACITY, RADAR_TILE_SIZE, type RadarLayer } from '@/core/weather';
 import type { TrailMap } from '@/hooks/use-trail-map';
 import type { ActivityMap } from '@/hooks/use-activity-map';
 import {
@@ -217,6 +218,20 @@ function scoreTwisty(m: MapboxMap_): GeoJSON.FeatureCollection | null {
   } catch {
     return null;
   }
+}
+
+/** Weather Radar (core/weather): one raster layer over the agency squares, under every line; a new one each 5-minute slot. */
+function syncRadar(m: MapboxMap_, radar: RadarLayer | null) {
+  const want = radar ? `oml-${radar.key}` : null;
+  for (const l of m.getStyle()?.layers ?? []) {
+    if (l.id.startsWith('oml-radar-') && l.id !== want) {
+      m.removeLayer(l.id);
+      if (m.getSource(l.id)) m.removeSource(l.id);
+    }
+  }
+  if (!radar || !want || m.getLayer(want)) return;
+  m.addSource(want, { type: 'raster', tiles: [radar.template], tileSize: RADAR_TILE_SIZE, maxzoom: RADAR_MAX_Z });
+  m.addLayer({ id: want, type: 'raster', source: want, paint: { 'raster-fade-duration': 0, 'raster-opacity': RADAR_OPACITY } }, AGENCY_ANCHOR);
 }
 
 /**
@@ -436,9 +451,11 @@ export function MapboxMap({
 
   // Trail layers follow the rider's choices, like the flat maps.
   const { trails, offline, osmLines, closedLines, labels, riderTrails, features, agencyLayers, parkTrails, parkLabels, parks } = trail;
+  const radar = trail.weather.radar;
   useEffect(() => {
     if (!map || !styled) return;
     syncAgency(map, agencyLayers, offline);
+    syncRadar(map, radar);
     for (const id of TRAIL_LAYER_IDS) {
       if (!map.getLayer(id)) continue;
       map.setLayoutProperty(id, 'visibility', trails ? 'visible' : 'none');
@@ -454,7 +471,7 @@ export function MapboxMap({
     src('oml-park-trails')?.setData?.(linesGeoJSON(parkPieces(parkTrails).map((p) => ({ key: p.key, points: p.points, props: { color: p.color, closed: p.closed, road: p.road } }))));
     src('oml-park-names')?.setData?.(pointsGeoJSON(parkLabels.map((l) => ({ key: `pl-${l.key}`, at: l.at, props: { name: l.closed ? `${l.name} · Closed` : l.name, closed: l.closed } }))));
     src('oml-park-titles')?.setData?.(pointsGeoJSON(parks.map((p) => ({ key: `park-${p.parkOsmId}`, at: p.center, props: { name: p.parkName, sub: parkSummaryLine(p) } }))));
-  }, [map, styled, trails, offline, osmLines, closedLines, labels, riderTrails, features, agencyLayers, parkTrails, parkLabels, parks]);
+  }, [map, styled, trails, offline, osmLines, closedLines, labels, riderTrails, features, agencyLayers, parkTrails, parkLabels, parks, radar]);
 
   // The activity's look, and Twisty Roads scored each time the map rests.
   const act = trail.activityMap;
