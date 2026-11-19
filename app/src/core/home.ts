@@ -18,7 +18,8 @@ export function firstName(rideName: string | null | undefined): string {
 }
 
 export type QuotaTone = 'pro' | 'free' | 'out';
-export type Quota = { text: string; tone: QuotaTone; upgrade: boolean };
+/** proOnly: the 4.0 plan, where Free creates no rides at all (Create a Ride opens the Pro screen). */
+export type Quota = { text: string; tone: QuotaTone; upgrade: boolean; proOnly?: boolean };
 
 /**
  * The label on Create a Ride: "Unlimited" on Pro (or a trial), "1 Left This Month" on Free, and
@@ -27,6 +28,7 @@ export type Quota = { text: string; tone: QuotaTone; upgrade: boolean };
 export function createQuota(ent: Pick<Entitlements, 'switchedOn' | 'rideAllowance' | 'ridesCreatedThisMonth'>): Quota | null {
   if (!ent.switchedOn) return null;
   if (ent.rideAllowance == null) return { text: tc('Unlimited'), tone: 'pro', upgrade: false };
+  if (ent.rideAllowance === 0) return { text: tc('Part of OnMyLead Pro'), tone: 'out', upgrade: true, proOnly: true };
   const left = Math.max(0, ent.rideAllowance - Math.max(0, ent.ridesCreatedThisMonth));
   return left > 0
     ? { text: tc('{left} Left This Month', { left }), tone: 'free', upgrade: true }
@@ -143,7 +145,7 @@ export function staticMapUrl(at: { lat: number; lng: number }, token: string, wi
  * (the old pill), else what the button does.
  */
 export function startRideDetail(q: Quota | null): string {
-  if (!q || q.tone === 'pro') return tc('Lead your group');
+  if (!q || q.tone === 'pro' || q.proOnly) return tc('Lead your group');
   return q.tone === 'out' ? tc('None left this month') : q.text;
 }
 

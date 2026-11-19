@@ -22,6 +22,7 @@ import type { Place } from '@/core/places';
 import { publicRidesInArea, publicRidesInState, publicRidesNear } from '@/lib/api';
 import { track } from '@/lib/analytics';
 import { useFlag } from '@/lib/app-settings';
+import { requirePro, useCan } from '@/lib/pro';
 import { currentPosition, stateAt } from '@/lib/location';
 import type { Ride } from '@/lib/types';
 
@@ -54,14 +55,16 @@ function FindTab() {
   const navigation = useNavigation();
   const scoutOn = useFlag('scout');
   const view: View2 = params.view === 'places' ? 'places' : 'rides';
-  const places = scoutOn && view === 'places';
+  // 4.0 plan: Places to Ride is Pro; a Free rider stays on Rides and gets the Pro prompt.
+  const placesOk = useCan('places');
+  const places = scoutOn && view === 'places' && placesOk;
   useEffect(() => {
     navigation.setOptions({ title: places ? t('Scout') : t('Rides Near You') });
   }, [navigation, places]);
-  const pick = (v: View2) => router.setParams({ view: v });
+  const pick = (v: View2) => (v === 'rides' || requirePro('places')) && router.setParams({ view: v });
   const top = scoutOn ? (
     <Segmented<View2>
-      value={view}
+      value={places ? 'places' : 'rides'}
       onChange={pick}
       options={[
         { value: 'rides', label: t('Rides') },

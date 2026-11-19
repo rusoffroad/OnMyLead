@@ -25,6 +25,8 @@ It shows once per account. If you've seen it on your phone, it won't show again 
 
 Cards only appear for features you can use. For example, the weather card shows once weather is available in the app.
 
+Cards for Pro features show a **Pro** tag above the title if you aren't on Pro.
+
 ## Move Through the Tour
 
 1. Tap **Next** (or swipe left) for the next card, and **Back** (or swipe right) to go back.

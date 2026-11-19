@@ -11,6 +11,7 @@ import { Gradient, Home, Pill } from '@/components/home/parts';
 import { Icon, type IconName } from '@/components/icon';
 import PageHead from '@/components/page-head';
 import { usePhotoCrop } from '@/components/photo-cropper';
+import { ProLock } from '@/components/pro-gate';
 import { ReportSheet } from '@/components/report-sheet';
 import { RiderDot } from '@/components/convoy';
 import { ThemedText } from '@/components/themed-text';
@@ -34,6 +35,7 @@ import {
 import { useFriends } from '@/lib/friends';
 import { rideMates } from '@/lib/groups';
 import { shareEvent } from '@/lib/share-event';
+import { useCan } from '@/lib/pro';
 import { useSession } from '@/lib/session';
 import { t } from '@/lib/i18n';
 
@@ -50,6 +52,8 @@ type PeoplePick = { kind: 'cohost' } | { kind: 'manager'; ride: EventRide } | nu
 export default function EventPage() {
   const { code, new: justCreated } = useLocalSearchParams<{ code: string; new?: string }>();
   const { session } = useSession();
+  // 4.0 plan: co-hosting is Pro. A Free co-host sees the event as a guest, with a Pro row for the host tools.
+  const cohostOk = useCan('event_cohost');
   const me = session?.user.id;
   const layout = useLayout();
   const friends = useFriends();
@@ -107,7 +111,8 @@ export default function EventPage() {
     );
   }
 
-  const e = ev;
+  const cohostLocked = ev.am_host && !ev.am_owner && !cohostOk;
+  const e = cohostLocked ? { ...ev, am_host: false } : ev;
   const phase = eventPhase(e);
   const cover = e.photos[0]?.path ?? null;
 
@@ -373,7 +378,9 @@ export default function EventPage() {
     </Section>
   ) : null;
 
-  const hostTools = e.am_host ? (
+  const hostTools = cohostLocked ? (
+    <ProLock feature="event_cohost" title={t('Co-Host Tools')} detail={t('Edit the event, add photos, agenda items and rides')} />
+  ) : e.am_host ? (
     <View style={styles.tools}>
       <Tool icon="draw" label={t('Edit Details')} onPress={() => router.push(`/events/new?id=${e.id}`)} />
       <Tool icon="download" label={busy?.startsWith('photos') ? t('Adding {v}', { v: busy.split(':')[1] ?? '' }) : t('Add Photos')} onPress={() => addPhotos('library')} />

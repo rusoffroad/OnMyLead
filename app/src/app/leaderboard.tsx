@@ -4,6 +4,8 @@ import { ActivityIndicator, Pressable, Switch, Text, View } from 'react-native';
 
 import { BadgePatch, PATCH_COLORS } from '@/components/badge-patch';
 import { Icon } from '@/components/icon';
+import { ProLock } from '@/components/pro-gate';
+import { ProTag } from '@/components/pro-tag';
 import { RiderPhoto } from '@/components/rider-photo';
 import { ThemedText } from '@/components/themed-text';
 import { TwoPane } from '@/components/two-pane';
@@ -20,6 +22,8 @@ import { initialOf } from '@/core/profile';
 import { profileHref } from '@/core/social';
 import { useLayout } from '@/hooks/use-layout';
 import { fetchLeaderAreas, fetchLeaderboard, fetchLeaderSettings, saveLeaderShown } from '@/lib/leaderboard';
+import { currentEntitlements, requirePro, useCan } from '@/lib/pro';
+import { can } from '@/core/entitlements';
 import { useSession } from '@/lib/session';
 
 import { currentLocale, t } from '@/lib/i18n';
@@ -33,6 +37,7 @@ export default function LeaderboardScreen() {
   const layout = useLayout();
   const [settings, setSettings] = useState<LeaderSettings | null>(null);
   const [areas, setAreas] = useState<LeaderArea[]>([]);
+  const filtersOk = useCan('leaderboard_filters');
   const [filter, setFilter] = useState<LeaderFilter | null>(null);
   const [board, setBoard] = useState<Leaderboard | null | undefined>(undefined);
   const [error, setError] = useState<string | null>(null);
@@ -60,7 +65,8 @@ export default function LeaderboardScreen() {
       .then((s) => {
         setSettings(s);
         if (filterRef.current) loadBoard(filterRef.current);
-        else changeFilter(startingFilter(s));
+        // 4.0 plan: Free sees the board for everyone; country and state filters are Pro.
+        else changeFilter(can(currentEntitlements(), 'leaderboard_filters') ? startingFilter(s) : { country: null, state: null });
       })
       .catch(() => {
         if (filterRef.current) loadBoard(filterRef.current);
@@ -109,7 +115,9 @@ export default function LeaderboardScreen() {
 
   const f = filter ?? { country: null, state: null };
   const you = (compact: boolean) => <YouCard settings={settings} board={board ?? null} filter={f} busy={busy} onShown={toggleShown} compact={compact} />;
-  const filters = <Filters areas={areas} settings={settings} filter={f} onChange={changeFilter} />;
+  const filters = filtersOk
+    ? <Filters areas={areas} settings={settings} filter={f} onChange={changeFilter} />
+    : <ProLock feature="leaderboard_filters" title={t('Your Country or State')} detail={t('See the leaderboard where you ride')} />;
   const list = (
     <View style={{ gap: Spacing.three }}>
       <View style={styles.headRow}>
@@ -208,13 +216,14 @@ function Settings({ settings, busy, onShown }: { settings: LeaderSettings | null
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={where ? t('You ride from {where}. Change it', { where }) : t('Pick where you ride from')}
-        onPress={() => router.push('/leaderboard-area')}
+        onPress={() => requirePro('leaderboard_filters') && router.push('/leaderboard-area')}
         style={({ pressed }) => [styles.setting, pressed && { backgroundColor: Colors.backgroundSelected }]}>
         <Icon name="pin" size={20} color={Colors.sky} />
         <View style={{ flex: 1 }}>
           <ThemedText style={{ fontWeight: 600 }}>{t('Where You Ride')}</ThemedText>
           <ThemedText type="small" themeColor="textSecondary" numberOfLines={1}>{where ?? t('Pick your state or country')}</ThemedText>
         </View>
+        <ProTag feature="leaderboard_filters" />
         <ThemedText type="small" style={{ color: Colors.sky, fontWeight: 600 }}>{where ? t('Change') : t('Pick')}</ThemedText>
       </Pressable>
 

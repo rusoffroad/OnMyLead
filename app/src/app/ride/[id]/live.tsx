@@ -1781,7 +1781,7 @@ export default function RideMode() {
             </Pressable>
             <FullMapButton onPress={enterFullMap} style={styles.fullMapBtn} />
             <Pressable
-              onPress={() => requirePro('quick_replies') && setMessageOpen(true)}
+              onPress={() => setMessageOpen(true)}
               accessibilityRole="button"
               accessibilityLabel={t('Type a Message')}
               accessibilityHint={t('Write your own message to everyone on this ride, or send one of your saved quick replies')}
@@ -1789,7 +1789,6 @@ export default function RideMode() {
               style={({ pressed }) => [styles.typeBtn, { opacity: pressed ? 0.75 : 1 }]}>
               <Icon name="chat" size={16} color={Colors.text} strokeWidth={2.2} />
               <Text style={styles.typeText}>{t('Message')}</Text>
-              <ProTag feature="quick_replies" />
             </Pressable>
           </View>
         )}

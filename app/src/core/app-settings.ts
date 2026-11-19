@@ -33,6 +33,7 @@ export const FLAG_GROUPS = [
   { key: 'connect', title: 'No-Service Sharing' },
   { key: 'extras', title: 'Toolkit and Extras' },
   { key: 'account', title: 'Sign-In and Rewards' },
+  { key: 'plans', title: 'Free and Pro' },
 ] as const;
 
 export type FlagGroup = (typeof FLAG_GROUPS)[number]['key'];
@@ -132,6 +133,13 @@ export const APP_FLAGS = {
     label: 'Sign in with Apple on the Website and Android',
     hint: 'Continue with Apple on onmylead.com and in the Android app, through Apple’s web sign-in. Off until the Apple Services ID and its secret are set up in Supabase (docs/web-sign-in-with-apple.md); on before that, the button fails.',
     offUntilSet: true,
+  },
+  pro_plan_4: {
+    group: 'plans',
+    label: '4.0 Free and Pro Plan',
+    hint: 'Turn on once 4.0 is live in both stores. Free riders then join rides other riders create, follow along and talk to the group, with 5 Map Mode hours a month; creating rides, Places to Ride, 3D Terrain, the Garage past one machine, Trip Planner, Starlink, co-hosting events and Leaderboard filters need Pro, and voting on polls is free. Riders whose account is older than the first time this goes on keep one ride a month until Feb 1, 2027. Safety, joining and Ride Mode are never affected. Off puts the old plan back.',
+    offUntilSet: true,
+    since: '4.0',
   },
 } as const satisfies Record<string, FlagInfo>;
 

@@ -274,7 +274,7 @@ function MapSettingsSheet({
               </View>
               <View style={styles.styles} accessibilityRole="radiogroup" accessibilityLabel={tr('Map style')}>
                 {bases.map((b) => (
-                  <StyleTile key={b} base={b} on={trail.base === b} onPress={() => pro('map_layers') && trail.setBase(b)} />
+                  <StyleTile key={b} base={b} on={trail.base === b} onPress={() => pro('map_layers') && (b !== 'terrain' || pro('terrain_3d')) && trail.setBase(b)} />
                 ))}
               </View>
               {trail.base === 'terrain' ? (

@@ -47,6 +47,14 @@ const FEATURES: Record<string, { label: string; hint: string; allowance?: string
   custom_dot: { label: 'Customize Your Dot', hint: 'Dot Style and Dot Size. The default dot stays free.' },
   group_photos: { label: 'Group Photos', hint: 'Adding a riding group photo. Seeing group photos stays free.' },
   carplay: { label: 'CarPlay', hint: 'The ride on the car screen. Free shows a notice there; Ride Mode on the phone stays free.' },
+  // 4.0 plan (app 4.0+). The 4.0 Free and Pro Plan switch on the Features page moves these together.
+  places: { label: 'Places to Ride', hint: 'App 4.0+. The Places to Ride search and its Home card. Place pages opened from a link still show.' },
+  terrain_3d: { label: '3D Terrain', hint: 'App 4.0+. The 3D Terrain map style (Map Layers is Pro too).' },
+  garage: { label: 'Garage', hint: 'App 4.0+. More than one machine in the Garage. The first machine, and machines already added, stay.' },
+  trip_planner: { label: 'Trip Planner', hint: 'App 4.0+. Planning trips. Saved trips are kept.' },
+  starlink: { label: 'Starlink', hint: 'App 4.0+. The Starlink page.' },
+  event_cohost: { label: 'Co-Host Events', hint: 'App 4.0+. Host tools for a co-host who is not the event owner.' },
+  leaderboard_filters: { label: 'Leaderboard Filters', hint: 'App 4.0+. The country and state filters and Where You Ride. The leaderboard for everyone stays free.' },
 };
 
 type Notice = { text: string; until?: string } | null;

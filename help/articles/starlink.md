@@ -21,6 +21,10 @@ keywords: [starlink, devices connected, home card, dish, satellite internet, min
 
 The Starlink page shows how your dish is doing, keeps your plan details in one place, and works out how long your batteries will run it.
 
+:::release 4.0
+From 4.0, the Starlink page is part of OnMyLead Pro. On Free, the Starlink row and the Home card carry the Pro tag.
+:::
+
 ## Open the Starlink Page
 
 :::until 3.0

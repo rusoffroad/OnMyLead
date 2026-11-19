@@ -39,6 +39,8 @@ export type TourCard = {
   isNew?: boolean;
   /** A Pro tag above the title, with this label beside it. */
   pro?: string;
+  /** The same, shown only once the 4.0 Free and Pro plan (pro_plan_4) is on. */
+  proWithPlan4?: string;
   /** The four activity chips (only while `activities` is on). */
   chips?: boolean;
   /** Shown only while at least one of these server flags exists and is on. */
@@ -64,6 +66,7 @@ export const TOUR_CARDS: TourCard[] = [
     image: 'join',
     title: 'Join or Create a Ride',
     body: 'Got a code from your ride leader? Type it in or scan the QR. Leading the ride? Create a Ride and share your code.',
+    proWithPlan4: 'Create a Ride',
   },
   {
     id: 'live',
@@ -113,6 +116,7 @@ export const TOUR_CARDS: TourCard[] = [
     title: 'Places to Ride and Events',
     body: 'Parks, forests and trails near you with rider reviews. Rallies, poker runs and ride weekends in Events.',
     isNew: true,
+    proWithPlan4: 'Places to Ride',
     flags: ['scout'],
   },
   {
@@ -133,6 +137,7 @@ export const TOUR_CARDS: TourCard[] = [
     image: 'starlink',
     title: 'Starlink',
     body: 'Got Starlink on your machine? Connect to its Wi-Fi and Home shows its speed, signal and how many devices are on it. The Starlink page has setup tips and a power budget.',
+    proWithPlan4: 'Starlink',
     flags: ['starlink'],
   },
 ];

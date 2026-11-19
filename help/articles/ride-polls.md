@@ -22,6 +22,10 @@ screenshots:
 
 A ride poll is a quick question in the ride chat with a few choices. Every rider on the ride gets one vote, can change it, and sees the live counts.
 
+:::release 4.0
+From 4.0, voting on a poll is free on every plan. Creating a poll is still part of Pro.
+:::
+
 ![Polls in ride chat](/help/img/chat.webp)
 
 ## Who Can Post a Poll

@@ -228,6 +228,7 @@ Android; **[flag]** behind a remote feature flag (`app_settings.flags`); **[Pro]
 - Emails through Resend: ride cancelled / deleted, trial reminders, branded auth emails.
 
 ### Pro, Trial and Promo Codes
+- 4.0 plan (switch `pro_plan_4`, off until 4.0 is live): Free joins rides others create, follows along, chats (typed Ride Mode message and poll voting free), 5 Map Mode hours a month; creating rides (pre-4.0 accounts keep 1 a month through 2027-02-01), Places to Ride, 3D Terrain, Garage past 1 machine, Trip Planner, Starlink, event co-host tools and Leaderboard filters are Pro (`core/pro.ts` COMPARISON_4, migration 20261122000000_pro_plan_4.sql).
 - Free vs Pro (`feature_plans`): Free has 1 ride a month, 5 past rides, 1 active trip; Pro adds
   unlimited rides, GPX import, offline maps, saved groups, polls, advanced stats and trip lists,
   premium ride cards. Safety features are always free.

@@ -3,9 +3,9 @@ import Head from 'expo-router/head';
 import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from 'react';
 
 import { storeLink } from '@/lib/found-us';
-import { APP_STORE_URL, COMPANY, PLAY_STORE_URL, PRO_PRICES, RUS_URL, SHOWCASE_3D_TERRAIN, SHOWCASE_COMMENT_REPLIES, SHOWCASE_EMERGENCY_SIREN, SHOWCASE_GROUP_PHOTOS, SHOWCASE_INTERSECTION_ZOOM, SHOWCASE_LEADER_TRACKLINE, SHOWCASE_MAP_FEATURES, SHOWCASE_NO_SERVICE, SHOWCASE_PARK_TRAILS, SHOWCASE_PHOTO_CROP, SHOWCASE_REDESIGN_3, SHOWCASE_EASY_LEAVE, SHOWCASE_END_RIDE_IN_MODE, SHOWCASE_FOUNDER_FRIENDS, SHOWCASE_QUICK_CREATE, SHOWCASE_EVENTS_AND_RIDES, SHOWCASE_PLACES_TO_RIDE, SHOWCASE_RADIO_SHARING, SHOWCASE_ROUTE_ETA, SHOWCASE_WEATHER, SHOWCASE_ACTIVITIES, SHOWCASE_SPREAD_RULER, TRIAL_DAYS } from '@/constants/site';
+import { APP_STORE_URL, COMPANY, PLAY_STORE_URL, PRO_PRICES, RUS_URL, SHOWCASE_3D_TERRAIN, SHOWCASE_COMMENT_REPLIES, SHOWCASE_EMERGENCY_SIREN, SHOWCASE_GROUP_PHOTOS, SHOWCASE_INTERSECTION_ZOOM, SHOWCASE_LEADER_TRACKLINE, SHOWCASE_MAP_FEATURES, SHOWCASE_NO_SERVICE, SHOWCASE_PARK_TRAILS, SHOWCASE_PHOTO_CROP, SHOWCASE_REDESIGN_3, SHOWCASE_EASY_LEAVE, SHOWCASE_END_RIDE_IN_MODE, SHOWCASE_FOUNDER_FRIENDS, SHOWCASE_QUICK_CREATE, SHOWCASE_EVENTS_AND_RIDES, SHOWCASE_PLACES_TO_RIDE, SHOWCASE_RADIO_SHARING, SHOWCASE_ROUTE_ETA, SHOWCASE_PRO_PLAN_4, SHOWCASE_WEATHER, SHOWCASE_ACTIVITIES, SHOWCASE_SPREAD_RULER, TRIAL_DAYS } from '@/constants/site';
 import type { SocialProvider } from '@/core/auth-link';
-import { FREE_MAP_HOURS } from '@/core/pro';
+import { FREE_MAP_HOURS, FREE_MAP_HOURS_4 } from '@/core/pro';
 import { REFERRAL_PRICE, referralsSwitchedOn } from '@/core/referrals';
 import { useAppSettings } from '@/lib/app-settings';
 import { useSocialProviders } from '@/lib/session';
@@ -296,7 +296,7 @@ export function Showcase() {
               <li>Turn any trail into a group ride’s route in one tap</li>
               <li>Sign in on your iPhone, iPad, Android phone or tablet and your trails and settings are there, backed up privately to your account</li>
             </ul>
-            <p className="qr-small">Map Mode is free for 8 hours a month (never counted on a group ride) and unlimited with Pro. Drawing, recording, saving, rating, Track Line, named spots, sharing and group rides on your trails are Pro. Shared trails show in full, and Hide My Start leaves off the first and last 200 meters of a recording that starts at home.</p>
+            <p className="qr-small">Map Mode is free for {SHOWCASE_PRO_PLAN_4 ? FREE_MAP_HOURS_4 : FREE_MAP_HOURS} hours a month (never counted on a group ride) and unlimited with Pro. Drawing, recording, saving, rating, Track Line, named spots, sharing and group rides on your trails are Pro. Shared trails show in full, and Hide My Start leaves off the first and last 200 meters of a recording that starts at home.</p>
           </div>
         </section>
       </main>
@@ -810,8 +810,43 @@ function Feature({ title, children }: { title: string; children: ReactNode }) {
   );
 }
 
-// Plan names match the app's Pro screen (core/pro.ts COMPARISON).
-const FREE = [
+// Plan names match the app's Pro screen (core/pro.ts COMPARISON_BEFORE_4, and COMPARISON_4 once
+// SHOWCASE_PRO_PLAN_4 is on).
+const FREE_4 = [
+  'Join Unlimited Rides and Follow the Leader',
+  'Live Tracking, EMERGENCY, Need Help, Crash Alert and Ride Bubble',
+  'Mechanical Issue and Family Tracking Links',
+  'Ride Chat, Group Chat, Messages and Poll Voting',
+  `Map Mode: ${FREE_MAP_HOURS_4} Hours a Month`,
+  'Friends, Badges, the Feed and Events',
+  'Forecast and Weather Alerts Where You Are',
+  'Garage: 1 Machine',
+  'Ride History: Last 5 Rides',
+];
+const PRO_4 = [
+  'Create Unlimited Rides and Unlimited Map Mode',
+  'iPad, Android Tablets and the Website',
+  'Draw Routes, Waypoints and Directions',
+  'Places to Ride',
+  'Bluetooth Sharing With No Service',
+  'CarPlay',
+  'Map Layers, Map Features and 3D Terrain',
+  'Weather Radar on the Map',
+  'Draw, Record, Save, Rate and Share Trails',
+  'Track Line and Named Spots',
+  'Import GPX Routes and Offline Maps',
+  'Post, Comment and Share to Social Media',
+  'Create and Co-Host Events',
+  'Saved Riding Groups, Group Photos and Custom Codes',
+  'Create Ride Polls, Saved Quick Replies and Music Controls',
+  'Full Ride History',
+  'Advanced Ride Statistics and Premium Cards',
+  'Every Garage Machine, Build Sheet, Trip Planner and Starlink',
+  'Leaderboard Filters',
+  'Themes, Light Mode, Natural Voices and Custom Dots',
+  'Sync Across Devices',
+];
+const FREE_BEFORE_4 = [
   'Create 1 Ride a Month',
   'Join Unlimited Rides and Follow the Leader',
   'Live Tracking, SOS, Crash Alert and Ride Bubble',
@@ -823,7 +858,7 @@ const FREE = [
   'Ride History: Last 5 Rides',
   ...(SHOWCASE_WEATHER ? ['Forecast and Weather Alerts Where You Are'] : []),
 ];
-const PRO = [
+const PRO_BEFORE_4 = [
   'Unlimited Rides and Unlimited Map Mode',
   'iPad, Android Tablets and the Website',
   'Draw Routes, Waypoints and Directions',
@@ -847,6 +882,8 @@ const PRO = [
   SHOWCASE_NO_SERVICE ? 'Themes, Light Mode, Natural Voices and Custom Dots' : 'Themes, Light Mode and Natural Voices',
   'Sync Across Devices',
 ];
+const FREE = SHOWCASE_PRO_PLAN_4 ? FREE_4 : FREE_BEFORE_4;
+const PRO = SHOWCASE_PRO_PLAN_4 ? PRO_4 : PRO_BEFORE_4;
 
 function Pricing() {
   const [annual, setAnnual] = useState(true);

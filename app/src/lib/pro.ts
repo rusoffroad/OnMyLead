@@ -84,6 +84,11 @@ function rideLimitBlock(): ProBlock {
  */
 export async function requireTripSlot(): Promise<boolean> {
   const ent = currentEntitlements();
+  // 4.0 plan: the Trip Planner itself is Pro.
+  if (!can(ent, 'trip_planner')) {
+    showProGate({ kind: 'pro_required', feature: 'trip_planner' });
+    return false;
+  }
   if (can(ent, 'advanced_trip_planning')) return true;
   const trips = await myTrips().catch(() => []);
   if (canStartTrip(ent, trips, localToday())) return true;

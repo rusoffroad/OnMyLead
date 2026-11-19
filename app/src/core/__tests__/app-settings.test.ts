@@ -76,7 +76,7 @@ describe('Admin Features page', () => {
   });
 
   it('only the flag that needs setup first starts off', () => {
-    expect(APP_FLAG_KEYS.filter((k) => !flagOn(NO_SETTINGS, k)).sort()).toEqual(['apple_web_sign_in']);
+    expect(APP_FLAG_KEYS.filter((k) => !flagOn(NO_SETTINGS, k)).sort()).toEqual(['apple_web_sign_in', 'pro_plan_4']);
   });
 
   it('lists only real changes, by what the app does', () => {

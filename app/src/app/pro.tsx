@@ -10,10 +10,10 @@ import { ThemedText } from '@/components/themed-text';
 import { Button, Screen } from '@/components/ui';
 import { Colors, font, Radius, RideColors, Spacing, themedStyles } from '@/constants/theme';
 import { withAlpha } from '@/core/color';
-import { annualPerMonth, annualSavingsPercent, COMPARISON, PRICES } from '@/core/pro';
+import { annualPerMonth, annualSavingsPercent, comparison, PRICES } from '@/core/pro';
 import { deviceStore, manageTarget, otherStoreBlock, restoreMessage } from '@/core/purchases';
 import { referralsSwitchedOn, rewardState } from '@/core/referrals';
-import { useAppSettings } from '@/lib/app-settings';
+import { useAppSettings, useFlag } from '@/lib/app-settings';
 import { track } from '@/lib/analytics';
 import { useEntitlements } from '@/lib/entitlements';
 import { buy, loadProducts, manageSubscription, PRODUCTS, redeemOfferCode, restore } from '@/lib/purchases';
@@ -192,6 +192,7 @@ function PlanOption({ on, onPress, name, price, detail, best }: { on: boolean; o
 }
 
 function Comparison() {
+  const rows = comparison(useFlag('pro_plan_4'));
   const cell = (v: boolean | string, pro: boolean) =>
     typeof v === 'string' ? (
       <Text style={[styles.cellText, pro && { color: Colors.text }]}>{t(v)}</Text>
@@ -207,7 +208,7 @@ function Comparison() {
         <Text style={[styles.col, styles.headText]}>{t('Free')}</Text>
         <Text style={[styles.col, styles.headText, { color: Colors.accent }]}>Pro</Text>
       </View>
-      {COMPARISON.map((r, i) => (
+      {rows.map((r, i) => (
         <View
           key={r.label}
           style={[styles.row, i > 0 && styles.rule]}

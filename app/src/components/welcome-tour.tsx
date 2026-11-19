@@ -11,6 +11,7 @@ import { cardBody, tourCards, WHATS_NEW_VERSION, whatsNewItems, type TourCard, t
 import { useLayout } from '@/hooks/use-layout';
 import { t, tx } from '@/lib/i18n';
 import { useTourFlags } from '@/lib/welcome-tour';
+import { useFlag } from '@/lib/app-settings';
 
 const IMAGES: Record<TourImage, number> = {
   welcome: require('../../assets/images/tour/welcome.jpg'),
@@ -156,14 +157,17 @@ export function TourPager({ mode: start, onClose }: { mode: TourMode; onClose: (
 
 function CardWords({ card, index, count, last, onBack, onNext }: { card: TourCard; index: number; count: number; last: boolean; onBack: () => void; onNext: () => void }) {
   const on = useTourFlags();
+  // 4.0 plan: creating rides, Places to Ride and Starlink carry the Pro tag once it is on.
+  const plan4 = useFlag('pro_plan_4');
+  const pro = card.pro ?? (plan4 ? card.proWithPlan4 : undefined);
   return (
     <View style={styles.words}>
       <ScrollView style={styles.scroll} contentContainerStyle={{ gap: Spacing.two }} showsVerticalScrollIndicator={false}>
-        {card.isNew || card.pro ? (
+        {card.isNew || pro ? (
           <View style={styles.kicker}>
             {card.isNew ? <Text style={styles.newTag}>{t('New')}</Text> : null}
-            {card.pro ? <ProChip /> : null}
-            {card.pro ? <Text style={styles.kickerText}>{tx(card.pro)}</Text> : null}
+            {pro ? <ProChip /> : null}
+            {pro ? <Text style={styles.kickerText}>{tx(pro)}</Text> : null}
           </View>
         ) : null}
         <Text style={styles.title} accessibilityRole="header">

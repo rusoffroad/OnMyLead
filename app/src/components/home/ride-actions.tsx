@@ -4,6 +4,7 @@ import { Pressable, Text, View } from 'react-native';
 import Svg, { Circle, Defs, G, LinearGradient, Path, Rect, Stop } from 'react-native-svg';
 
 import { Icon, type IconName } from '@/components/icon';
+import { ProChip } from '@/components/pro-tag';
 import { TextBox } from '@/components/keyboard';
 import { Colors, currentScheme, font, Spacing, themedStyles, TileSurface } from '@/constants/theme';
 import { activityHero, activityInk, type ActivityId } from '@/core/activities';
@@ -82,10 +83,10 @@ export function ActionTiles({
   quota, onStart, compact, tight, createLine, eventsLine, activity,
 }: { quota: Quota | null; onStart: () => void; compact?: boolean; tight?: boolean; createLine?: string; eventsLine?: string; activity?: ActivityId }) {
   // An activity's own line (Road Trip: "Lead the convoy") shows when the plan has no count to show.
-  const detail = createLine && (!quota || quota.tone === 'pro') ? createLine : startRideDetail(quota);
+  const detail = createLine && (!quota || quota.tone === 'pro' || quota.proOnly) ? createLine : startRideDetail(quota);
   return (
     <View style={[styles.pair, compact && { gap: tight ? 8 : 10 }]}>
-      <Tile icon="flag" tone="red" activity={activity} title={t('Create a Ride')} detail={detail} compact={compact} tight={tight} onPress={quota?.tone === 'out' ? () => router.push('/pro') : onStart} />
+      <Tile icon="flag" tone="red" activity={activity} title={t('Create a Ride')} detail={detail} compact={compact} tight={tight} pro={quota?.proOnly} onPress={quota?.tone === 'out' ? () => router.push('/pro') : onStart} />
       <Tile icon="calendar" tone="gold" title={t('Events and Group Rides')} detail={eventsLine ?? t('Rallies and rides')} compact={compact} tight={tight} onPress={() => router.push('/events')} />
     </View>
   );
@@ -99,8 +100,8 @@ export function ActionTiles({
  * line; Events and Group Rides draws a week of calendar days with one marked.
  */
 function Tile({
-  icon, title, detail, onPress, tone, compact, tight, activity,
-}: { icon: IconName; title: string; detail: string; onPress: () => void; tone: 'red' | 'gold'; compact?: boolean; tight?: boolean; activity?: ActivityId }) {
+  icon, title, detail, onPress, tone, compact, tight, activity, pro,
+}: { icon: IconName; title: string; detail: string; onPress: () => void; tone: 'red' | 'gold'; compact?: boolean; tight?: boolean; activity?: ActivityId; pro?: boolean }) {
   const red = tone === 'red';
   // Create a Ride's red line and edge take the activity's colour (Offroad: today's red).
   const ink = red ? (activity ? activityInk(activity, currentScheme(), '#FF5A60') : '#FF5A60') : Colors.gold;
@@ -114,7 +115,7 @@ function Tile({
       <View>
         <View style={styles.tileKicker}>
           <Icon name={icon} size={15} color={ink} strokeWidth={2.2} />
-          <Text style={[styles.tileDetail, { color: ink }]} numberOfLines={1}>{detail}</Text>
+          {pro ? <ProChip style={{ height: 18, alignSelf: 'auto' }} /> : <Text style={[styles.tileDetail, { color: ink }]} numberOfLines={1}>{detail}</Text>}
         </View>
         <Text style={[styles.tileTitle, tight && styles.tileTitleTight]} numberOfLines={2} adjustsFontSizeToFit minimumFontScale={0.8}>{title}</Text>
       </View>

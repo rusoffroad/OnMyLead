@@ -6,6 +6,10 @@ order: 10
 release: "1.0"
 updated: 2026-11-19
 sources:
+  - supabase/migrations/20261122000000_pro_plan_4.sql
+  - app/src/components/pro-feature-gate.tsx
+  - app/src/components/app-notices.tsx
+  - app/src/core/home.ts
   - supabase/migrations/20261105090000_pro_bluetooth_dot_photos.sql
   - app/src/core/carplay.ts
   - app/src/hooks/use-dot-size.ts
@@ -28,10 +32,16 @@ sources:
   - supabase/migrations/20261018000000_pro_entitlements.sql
   - supabase/migrations/20261027000000_play_billing.sql
 related: [navigation-mode, pro-trial, subscribe-to-pro, manage-subscription, emergency-and-safety]
-keywords: [free, pro, map mode hours, map time, pro tag, premium, upgrade, price, cost, limits, ride limit, one ride a month, what's included, features, tablet]
+keywords: [free, pro, create rides pro, 4.0 plan, free rides through february, map mode hours, map time, pro tag, premium, upgrade, price, cost, limits, ride limit, one ride a month, what's included, features, tablet]
 ---
 
+:::until 4.0
 OnMyLead is free to download and use. Free accounts can join as many rides as they like, and every safety feature is free on every plan. OnMyLead Pro is for riders who lead a lot of rides and want extras like offline maps and GPX import.
+:::
+
+:::release 4.0
+OnMyLead is free to download. On Free you join rides other riders create, follow the leader in Ride Mode, talk to the group and get 5 hours of Map Mode every month. Every safety feature is free on every plan. Creating your own rides and almost everything else is part of OnMyLead Pro.
+:::
 
 Pro is $4.99 a month or $29.99 a year in the US. Other countries see the price in local currency. Every new account starts with a [free 30-day Pro Trial](/help/pro-trial).
 
@@ -91,6 +101,7 @@ This is the same comparison as the **Free and Pro** table on the Pro screen.
 | iPad, Android Tablets and the Website | No | Yes |
 :::
 
+:::until 4.0
 :::release 2.1
 | | Free | Pro |
 |---|---|---|
@@ -123,6 +134,40 @@ This is the same comparison as the **Free and Pro** table on the Pro screen.
 | Sync Across Devices | No | Yes |
 | iPad, Android Tablets and the Website | No | Yes |
 :::
+:::
+
+:::release 4.0
+| | Free | Pro |
+|---|---|---|
+| Join Rides and Follow the Leader | Unlimited | Unlimited |
+| Live Tracking, EMERGENCY, Need Help, Crash Alert and Ride Bubble | Yes | Yes |
+| Ride Chat, Group Chat, Messages and Poll Voting | Yes | Yes |
+| Friends, Badges, the Feed and Events | Yes | Yes |
+| Forecast and Weather Alerts Where You Are | Yes | Yes |
+| Map Mode | 5 Hours a Month | Unlimited |
+| Create Rides | No | Unlimited |
+| Draw Routes, Waypoints and Directions | No | Yes |
+| Places to Ride | No | Yes |
+| Bluetooth Sharing With No Service | No | Yes |
+| CarPlay | No | Yes |
+| Map Layers, Map Features and 3D Terrain | No | Yes |
+| Weather Radar on the Map | No | Yes |
+| Draw, Record, Save, Rate and Share Trails | No | Yes |
+| Track Line and Named Spots | No | Yes |
+| Import GPX Routes and Offline Maps | No | Yes |
+| Post, Comment and Share to Social Media | No | Yes |
+| Create and Co-Host Events | No | Yes |
+| Saved Riding Groups, Group Photos and Custom Codes | No | Yes |
+| Create Ride Polls, Saved Quick Replies and Music Controls | No | Yes |
+| Ride History | Last 5 | All |
+| Advanced Ride Statistics and Premium Cards | No | Yes |
+| Garage | 1 Machine | Every Machine and Build Sheet |
+| Trip Planner and Starlink | No | Yes |
+| Leaderboard Filters | No | Yes |
+| Themes, Light Mode, Natural Voices and Custom Dots | No | Yes |
+| Sync Across Devices | No | Yes |
+| iPad, Android Tablets and the Website | No | Yes |
+:::
 
 ## Always Free
 
@@ -134,7 +179,17 @@ Safety never depends on your plan. On every plan you get Ride Mode, live trackin
 Joining a ride and following the leader are free and unlimited, on every device. Safety never depends on your plan. On every plan you get Ride Mode, live tracking, Need Help, EMERGENCY, Mechanical Issue alerts, Crash Alert, Ride Bubble, location sharing, family links, ride chat, the status buttons and the leader's route and waypoints on the ride map. Directions to a rider who needs help are free too.
 :::
 
+:::release 4.0
+From 4.0, these are free too: typing your own message to the group in Ride Mode, voting on ride polls, and directions to the meeting point of a ride you're on.
+:::
+
 ## The Free Monthly Ride
+
+:::release 4.0
+From 4.0, creating rides is part of OnMyLead Pro. If your account was made before 4.0, you keep one free ride a month through February 1, 2027, and Home tells you so. Rides you already created keep working: you can still start them, lead them and end them. New accounts get the [free 30-day Pro Trial](/help/pro-trial) first. On Free, Create a Ride carries the Pro tag and opens the Pro screen.
+
+Until February 1, 2027, the rules below still apply to accounts made before 4.0.
+:::
 
 Free accounts create one ride each calendar month.
 
@@ -149,7 +204,12 @@ When you create a ride on a Free account, the Create a Ride screen shows how man
 :::release 2.0
 ## Free Map Mode Time
 
+:::until 4.0
 Free accounts get 8 hours of Map Mode every calendar month (UTC time). Pro has no limit.
+:::
+:::release 4.0
+Free accounts get 5 hours of Map Mode every calendar month (UTC time). Pro has no limit.
+:::
 
 - The clock only runs while Map Mode is open on your screen. It stops when you leave Map Mode or put the app in the background.
 - It never runs while you're sharing your location on a group ride, so riding with a group and following the leader stay unlimited.
@@ -215,6 +275,20 @@ Free accounts get 8 hours of Map Mode every calendar month (UTC time). Pro has n
 If you were already using a theme or a voice before 2.0, the app keeps it.
 :::
 
+:::release 4.0
+New in Pro with 4.0:
+
+- **Create Rides:** lead your own group rides, as many as you like, on your phone, tablet or the website. Accounts made before 4.0 keep one free ride a month through February 1, 2027.
+- **Places to Ride:** off-road parks, OHV areas, trail systems and tracks near you. See [Find Places to Ride With Scout](/help/scout).
+- **3D Terrain:** hills and canyons in 3D in Ride Mode and Map Mode. See [3D Terrain](/help/3d-terrain).
+- **Garage:** one machine stays free, so the fuel check on your rides keeps working. More machines need Pro. Machines you already added stay. See [Your Garage](/help/garage).
+- **Trip Planner** and **Starlink**: trips you already saved are kept. See [Trip Planner](/help/trip-planner) and [Starlink](/help/starlink).
+- **Co-Host Events:** a co-host's tools (edit, photos, agenda, rides) need Pro. Seeing events and saying you're going stay free. See [Events](/help/events).
+- **Leaderboard Filters:** the leaderboard for your country or state, and Where You Ride. The leaderboard for everyone stays free. See [Badge Leaderboard](/help/badge-leaderboard).
+
+The Welcome Tour, Activities and Forecast Where You Are are free on every plan. Weather Radar and each activity's Map Features are Pro.
+:::
+
 :::release 2.1
 New in Pro with 2.1:
 
@@ -233,6 +307,10 @@ When you tap something that needs Pro, a short prompt explains it. Tap **See OnM
 
 :::release 2.0
 On a Free account, a small gold **Pro** tag sits beside each button that needs Pro, so you know before you tap. You'll see it on buttons like **Import GPX**, **Record a Trail**, **Download** for offline maps, **New Group**, **Create an Event**, **Directions**, **Add Waypoint**, **Message** in Ride Mode, the music button, **Map Style**, **Track Line**, **Mark a Spot**, poll voting, the theme and voice choices, and **Sync**. Tapping one opens the same prompt. During your Pro Trial and on Pro the tags are gone. Create a Ride doesn't carry a tag, because Free includes a ride a month; it shows how many you have left instead.
+:::
+
+:::release 4.0
+From 4.0 you'll also see the Pro tag on **Places to Ride**, the **3D Terrain** map style, **Trip Planner**, **Starlink**, the Leaderboard's **Where You Ride** and country filters, a second machine in the **Garage**, and an event's host tools when you're a co-host. A Free account made after 4.0 sees it on **Create a Ride** too. **Message** in Ride Mode and poll voting no longer carry it; saving a message as one of **My Quick Replies** still does.
 :::
 
 ## See Your Plan

@@ -24,6 +24,10 @@ screenshots:
 
 The Garage keeps your machines in one place: a photo, the details, every part you've added and how far a tank will take you.
 
+:::release 4.0
+From 4.0, one machine in the Garage is free, so the fuel check on your rides keeps working. Adding a second machine needs OnMyLead Pro (the Pro tag sits under **Add a Machine**). Machines you already added stay.
+:::
+
 ![A machine in the Garage with its fuel range and build](/help/img/vehicle.webp)
 
 ## Open Your Garage
