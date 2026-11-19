@@ -1,0 +1,7 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+  <!--
+    Radio Sharing (src/lib/radio.ts): connects to the rider's own Meshtastic radio. Uses the same
+    Bluetooth permissions Bluetooth Sharing already declares (modules/onmylead-nearby), so nothing
+    new is asked for here.
+  -->
+</manifest>

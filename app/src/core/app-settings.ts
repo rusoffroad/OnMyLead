@@ -38,6 +38,11 @@ export const APP_FLAGS = {
   mapbox_maps: { label: 'Mapbox Maps', hint: 'Every map drawn by Mapbox (Satellite, Topo, 3D Terrain and the standard map, free up to 25,000 riders a month). Off: the Apple, Google and website maps from 2.0 draw instead, with the same trails and downloads.' },
   terrain_3d: { label: '3D Terrain', hint: 'The 3D Terrain map style in Ride Mode and Map Mode (Mapbox: free up to 25,000 riders a month). Off: riders who picked it see the flat satellite map.' },
   bluetooth_sharing: { label: 'Bluetooth Sharing', hint: 'Ride Mode passing spots and alerts between nearby riders over Bluetooth when there is no service (app 2.1). Off stops the Bluetooth radio; sharing and alerts over the internet are not affected.' },
+  radio_sharing: {
+    label: 'Radio Sharing (Meshtastic)',
+    hint: 'Riders who pair their own Meshtastic radio under You also send Bluetooth Sharing spots, alerts and messages over it, for miles of range with no service (app 3.5). Off until it has been tested with real radios. Off drops the radio link; Bluetooth Sharing is not affected.',
+    offUntilSet: true,
+  },
   referrals: { label: 'Refer a Friend', hint: 'Invite Friends and the 50% off Pro Annual reward. Turn on only once the Apple offer codes and the Google Play referral-50 offer exist. Rewards already earned can still be claimed when it is off.' },
   home_feed: { label: 'Home Feed', hint: 'The Feed on the home screen (friends’ rides, badges and trails). Riders’ feed settings are kept.' },
   apple_web_sign_in: {
