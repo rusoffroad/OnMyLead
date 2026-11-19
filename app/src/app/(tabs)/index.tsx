@@ -77,7 +77,7 @@ type Mine = RideMember & { rides: Ride };
 type Near = Ride & { distanceMi?: number };
 
 // How tall the map header is and how far the Map Mode banner reaches up over it: homeHeader in
-// core/home.ts (shorter on phones since 3.4, so every card fits on one screen).
+// core/home.ts (shorter on phones since 4.0, so every card fits on one screen).
 
 /** Rider trails around a spot, counted once per app session (it's a line on the banner, not a live number). */
 let trailCount: number | null = null;
@@ -370,7 +370,7 @@ export default function HomeScreen() {
   );
 
   // 3.0 (approved mock v4, Chris 2026-11-10): Map Mode first, over the bottom of the map header,
-  // then the red Join a Ride, then Create a Ride and Events side by side, then Places to Ride (3.4,
+  // then the red Join a Ride, then Create a Ride and Events side by side, then Places to Ride (4.0,
   // its own card underneath). These always lead; the sections under them are the rider's to show,
   // hide and order (Customize Home). On a phone they sit a little tighter so they fit on one screen.
   const actions = (

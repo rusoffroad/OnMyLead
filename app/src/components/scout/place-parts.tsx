@@ -20,7 +20,7 @@ import { t } from '@/lib/i18n';
 import { deleteSpotReview, pickReviewPhotos, removeReviewPhotos, saveSpotReview, spotPhotoUrl, uploadReviewPhoto } from '@/lib/spots';
 
 /**
- * The parts of a place page (app/spot/[id].tsx, 3.4 "a profile for the park or area", approved mock
+ * The parts of a place page (app/spot/[id].tsx, 4.0 "a profile for the park or area", approved mock
  * v3 2026-11-18): the row of quick actions, the trails by level, the info card (address, phone,
  * hours, fees, season) and the rider reviews with photos and the Reviews on Google link.
  */

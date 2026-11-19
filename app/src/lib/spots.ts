@@ -70,7 +70,7 @@ const MILES_KEY = 'scout.miles';
 export const readScoutMiles = () => AsyncStorage.getItem(MILES_KEY).then(parseSavedMiles).catch(() => parseSavedMiles(null));
 export const saveScoutMiles = (miles: number) => AsyncStorage.setItem(MILES_KEY, String(miles)).catch(() => {});
 
-// ---- Place page, reviews and favorites (3.4, migration 20261119100000_places_to_ride.sql) -----
+// ---- Place page, reviews and favorites (4.0, migration 20261119100000_places_to_ride.sql) -----
 
 /** The function isn't on the server yet (the migration hasn't run): fall back to the plain place. */
 const pageNotYet = (message: string) => /riding_spot_page|schema cache|could not find the function/i.test(message);

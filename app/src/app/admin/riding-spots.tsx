@@ -27,7 +27,7 @@ const STATUS: Record<api.SpotStatus, { label: string; tone: 'ok' | 'warn' | 'mut
  * Places to Ride (Scout): the off-road parks, OHV areas, trail systems, trailheads and tracks riders
  * see on Find > Places to Ride. Riders' suggestions wait here until approved. Imported places
  * (Forest Service, BLM, OpenStreetMap) can be renamed, re-filed or hidden; a later import never
- * undoes that. 3.4: each place's details (address, phone, hours, fees, season) are edited here,
+ * undoes that. 4.0: each place's details (address, phone, hours, fees, season) are edited here,
  * and Rider Reviews lists riders' reviews of places, where one that breaks the rules can be hidden.
  */
 export default function RidingSpotsPage() {

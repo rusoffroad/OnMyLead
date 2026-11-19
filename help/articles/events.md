@@ -62,7 +62,7 @@ The **+** (or **Create**) button at the top right creates an event while you're 
 :::
 
 :::release 3.0
-From 3.0, tap **Events** in the tab bar, or the **Events** tile on Home next to **Start a Ride** (**Create a Ride** from 3.4).
+From 3.0, tap **Events** in the tab bar, or the **Events** tile on Home next to **Start a Ride** (**Create a Ride** from 4.0).
 :::
 
 :::release 3.0
