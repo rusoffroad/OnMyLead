@@ -77,8 +77,9 @@ export function useWebDirectionsPrompt(): [DirectionsTarget | null, () => void] 
 
 /** Turn-by-turn directions: straight into the rider's maps app, or ask which one first. */
 export async function openDirections(t: DirectionsTarget, opts?: { safety?: boolean }) {
-  // Directions are Pro, except to a rider who asked for help (Need Help, EMERGENCY, a crash).
-  if (!opts?.safety && !requirePro('directions')) return;
+  // Directions are Pro, except to a rider who asked for help (Need Help, EMERGENCY, a crash) and
+  // to the meeting point of a ride you're on (free from 4.0).
+  if (!opts?.safety && !t.free && !requirePro('directions')) return;
   await load();
   const app = pickedApp(pref, Platform.OS);
   if (app) return openIn(app, t);

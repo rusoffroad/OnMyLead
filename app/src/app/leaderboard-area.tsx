@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, View } from 'react-native';
 
 import { Icon } from '@/components/icon';
+import { ProFeatureGate } from '@/components/pro-feature-gate';
 import { ThemedText } from '@/components/themed-text';
 import { Button, Choice, ErrorText, Field, Screen } from '@/components/ui';
 import { Colors, Radius, Spacing, themedStyles } from '@/constants/theme';
@@ -19,7 +20,16 @@ const FIRST_COUNTRIES = ['US', 'CA', 'MX', 'AU'];
  * leaderboard's filters. Optional. On the apps, Use My Location fills it in from one location fix
  * and the phone's own geocoder; only the two codes are saved.
  */
+/** Where You Ride is part of the Leaderboard filters (Pro on the 4.0 plan). */
 export default function LeaderboardAreaScreen() {
+  return (
+    <ProFeatureGate feature="leaderboard_filters">
+      <LeaderboardArea />
+    </ProFeatureGate>
+  );
+}
+
+function LeaderboardArea() {
   const { session, loading } = useSession();
   const [country, setCountry] = useState<string | null>(null);
   const [state, setState] = useState<string | null>(null);

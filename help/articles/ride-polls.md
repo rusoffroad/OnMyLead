@@ -4,7 +4,7 @@ summary: Leaders post a quick question in ride chat, like a lunch stop or the pa
 category: ride-mode
 order: 50
 release: "1.0"
-updated: 2026-11-17
+updated: 2026-11-19
 sources:
   - app/src/components/ride-poll.tsx
   - app/src/components/ride-chat.tsx
@@ -21,6 +21,10 @@ screenshots:
 ---
 
 A ride poll is a quick question in the ride chat with a few choices. Every rider on the ride gets one vote, can change it, and sees the live counts.
+
+:::release 4.0
+From 4.0, voting on a poll is free on every plan. Creating a poll is still part of Pro.
+:::
 
 ![Polls in ride chat](/help/img/chat.webp)
 

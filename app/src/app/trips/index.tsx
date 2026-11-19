@@ -3,6 +3,7 @@ import { useCallback, useState } from 'react';
 import { Pressable, View } from 'react-native';
 
 import { FlagGate } from '@/components/app-notices';
+import { ProFeatureGate } from '@/components/pro-feature-gate';
 import { ThemedText } from '@/components/themed-text';
 import { Button, Card, ErrorText, Screen } from '@/components/ui';
 import { ProgressBar } from '@/components/progress-bar';
@@ -16,7 +17,9 @@ import { t } from '@/lib/i18n';
 export default function TripsScreen() {
   return (
     <FlagGate flag="trip_planner">
-      <Trips />
+      <ProFeatureGate feature="trip_planner">
+        <Trips />
+      </ProFeatureGate>
     </FlagGate>
   );
 }

@@ -6,9 +6,12 @@ import { Pressable, View } from 'react-native';
 import { ThemedText } from '@/components/themed-text';
 import { Button, Card, ErrorText, Screen } from '@/components/ui';
 import { Icon } from '@/components/icon';
+import { ProTag } from '@/components/pro-tag';
 import { Colors, Spacing } from '@/constants/theme';
 import { formatDollars, kindLabel, vehicleTitle } from '@/core/garage';
+import { canAddMachine } from '@/core/pro';
 import { myVehicles, type VehicleWithCost } from '@/lib/api';
+import { currentEntitlements, showProGate } from '@/lib/pro';
 import { useSession } from '@/lib/session';
 
 import { t } from '@/lib/i18n';
@@ -37,7 +40,16 @@ export default function Garage() {
 
   return (
     <Screen>
-      <Button title={t('Add a Machine')} big onPress={() => router.push('/garage/new')} />
+      <Button
+        title={t('Add a Machine')}
+        big
+        onPress={() => {
+          // 4.0 plan: one machine is free; a second needs Pro.
+          if (canAddMachine(currentEntitlements(), vehicles?.length ?? 0)) router.push('/garage/new');
+          else showProGate({ kind: 'pro_required', feature: 'garage' });
+        }}
+      />
+      {vehicles && vehicles.length > 0 ? <ProTag feature="garage" style={{ alignSelf: 'center' }} /> : null}
       <ErrorText error={error} />
       {vehicles && vehicles.length === 0 ? (
         <ThemedText themeColor="textSecondary">{t('Your garage is empty. Add your rig or side-by-side to track the build and fuel range.')}</ThemedText>

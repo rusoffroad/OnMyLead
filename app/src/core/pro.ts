@@ -18,6 +18,21 @@ export const FREE_HISTORY = 5;
 /** Free Map Mode hours each UTC month (feature_plans map_mode allowance; Admin can change it). */
 export const FREE_MAP_HOURS = 8;
 
+/** Free Map Mode hours each UTC month on the 4.0 plan (the pro_plan_4 switch sets the allowance to this). */
+export const FREE_MAP_HOURS_4 = 5;
+
+/**
+ * Riders who had an account before the 4.0 plan keep creating a ride a month through Feb 1, 2027:
+ * the server ends it at midnight Pacific (RIDE_GRACE_UNTIL); RIDE_GRACE_DAY is the day riders read.
+ */
+export const RIDE_GRACE_UNTIL = '2027-02-02T08:00:00Z';
+export const RIDE_GRACE_DAY = '2027-02-01';
+
+/** "Feb 1, 2027", the last day of the ride grace, the same in every time zone. */
+export function graceDayText(): string {
+  return new Date(`${RIDE_GRACE_DAY}T12:00:00Z`).toLocaleDateString(coreLocale(), { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+}
+
 /** The plan line, e.g. "Pro Trial — 12 Days Remaining", "Pro" or "Free". */
 export function planHeadline(ent: Entitlements): string {
   return trialBadgeText(ent) ?? tc(ent.label);
@@ -37,8 +52,8 @@ export type ProBlock = ProError;
  */
 export const FEATURE_INFO: Record<FeatureKey, { title: string; body: string; vars?: Record<string, number> }> = {
   create_ride: {
-    title: 'Create More Rides',
-    body: 'Free accounts create one ride each month. Pro creates as many as you lead. Joining rides is always free.',
+    title: 'Create Rides',
+    body: 'Lead your own group rides, as many as you like, from your phone, tablet or the website. Joining rides other riders create is always free.',
   },
   import_gpx: {
     title: 'Import GPX Routes',
@@ -98,8 +113,8 @@ export const FEATURE_INFO: Record<FeatureKey, { title: string; body: string; var
     body: 'Pick your own easy code for a ride, group or friend link. Every ride and group still gets a free code that works.',
   },
   quick_replies: {
-    title: 'Your Own Messages',
-    body: 'Type your own one-line message to the group in Ride Mode and save your favorite quick replies. The status buttons, Need Help and EMERGENCY stay free.',
+    title: 'My Quick Replies',
+    body: 'Save the messages you send most as My Quick Replies, one tap away in Ride Mode. Typing your own message, the status buttons, Need Help and EMERGENCY stay free.',
   },
   music_controls: {
     title: 'Music Controls',
@@ -185,10 +200,41 @@ export const FEATURE_INFO: Record<FeatureKey, { title: string; body: string; var
     title: 'CarPlay',
     body: 'See your group and send status taps from your car’s screen. Ride Mode, status taps and EMERGENCY stay free on your phone.',
   },
+  places: {
+    title: 'Places to Ride',
+    body: 'Find off-road parks, OHV areas, trail systems and tracks near you, with directions and a ride you can start there. Rides other riders create stay free to join.',
+  },
+  terrain_3d: {
+    title: '3D Terrain',
+    body: 'See the hills and canyons in 3D with contours and peaks in Ride Mode and Map Mode. The standard map stays free.',
+  },
+  garage: {
+    title: 'Your Whole Garage',
+    body: 'Add every machine you ride, with photos, specs and fuel range. One machine stays free, so the fuel check on your rides keeps working.',
+  },
+  trip_planner: {
+    title: 'Trip Planner',
+    body: 'Plan trips with packing lists you tick off, starter lists and copies for next time. Joining other riders’ rides stays free.',
+  },
+  starlink: {
+    title: 'Starlink',
+    body: 'See your dish’s signal, speed and history, plus setup notes and how long your battery runs it. Your Starlink app itself stays free to use.',
+  },
+  event_cohost: {
+    title: 'Co-Host Events',
+    body: 'Help run an event: add photos, agenda items and your group rides. Seeing events and saying you’re going stay free.',
+  },
+  leaderboard_filters: {
+    title: 'Leaderboard Filters',
+    body: 'See the badge leaderboard for your country or state, and set where you ride. The leaderboard for everyone stays free.',
+  },
 };
 
-/** The comparison on the Pro screen. true = included, false = not, a string = the amount. */
-export const COMPARISON: { label: string; free: boolean | string; pro: boolean | string }[] = [
+/** One row of the Free vs Pro comparison. true = included, false = not, a string = the amount. */
+export type ComparisonRow = { label: string; free: boolean | string; pro: boolean | string };
+
+/** The comparison before the 4.0 plan (still what riders get until the owner turns it on). */
+export const COMPARISON_BEFORE_4: ComparisonRow[] = [
   { label: 'Create Rides', free: '1 a Month', pro: 'Unlimited' },
   { label: 'Join Rides and Follow the Leader', free: 'Unlimited', pro: 'Unlimited' },
   { label: 'Live Tracking, SOS, Crash Alert and Ride Bubble', free: true, pro: true },
@@ -218,6 +264,73 @@ export const COMPARISON: { label: string; free: boolean | string; pro: boolean |
   { label: 'Sync Across Devices', free: false, pro: true },
   { label: 'iPad, Android Tablets and the Website', free: false, pro: true },
 ];
+
+/**
+ * The 4.0 plan (Chris, 2026-11-19): Free joins rides other riders create, follows along and talks
+ * to the group, with free Map Mode hours each month; everything else is Pro. Safety is on every plan.
+ */
+export const COMPARISON_4: ComparisonRow[] = [
+  { label: 'Join Rides and Follow the Leader', free: 'Unlimited', pro: 'Unlimited' },
+  { label: 'Live Tracking, EMERGENCY, Need Help, Crash Alert and Ride Bubble', free: true, pro: true },
+  { label: 'Ride Chat, Group Chat, Messages and Poll Voting', free: true, pro: true },
+  { label: 'Friends, Badges, the Feed and Events', free: true, pro: true },
+  { label: 'Map Mode', free: `${FREE_MAP_HOURS_4} Hours a Month`, pro: 'Unlimited' },
+  { label: 'Create Rides', free: false, pro: 'Unlimited' },
+  { label: 'Draw Routes, Waypoints and Directions', free: false, pro: true },
+  { label: 'Places to Ride', free: false, pro: true },
+  { label: 'Bluetooth Sharing With No Service', free: false, pro: true },
+  { label: 'CarPlay', free: false, pro: true },
+  { label: 'Map Layers, Map Features and 3D Terrain', free: false, pro: true },
+  { label: 'Draw, Record, Save, Rate and Share Trails', free: false, pro: true },
+  { label: 'Track Line and Named Spots', free: false, pro: true },
+  { label: 'Import GPX Routes and Offline Maps', free: false, pro: true },
+  { label: 'Post, Comment and Share to Social Media', free: false, pro: true },
+  { label: 'Create and Co-Host Events', free: false, pro: true },
+  { label: 'Saved Riding Groups, Group Photos and Custom Codes', free: false, pro: true },
+  { label: 'Create Ride Polls, Saved Quick Replies and Music Controls', free: false, pro: true },
+  { label: 'Ride History', free: `Last ${FREE_HISTORY}`, pro: 'All' },
+  { label: 'Advanced Ride Statistics and Premium Cards', free: false, pro: true },
+  { label: 'Garage', free: '1 Machine', pro: 'Every Machine and Build Sheet' },
+  { label: 'Trip Planner and Starlink', free: false, pro: true },
+  { label: 'Leaderboard Filters', free: false, pro: true },
+  { label: 'Themes, Light Mode, Natural Voices and Custom Dots', free: false, pro: true },
+  { label: 'Sync Across Devices', free: false, pro: true },
+  { label: 'iPad, Android Tablets and the Website', free: false, pro: true },
+];
+
+/** The comparison to show: the 4.0 plan once the owner has switched it on. */
+export function comparison(plan4: boolean): ComparisonRow[] {
+  return plan4 ? COMPARISON_4 : COMPARISON_BEFORE_4;
+}
+
+/** Kept for older callers: today's comparison. */
+export const COMPARISON = COMPARISON_BEFORE_4;
+
+/**
+ * The Home notice about the 4.0 plan for a Free rider, once it is switched on, or null:
+ *   * 'grace': an account older than the plan, still creating a ride a month until RIDE_GRACE_UNTIL
+ *     (shown once, and again in the last 14 days with its own key);
+ *   * 'pro': no rides left on Free at all (shown once).
+ */
+export function planNotice(
+  ent: Pick<Entitlements, 'switchedOn' | 'accountType' | 'rideAllowance'>, plan4: boolean, now: number = Date.now(),
+): { kind: 'grace' | 'pro'; key: string } | null {
+  if (!plan4 || !ent.switchedOn || ent.accountType !== 'free') return null;
+  const end = Date.parse(RIDE_GRACE_UNTIL);
+  if ((ent.rideAllowance ?? 0) > 0 && now < end) {
+    return { kind: 'grace', key: end - now <= 14 * 24 * 60 * 60 * 1000 ? 'plan4-grace-soon' : 'plan4-grace' };
+  }
+  if (ent.rideAllowance === 0) return { kind: 'pro', key: 'plan4-pro' };
+  return null;
+}
+
+/** Free garage machines on the 4.0 plan. */
+export const FREE_MACHINES = 1;
+
+/** One machine stays free (so a ride's fuel check works); more need Pro. Machines already added are always kept. */
+export function canAddMachine(ent: Entitlements, machines: number): boolean {
+  return can(ent, 'garage') || machines < FREE_MACHINES;
+}
 
 export const PRICES = { monthly: 4.99, annual: 29.99 } as const;
 

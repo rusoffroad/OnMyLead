@@ -4,7 +4,7 @@ summary: See where you rank against other riders by badges earned, everywhere or
 category: account
 order: 26
 release: "2.1"
-updated: 2026-11-05
+updated: 2026-11-19
 sources:
   - app/src/app/leaderboard.tsx
   - app/src/app/leaderboard-area.tsx
@@ -17,6 +17,10 @@ keywords: [leaderboard, leader board, ranking, top riders, compare, state, count
 ---
 
 The **Leaderboard** ranks riders by the badges they earned by riding. Look at everyone, or narrow it to a country and then a state or province.
+
+:::release 4.0
+From 4.0, the country and state filters and **Where You Ride** are part of OnMyLead Pro. On Free the leaderboard shows Everywhere, and **Show Me on the Leaderboard** still works.
+:::
 
 ## Open the Leaderboard
 

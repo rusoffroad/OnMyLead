@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 
 import { Icon } from '@/components/icon';
+import { ProTag } from '@/components/pro-tag';
 import { SpotPinArt } from '@/components/spot-pin';
 import { font, themedStyles } from '@/constants/theme';
 import { activityHero, type ActivityId } from '@/core/activities';
@@ -65,7 +66,10 @@ export function PlacesCard({ compact, tight, line, activity }: { compact?: boole
           <Text style={styles.kickerText} numberOfLines={1}>{t('Find somewhere new')}</Text>
           {fresh ? <Text style={styles.newTag}>{t('New')}</Text> : null}
         </View>
-        <Text style={[styles.title, tight && styles.titleTight]} accessibilityRole="header" numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8}>{t('Places to Ride')}</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          <Text style={[styles.title, tight && styles.titleTight, { flexShrink: 1 }]} accessibilityRole="header" numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8}>{t('Places to Ride')}</Text>
+          <ProTag feature="places" />
+        </View>
         <Text style={styles.sub} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.85}>{sub}</Text>
       </View>
       <View style={[styles.go, hue && { backgroundColor: hue.top, boxShadow: `0px 0px 0px 3px ${hue.edge}` }]}>

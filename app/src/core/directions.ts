@@ -24,6 +24,8 @@ export type DirectionsTarget = {
   to: LatLng | string;
   /** Stops to pass on the way, in order. */
   via?: LatLng[];
+  /** Free on every plan (4.0: getting to the meeting point of a ride you're on). */
+  free?: boolean;
 };
 
 const coord = (p: LatLng) => `${p.lat.toFixed(6)},${p.lng.toFixed(6)}`;
@@ -108,7 +110,7 @@ export function rideDirections(opts: {
   const rows: DirectionsRow[] = [];
   if (opts.regroup) rows.push({ key: 'regroup', title: tc('Regroup Point'), detail: tc('Where the leader asked everyone to meet up'), target: { title: tc('the Regroup Point'), to: opts.regroup } });
   const m = opts.meet;
-  if (m) rows.push({ key: 'meet', title: tc('Meeting Point'), detail: m.label?.trim() || `${m.lat.toFixed(4)}, ${m.lng.toFixed(4)}`, target: { title: tc('the Meeting Point'), to: m } });
+  if (m) rows.push({ key: 'meet', title: tc('Meeting Point'), detail: m.label?.trim() || `${m.lat.toFixed(4)}, ${m.lng.toFixed(4)}`, target: { title: tc('the Meeting Point'), to: m, free: true } });
   const partway = (opts.alongM ?? 0) > 50;
   const r = opts.route ? routeDirections(opts.route, 'the End of the Route', partway ? opts.alongM : null) : null;
   if (r) {

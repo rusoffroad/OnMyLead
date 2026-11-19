@@ -1,6 +1,7 @@
 import { useLocalSearchParams } from 'expo-router';
 
 import { FlagGate } from '@/components/app-notices';
+import { ProFeatureGate } from '@/components/pro-feature-gate';
 import { Scout } from '@/components/scout/scout';
 
 /**
@@ -11,7 +12,9 @@ export default function PlacesScreen() {
   const { show } = useLocalSearchParams<{ show?: string }>();
   return (
     <FlagGate flag="scout">
-      <Scout top={null} start={show === 'favorites' ? 'favorites' : 'near'} />
+      <ProFeatureGate feature="places">
+        <Scout top={null} start={show === 'favorites' ? 'favorites' : 'near'} />
+      </ProFeatureGate>
     </FlagGate>
   );
 }

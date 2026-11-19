@@ -14,7 +14,7 @@ import { codeCheckOk, ShareCodeField, type CodeCheck } from '@/components/share-
 import { Button, Card, Choice, ErrorText, Field, MultiChoice, Screen } from '@/components/ui';
 import { Colors, font, Radius, Spacing, themedStyles } from '@/constants/theme';
 import type { BubblePreset } from '@/core/bubble';
-import { rideAllowanceText } from '@/core/entitlements';
+import { createsRidesOnlyWithPro, rideAllowanceText } from '@/core/entitlements';
 import { stateByCode, US_STATES } from '@/core/discovery';
 import type { JoinPolicy } from '@/core/joining';
 import { placeLabel, type Place } from '@/core/places';
@@ -39,6 +39,7 @@ import { loadRideDefaults, saveRideDefaults } from '@/lib/quick-ride';
 import { useSession } from '@/lib/session';
 import { handleProError, requirePro } from '@/lib/pro';
 import { ProTag } from '@/components/pro-tag';
+import { ProFeaturePage } from '@/components/pro-feature-gate';
 
 import { t as tr } from '@/lib/i18n';
 import { useDiscoverActivity } from '@/lib/activity';
@@ -49,7 +50,14 @@ const toInt = (s: string) => (s.trim() ? Math.max(1, parseInt(s, 10)) || null : 
 type Kind = 'public' | 'private';
 type RoutePlan = 'mapped' | 'freeride';
 
-export default function NewRide() {
+/** 4.0 plan: a Free rider with no ride allowance sees what Pro adds instead of the form. */
+export default function NewRideScreen() {
+  const { ent } = useEntitlements();
+  if (createsRidesOnlyWithPro(ent)) return <ProFeaturePage feature="create_ride" />;
+  return <NewRide />;
+}
+
+function NewRide() {
   // Activities (4.0): the ride is for the activity picked on Home (Offroad while the switcher is off).
   const activity = useDiscoverActivity();
   const { type, copy, trail, group, event, spot, lat, lng, state } = useLocalSearchParams<{ type?: string; copy?: string; trail?: string; group?: string; event?: string; spot?: string; lat?: string; lng?: string; state?: string }>();

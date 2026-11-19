@@ -10,7 +10,7 @@ import { APP_FLAGS, liveNotice, noticeKey, type AppFlag, type Notice } from '@/c
 import { dismissNotice, useAppSettings, useFlag } from '@/lib/app-settings';
 import { openStore, useUpdateState, useVersionNotice } from '@/lib/app-update';
 import { useEntitlements } from '@/lib/entitlements';
-import { shortDate } from '@/core/pro';
+import { graceDayText, planNotice, shortDate } from '@/core/pro';
 
 import { t } from '@/lib/i18n';
 const untilText = (iso: string) =>
@@ -38,7 +38,10 @@ export function AppNotices() {
   const trialKey = ent.proSource === 'trial' && ent.trialEndsAt ? `trial-${ent.trialEndsAt}` : null;
   const trialEnds = trialKey ? shortDate(ent.trialEndsAt) : '';
   const showTrial = !!trialKey && !!trialEnds && !dismissed.includes(trialKey);
-  if (!versionNotice && !showUpdate && !maintenance && !showAnnouncement && !showTrial) return null;
+  // 4.0 plan: tell Free riders once what changed (and riders with the ride grace, again near its end).
+  const plan = planNotice(ent, useFlag('pro_plan_4'));
+  const showPlan = !!plan && !dismissed.includes(plan.key);
+  if (!versionNotice && !showUpdate && !maintenance && !showAnnouncement && !showTrial && !showPlan) return null;
   return (
     <View style={{ gap: 10 }}>
       {versionNotice ? (
@@ -68,6 +71,22 @@ export function AppNotices() {
           title={t('Your Pro Trial Runs Until {date}', { date: trialEnds })}
           closeLabel="Close trial notice"
           onClose={() => dismissNotice(trialKey)}
+          action={<Button title={t('See Pro')} onPress={() => router.push('/pro')} style={{ alignSelf: 'flex-start', marginTop: 6 }} />}
+        />
+      ) : null}
+      {showPlan && plan ? (
+        <NoticeCard
+          notice={{
+            text: plan.kind === 'grace'
+              ? t('Thanks for riding with us early. You can keep creating one ride a month on Free through {date}. After that, creating rides is part of OnMyLead Pro. Joining rides, Ride Mode, chat and EMERGENCY stay free.', { date: graceDayText() })
+              : t('Creating rides and most features are part of OnMyLead Pro. On Free you join rides other riders create, follow along, talk to the group and get free Map Mode hours each month. EMERGENCY is on every plan.'),
+          }}
+          color={Colors.gold}
+          tint="rgba(230,194,122,0.12)"
+          icon="star"
+          title={plan.kind === 'grace' ? t('Free Rides Through {date}', { date: graceDayText() }) : t('What’s Free and What’s Pro')}
+          closeLabel="Close plan notice"
+          onClose={() => dismissNotice(plan.key)}
           action={<Button title={t('See Pro')} onPress={() => router.push('/pro')} style={{ alignSelf: 'flex-start', marginTop: 6 }} />}
         />
       ) : null}

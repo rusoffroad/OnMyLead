@@ -28,6 +28,10 @@ keywords: [favorite places, favorites, saved places, reviews, rider reviews, par
 
 Scout finds places to ride near you: off-road parks, OHV areas, trail systems, trailheads and motocross tracks. It looks 250 miles around you to start, and you can change that from 10 to 1,000 miles.
 
+:::release 4.0
+From 4.0, Places to Ride is part of OnMyLead Pro. On Free, the Places to Ride card on Home and the Places to Ride switch on Find carry the Pro tag, and tapping them opens the Pro screen. A place page opened from a link still shows.
+:::
+
 ## Open Scout
 
 :::until 3.0

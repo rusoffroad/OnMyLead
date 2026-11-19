@@ -33,6 +33,10 @@ screenshots:
 
 Ride Mode has big buttons so you can tell the group what's going on without typing. Every rider on the ride sees your tap, and you can see whose phone has it.
 
+:::release 4.0
+From 4.0, **Message** is free on every plan: type your own one-line message to the group. Saving it as one of **My Quick Replies** is still part of Pro.
+:::
+
 ![The status buttons in Ride Mode](/help/img/live.webp)
 
 :::warning
