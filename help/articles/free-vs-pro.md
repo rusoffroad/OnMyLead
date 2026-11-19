@@ -180,6 +180,13 @@ Free accounts get 8 hours of Map Mode every calendar month (UTC time). Pro has n
 - **Waypoints and Planned Stops:** drop waypoints and plan stops with symbols for fuel, camp, hazards and more. Seeing the leader's waypoints on a ride stays free. See [Waypoints and Planned Stops](/help/waypoints-and-planned-stops).
 - **Directions:** hand any spot to Apple Maps or Google Maps for turn-by-turn directions. Directions to a rider who needs help stay free. See [Get Directions in Apple Maps or Google Maps](/help/directions).
 - **Map Layers:** switch between satellite, topo and the trails layer with trail names and closures. The standard map stays free. See [Map Layers and Trails](/help/map-layers).
+:::
+
+:::release 4.0
+- **Weather Radar:** rain and snow from NOAA radar over the map in Ride Mode and Map Mode. **Forecast Where You Are**, with weather alerts, stays free. See [Weather Radar and Forecast](/help/weather).
+:::
+
+:::release 2.0
 - **Unlimited Map Mode:** Free includes 8 hours of Map Mode a month. Pro has no limit.
 - **Map a Custom Trail:** draw a trail on the map and measure distances along it. Following trails stays free.
 - **Record, Save, Rate and Share Trails:** record your line, keep your trails in My Trails, rate trails and share yours on the public map. Seeing and following other riders' trails stays free. See [Navigate Offroad and Map Your Own Trails](/help/navigation-mode).

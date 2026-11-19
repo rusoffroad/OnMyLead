@@ -1,13 +1,15 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useEffect, useState } from 'react';
 
-import { forecastInRange, forecastUrl, parseForecast, type DayForecast } from '@/core/ride-day';
+import { dayForecastFrom, forecastInRange, type DayForecast } from '@/core/ride-day';
+import { dayPeriods } from '@/lib/weather';
 
-const key = (rideId: string) => `ride.forecast.v1.${rideId}`;
+const key = (rideId: string) => `ride.forecast.v2.${rideId}`;
 
 /**
- * The meet day's forecast for a ride, from Open-Meteo. The last one fetched is kept on the phone,
- * so it still shows at a trailhead with no signal. Undefined while loading, null when there's none.
+ * The meet day's forecast for a ride, from the National Weather Service (lib/weather). The last one
+ * fetched is kept on the phone, so it still shows at a trailhead with no signal. Undefined while
+ * loading, null when there's none (too far ahead, or outside the United States).
  */
 export function useRideForecast(ride: { id: string; meet_at: string; meet_area_lat: number; meet_area_lng: number } | null) {
   const [forecast, setForecast] = useState<DayForecast | null | undefined>(undefined);
@@ -26,8 +28,7 @@ export function useRideForecast(ride: { id: string; meet_at: string; meet_area_l
       const cached = saved ? (JSON.parse(saved) as DayForecast) : null;
       if (live && cached) setForecast(cached);
       try {
-        const res = await fetch(forecastUrl(lat, lng, meet));
-        const f = res.ok ? parseForecast(await res.json(), meet) : null;
+        const f = dayForecastFrom(await dayPeriods({ lat, lng }), meet);
         if (!live) return;
         setForecast(f ?? cached);
         if (f) AsyncStorage.setItem(key(id), JSON.stringify(f)).catch(() => {});
