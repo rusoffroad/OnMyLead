@@ -3696,6 +3696,12 @@ const dict: Record<string, string> = {
   "Channel busy {n}%": "Канал занят {n}%",
   "Paired with {name}": "Подключена: {name}",
   "Pair your Meshtastic radio for miles of range with no service": "Подключите рацию Meshtastic для связи за километры без сети",
+  "mph": "миль/ч",
+  "Estimated Time": "Примерное Время",
+  "Enter Your Speed": "Введите Скорость",
+  "Average speed in miles per hour": "Средняя скорость в милях в час",
+  "Estimated time {v}": "Примерное время {v}",
+  "A rough guess of moving time at that average speed. Terrain, weather, stops and regroups all add time, so plan extra.": "Грубая оценка времени в движении при этой средней скорости. Рельеф, погода, остановки и сборы группы добавляют время, так что закладывайте запас.",
 };
 
 export default dict;

@@ -3696,6 +3696,12 @@ const dict: Record<string, string> = {
   "Channel busy {n}%": "チャンネル使用率 {n}%",
   "Paired with {name}": "{name} とペアリング済み",
   "Pair your Meshtastic radio for miles of range with no service": "Meshtastic無線機をペアリングすれば、電波がなくても何キロも届きます",
+  "mph": "mph",
+  "Estimated Time": "予想時間",
+  "Enter Your Speed": "速度を入力",
+  "Average speed in miles per hour": "平均速度(マイル毎時)",
+  "Estimated time {v}": "予想時間 {v}",
+  "A rough guess of moving time at that average speed. Terrain, weather, stops and regroups all add time, so plan extra.": "その平均速度で走った場合の走行時間のおおよその目安です。路面、天候、休憩、合流でさらに時間がかかるので、余裕をもって計画してください。",
 };
 
 export default dict;

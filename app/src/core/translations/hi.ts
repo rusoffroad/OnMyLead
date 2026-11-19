@@ -3696,6 +3696,12 @@ const dict: Record<string, string> = {
   "Channel busy {n}%": "चैनल व्यस्त {n}%",
   "Paired with {name}": "{name} से पेयर किया गया",
   "Pair your Meshtastic radio for miles of range with no service": "बिना नेटवर्क कई किलोमीटर की रेंज के लिए अपना Meshtastic रेडियो पेयर करें",
+  "mph": "mph",
+  "Estimated Time": "अनुमानित समय",
+  "Enter Your Speed": "अपनी स्पीड डालें",
+  "Average speed in miles per hour": "मील प्रति घंटा में औसत स्पीड",
+  "Estimated time {v}": "अनुमानित समय {v}",
+  "A rough guess of moving time at that average speed. Terrain, weather, stops and regroups all add time, so plan extra.": "उस औसत स्पीड पर चलने के समय का मोटा अंदाज़ा। रास्ता, मौसम, रुकना और ग्रुप को फिर से इकट्ठा करना समय बढ़ाते हैं, इसलिए ज़्यादा समय रखें।",
 };
 
 export default dict;

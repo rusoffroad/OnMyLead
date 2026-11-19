@@ -3696,6 +3696,12 @@ const dict: Record<string, string> = {
   "Channel busy {n}%": "信道占用 {n}%",
   "Paired with {name}": "已与 {name} 配对",
   "Pair your Meshtastic radio for miles of range with no service": "配对你的 Meshtastic 电台，无信号也能远达数公里",
+  "mph": "英里/时",
+  "Estimated Time": "预计时间",
+  "Enter Your Speed": "输入你的速度",
+  "Average speed in miles per hour": "平均速度(英里/小时)",
+  "Estimated time {v}": "预计时间 {v}",
+  "A rough guess of moving time at that average speed. Terrain, weather, stops and regroups all add time, so plan extra.": "按这个平均速度行驶时间的粗略估计。地形、天气、停车和集合都会增加时间,请预留余量。",
 };
 
 export default dict;

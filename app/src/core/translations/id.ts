@@ -3696,6 +3696,12 @@ const dict: Record<string, string> = {
   "Channel busy {n}%": "Kanal sibuk {n}%",
   "Paired with {name}": "Terpasang dengan {name}",
   "Pair your Meshtastic radio for miles of range with no service": "Pasangkan radio Meshtastic-mu untuk jangkauan berkilo-kilometer tanpa sinyal",
+  "mph": "mph",
+  "Estimated Time": "Perkiraan Waktu",
+  "Enter Your Speed": "Masukkan Kecepatanmu",
+  "Average speed in miles per hour": "Kecepatan rata-rata dalam mil per jam",
+  "Estimated time {v}": "Perkiraan waktu {v}",
+  "A rough guess of moving time at that average speed. Terrain, weather, stops and regroups all add time, so plan extra.": "Perkiraan kasar waktu berkendara pada kecepatan rata-rata itu. Medan, cuaca, berhenti, dan berkumpul kembali menambah waktu, jadi sediakan waktu lebih.",
 };
 
 export default dict;
