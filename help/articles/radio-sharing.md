@@ -4,7 +4,9 @@ summary: Pair your own Meshtastic radio and Bluetooth Sharing also goes over it,
 category: ride-mode
 order: 26
 release: "4.0"
+draft: true
 updated: 2026-11-19
+review: "Draft: Radio Sharing is off (Admin switch radio_sharing) until it is tested with real radios (Chris 2026-11-19). Publish when it is turned on, and set release: to the version it is turned on in."
 sources:
   - app/src/core/meshtastic.ts
   - app/src/core/radio-share.ts
