@@ -51,3 +51,26 @@ export function formatEta(lengthM: number | null | undefined, mph: number | null
   if (sec == null) return null;
   return formatDuration(Math.max(60, sec));
 }
+
+/**
+ * Room kept above the route panel, under the status bar: the bar with the ride's name and, below
+ * it, the round Map Settings button (66 down, 46 tall in route.tsx and trail-map-overlay), plus a gap.
+ */
+export const PANEL_TOP_ROOM = 120;
+
+/**
+ * How far the route builder's panel rides up while the speed box has the keyboard open: enough to
+ * clear the keyboard, but never so far that the panel's top goes past the Map Settings button, the
+ * bar with the ride's name or the status bar (a tall panel on a phone would otherwise slide under the clock). If the panel
+ * can't clear the keyboard, the keyboard covers its bottom (the buttons under the speed box).
+ *
+ * bottomGap is the panel's own distance from the screen's bottom edge (12 for the tablet's floating
+ * card, 0 on a phone), and bottomInset the safe area the phone panel already pads for.
+ */
+export function panelLift(o: { keyboard: number; panelH: number; windowH: number; topInset: number; bottomInset: number; bottomGap: number }): number {
+  if (o.keyboard <= 0) return 0;
+  const wanted = Math.max(0, o.keyboard - (o.bottomGap ? 0 : o.bottomInset));
+  if (!o.panelH) return wanted;
+  const room = o.windowH - o.panelH - o.bottomGap - (o.topInset + PANEL_TOP_ROOM);
+  return Math.max(0, Math.min(wanted, room));
+}

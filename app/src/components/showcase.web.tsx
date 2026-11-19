@@ -3,7 +3,11 @@ import Head from 'expo-router/head';
 import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from 'react';
 
 import { storeLink } from '@/lib/found-us';
+<<<<<<< HEAD
 import { APP_STORE_URL, COMPANY, PLAY_STORE_URL, PRO_PRICES, RUS_URL, SHOWCASE_3D_TERRAIN, SHOWCASE_COMMENT_REPLIES, SHOWCASE_EMERGENCY_SIREN, SHOWCASE_GROUP_PHOTOS, SHOWCASE_INTERSECTION_ZOOM, SHOWCASE_LEADER_TRACKLINE, SHOWCASE_MAP_FEATURES, SHOWCASE_NO_SERVICE, SHOWCASE_PARK_TRAILS, SHOWCASE_PHOTO_CROP, SHOWCASE_REDESIGN_3, SHOWCASE_EASY_LEAVE, SHOWCASE_END_RIDE_IN_MODE, SHOWCASE_FOUNDER_FRIENDS, SHOWCASE_QUICK_CREATE, SHOWCASE_EVENTS_AND_RIDES, SHOWCASE_PLACES_TO_RIDE, SHOWCASE_ROUTE_ETA, SHOWCASE_ACTIVITIES, SHOWCASE_SPREAD_RULER, TRIAL_DAYS } from '@/constants/site';
+=======
+import { APP_STORE_URL, COMPANY, PLAY_STORE_URL, PRO_PRICES, RUS_URL, SHOWCASE_3D_TERRAIN, SHOWCASE_COMMENT_REPLIES, SHOWCASE_EMERGENCY_SIREN, SHOWCASE_GROUP_PHOTOS, SHOWCASE_INTERSECTION_ZOOM, SHOWCASE_LEADER_TRACKLINE, SHOWCASE_MAP_FEATURES, SHOWCASE_NO_SERVICE, SHOWCASE_PARK_TRAILS, SHOWCASE_PHOTO_CROP, SHOWCASE_REDESIGN_3, SHOWCASE_EASY_LEAVE, SHOWCASE_END_RIDE_IN_MODE, SHOWCASE_FOUNDER_FRIENDS, SHOWCASE_QUICK_CREATE, SHOWCASE_EVENTS_AND_RIDES, SHOWCASE_PLACES_TO_RIDE, SHOWCASE_RADIO_SHARING, SHOWCASE_ROUTE_ETA, SHOWCASE_SPREAD_RULER, TRIAL_DAYS } from '@/constants/site';
+>>>>>>> origin/main
 import type { SocialProvider } from '@/core/auth-link';
 import { FREE_MAP_HOURS } from '@/core/pro';
 import { REFERRAL_PRICE, referralsSwitchedOn } from '@/core/referrals';
@@ -70,7 +74,7 @@ export function Showcase() {
         </a>
         <nav aria-label="Sections">
           {SHOWCASE_NO_SERVICE ? <a href="#no-service" onClick={jump('no-service')}>No Service</a> : null}
-          <a href="#new" onClick={jump('new')}>{SHOWCASE_REDESIGN_3 ? 'New in 3.0' : 'New in 2.1'}</a>
+          <a href="#new" onClick={jump('new')}>{SHOWCASE_REDESIGN_3 ? "What's New" : 'New in 2.1'}</a>
           <a href="#how" onClick={jump('how')}>How It Works</a>
           <a href="#plan" onClick={jump('plan')}>Plan on the Web</a>
           <a href="#features" onClick={jump('features')}>Features</a>
@@ -104,7 +108,7 @@ export function Showcase() {
             </p>
             {SHOWCASE_REDESIGN_3 ? (
               <a className="hero-new" href="#new" onClick={jump('new')}>
-                <b>New in 3.0</b> A whole new look, with Map Mode up front.
+                <b>New</b> A whole new look, with Map Mode up front.
               </a>
             ) : SHOWCASE_NO_SERVICE ? (
               <a className="hero-new" href="#no-service" onClick={jump('no-service')}>
@@ -326,7 +330,7 @@ export function Showcase() {
               <li><b>Offline Maps (Pro).</b> Save the area and its trails before you leave, and the map works with no bars.</li>
               <li><b>The Route Stays on Your Phone.</b> Once you’ve seen it, it’s there when signal drops.</li>
               <li><b>A Family Link.</b> People at home follow along on a read-only page, no app needed.</li>
-              <li><b>Bluetooth Sharing, New in 2.1.</b> With no service, riders close by on the same ride still pass spots, status taps and EMERGENCY alerts phone to phone over Bluetooth, about 100 to 300 feet, encrypted for your ride only. The first phone to get a bar sends it all on. Spots, taps and messages are Pro; EMERGENCY goes out on every plan.</li>
+              <li><b>Bluetooth Sharing.</b> With no service, riders close by on the same ride still pass spots, status taps and EMERGENCY alerts phone to phone over Bluetooth, about 100 to 300 feet, encrypted for your ride only. The first phone to get a bar sends it all on. Spots, taps and messages are Pro; EMERGENCY goes out on every plan.</li>
             </ul>
           </div>
           <figure className="signal-map">
@@ -353,11 +357,11 @@ export function Showcase() {
               )}
               <Feature title="Your Music, Without Leaving the Map">Tap the Music button in Ride Mode to pause, skip a song or turn it up, with buttons big enough for gloves. On Android it works with Spotify, YouTube Music, Pandora and the rest; on iPhone and iPad with Apple Music, plus the volume of any app. Don’t want it? Hide it.</Feature>
               <Feature title="CarPlay">Plug your iPhone into a CarPlay truck or Jeep and your ride is on the car screen: big buttons for OK, Stopped, Need Fuel, Mechanical Issue and Need Help, your group, Regroup Here for the leader, and EMERGENCY. When a rider falls behind or needs help, it pops up on the dash. Riding solo, Map Mode shows your speed, elevation, heading and the trail you’re following. Coming next: the map on the car screen, with your trails and roads (pick them with Layers), the ride route, your group’s dots and turn-by-turn for the trail ahead, plus ride messages and group chats read out loud with a tap and one-tap replies. CarPlay comes with Pro.</Feature>
-              <Feature title="Edit Ride Details, New in 2.1">Plans change. The organizer changes the name, day, time, meeting point or any detail from the ride page, on the phone or at onmylead.com. Everyone on the ride is told about a new time or meeting spot, and the ride page shows what changed.</Feature>
+              <Feature title="Edit Ride Details">Plans change. The organizer changes the name, day, time, meeting point or any detail from the ride page, on the phone or at onmylead.com. Everyone on the ride is told about a new time or meeting spot, and the ride page shows what changed.</Feature>
               {SHOWCASE_PLACES_TO_RIDE ? (
                 <Feature title="Places to Ride, New in 4.0">Find somewhere new to ride, right from Home. Off-road parks, national forests, OHV areas, trails and motocross tracks show as pins around you. Each place has its own page: address, phone, hours, fees, its trails by level, reviews and photos from OnMyLead riders, directions, Create a Ride Here and Open in Map Mode to look over the terrain. Save the ones you like to Favorite Places.</Feature>
               ) : (
-                <Feature title="Scout: Places to Ride, New in 2.1">Find a new place to ride. Scout, on the Find tab, shows off-road parks, OHV areas, trail systems, trailheads and motocross tracks around you, 250 miles out to start and anywhere from 10 to 1,000 on the slider. Each place has directions, the public rides coming up there and Create a Ride Here. Places come from the Forest Service, BLM and OpenStreetMap, and riders suggest the ones we’re missing.</Feature>
+                <Feature title="Scout: Places to Ride">Find a new place to ride. Scout, on the Find tab, shows off-road parks, OHV areas, trail systems, trailheads and motocross tracks around you, 250 miles out to start and anywhere from 10 to 1,000 on the slider. Each place has directions, the public rides coming up there and Create a Ride Here. Places come from the Forest Service, BLM and OpenStreetMap, and riders suggest the ones we’re missing.</Feature>
               )}
               {SHOWCASE_ACTIVITIES ? (
                 <Feature title="Offroad, Motorcycle, Road Trip and Snowmobile, New in 4.1">One app for every way you ride. Tap the activity button on Home to switch, and OnMyLead changes color so you always know where you are. Each activity gets its own Ride Mode buttons, like Belt Broke and Warming Up on a sled or Food Stop on a road trip, and shows the rides, events and places for it. Your friends and groups come with you, EMERGENCY stays red and reaches everyone nearby, and Pro covers them all.</Feature>
@@ -738,8 +742,15 @@ function NoService() {
             keep moving on your map, and a status tap, a message or an EMERGENCY still gets through. Every phone passes
             it along, so the rider at the back reaches the leader through the riders in between.
           </p>
+          {SHOWCASE_RADIO_SHARING ? (
+            <p>
+              Riding further apart? Pair your own Meshtastic radio under You and the same spots, taps, messages and
+              EMERGENCY also go over it, miles from rider to rider with no service, to everyone on your ride who has
+              a radio too. Encrypted for your ride only.
+            </p>
+          ) : null}
           <p className="ns-small">
-            New in 2.1 with OnMyLead Pro (every new account gets {TRIAL_DAYS} days of Pro free). On every plan, phones
+            Part of OnMyLead Pro (every new account gets {TRIAL_DAYS} days of Pro free). On every plan, phones
             pass it all along and EMERGENCY goes out over Bluetooth. iPhone, iPad and Android all work together, and
             it’s encrypted so only riders on your ride can read it.
           </p>

@@ -334,7 +334,9 @@ export async function startNearby(rideId: string, myId: string): Promise<void> {
     native.start(NEARBY_SERVICE_UUID, NEARBY_INBOX_UUID, NEARBY_OUTBOX_UUID);
   } catch {
     stopNearby();
+    return;
   }
+  tellRadio((h) => h.onSession({ rideId, myId }));
 }
 
 export function stopNearby() {
@@ -344,6 +346,7 @@ export function stopNearby() {
   session = null;
   clearInterval(s.timer);
   s.subs.forEach((x) => x.remove());
+  tellRadio((h) => h.onSession(null));
   try {
     native?.stop();
   } catch {}
@@ -502,6 +505,7 @@ function sendNow(items: NearbyItem[]) {
     native.sendNow(items.map((i) => toBase64(sealFrame(s.mesh.keys.rideKey, i, nonce(), nowSec))));
   } catch {}
   pushOutgoing();
+  tellRadio((h) => h.onNew());
 }
 
 function pushOutgoing() {
@@ -534,11 +538,21 @@ function emit(e: NearbyEvent) {
 }
 
 function receive(b64: string) {
+  let frame: Uint8Array;
+  try {
+    frame = fromBase64(b64);
+  } catch {
+    return;
+  }
+  receiveFrame(frame);
+}
+
+function receiveFrame(frame: Uint8Array) {
   const s = session;
   if (!s) return;
   let item: NearbyItem | null = null;
   try {
-    item = s.mesh.receive(fromBase64(b64), Date.now());
+    item = s.mesh.receive(frame, Date.now());
   } catch {
     item = null;
   }
@@ -646,4 +660,45 @@ function subscribeView(l: () => void) {
 
 export function useNearby(): NearbyView {
   return useSyncExternalStore(subscribeView, () => view, () => EMPTY);
+}
+
+// ---------------------------------------------------------------------------
+// Radio Sharing (lib/radio.ts): the rider's own Meshtastic radio as a second way out for the same
+// packets. Nothing here runs unless lib/radio attached itself (Admin switch on and a radio paired),
+// and anything it throws is caught, so Bluetooth Sharing works exactly as before without it.
+// ---------------------------------------------------------------------------
+
+export type NearbyRadioHooks = {
+  /** Bluetooth Sharing started for a ride (or stopped: null). */
+  onSession(s: { rideId: string; myId: string } | null): void;
+  /** A new tap, message or receipt is waiting to go out. */
+  onNew(): void;
+};
+
+let radioHooks: NearbyRadioHooks | null = null;
+
+function tellRadio(f: (h: NearbyRadioHooks) => void) {
+  const h = radioHooks;
+  if (!h) return;
+  try {
+    f(h);
+  } catch {}
+}
+
+/** lib/radio.ts attaches itself (null detaches). Told at once about a session already running. */
+export function attachNearbyRadio(h: NearbyRadioHooks | null) {
+  radioHooks = h;
+  const s = session;
+  if (h && s) tellRadio((x) => x.onSession({ rideId: s.rideId, myId: s.mesh.myId }));
+}
+
+/** The running session's mesh, for the radio to pick from (null when Bluetooth Sharing isn't running). */
+export function nearbyMeshFor(rideId: string): NearbyMesh | null {
+  const s = session;
+  return s && s.rideId === rideId ? s.mesh : null;
+}
+
+/** A packet the radio heard: handled exactly like one heard over phone Bluetooth. */
+export function nearbyFromRadio(frame: Uint8Array) {
+  receiveFrame(frame);
 }

@@ -1,0 +1,55 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face { font-family: BC; src: url(BarlowCondensed_800ExtraBold.ttf); font-weight: 800; }
+@font-face { font-family: BC; src: url(BarlowCondensed_700Bold.ttf); font-weight: 700; }
+@font-face { font-family: B; src: url(Barlow_500Medium.ttf); font-weight: 500; }
+@font-face { font-family: B; src: url(Barlow_700Bold.ttf); font-weight: 700; }
+:root { --navy:#050B15; --red:#E5262E; --cyan:#19C2FF; --text:#F4F6F9; --soft:#B9C5D6; }
+*{margin:0;box-sizing:border-box}
+html,body{width:1080px;overflow:hidden;background:var(--navy);color:var(--text);font-family:B}
+body{position:relative}
+.bg{position:absolute;inset:0;background-size:cover;background-position:center}
+.shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,11,21,.92) 0%,rgba(5,11,21,.72) 34%,rgba(5,11,21,.55) 60%,rgba(5,11,21,.96) 100%)}
+.logo{position:absolute;left:56px;top:48px;width:230px}
+h1{position:absolute;left:56px;right:56px;font:800 104px/.9 BC;letter-spacing:-.5px}
+h1 b{color:var(--red);font-weight:800}
+.phone{position:absolute;border-radius:52px;overflow:hidden;border:4px solid rgba(255,255,255,.22);box-shadow:0 50px 110px -30px rgba(0,0,0,.9),0 0 0 10px rgba(5,11,21,.55)}
+.phone img{display:block;width:100%}
+ul{position:absolute;list-style:none;display:flex;flex-direction:column;gap:22px}
+li{font:700 36px/1.08 BC;padding-left:44px;position:relative}
+li:before{content:"";position:absolute;left:0;top:7px;width:24px;height:24px;border-radius:50%;background:var(--red);box-shadow:0 0 0 6px rgba(229,38,46,.25)}
+.foot{position:absolute;left:56px;right:56px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.cta{font:800 44px/1 BC;background:var(--red);padding:22px 34px;border-radius:999px;white-space:nowrap}
+.note{font:500 25px/1.3 B;color:var(--soft)}
+.note b{color:#fff}
+</style></head><body>
+<div class="bg" id="bg"></div><div class="shade"></div>
+<img class="logo" src="logo-wordmark.png" alt="">
+<h1 id="h"></h1>
+<div class="phone" id="ph"><img id="shot" alt=""></div>
+<ul id="ul"></ul>
+<div class="foot" id="foot"><div class="note"><b>Free</b> on iPhone and Android.<br>Every new rider gets 30 days of Pro free.</div><div class="cta">Get the App</div></div>
+<script>
+const q=new URLSearchParams(location.search), v=q.get('v')||'a', tall=q.get('f')==='story';
+const H=tall?1920:1350; document.body.style.height=H+'px';
+const V={
+ a:{bg:'alpine-loop-nara-7721462.jpg',h:'Ride Together.<br><b>Get Home Together.</b>',shot:'02-bluetooth.png',
+    li:['Your whole group on one live map','An alert the moment someone falls behind','Regroup, Flat Tire or EMERGENCY in one tap']},
+ b:{bg:'alpine-loop-nara-7721462.jpg',h:'Know the second<br><b>someone falls behind.</b>',shot:'ride-mode-3.webp',
+    li:['Leader to tail gunner on one screen','Riders join with a code, link or QR','Side-by-sides, Jeeps, bikes, ATVs, trucks']},
+ c:{bg:'night.webp',h:'No service?<br><b>Your group still hears you.</b>',shot:'02-bluetooth.png',
+    li:['Phones pass it rider to rider over Bluetooth','Status taps and messages still get through','EMERGENCY goes out on every plan']}
+}[v];
+document.getElementById('bg').style.backgroundImage=`url(${V.bg})`;
+document.getElementById('h').innerHTML=V.h; document.getElementById('shot').src=V.shot;
+document.getElementById('ul').innerHTML=V.li.map(t=>`<li>${t}</li>`).join('');
+const h=document.getElementById('h'), ph=document.getElementById('ph'), ul=document.getElementById('ul'), foot=document.getElementById('foot');
+if(!tall){ h.style.top='140px'; if(v==='c') h.style.fontSize='88px'; ph.style.cssText+='right:56px;top:380px;width:440px;height:820px';
+  ul.style.cssText+='left:56px;top:430px;width:480px'; foot.style.bottom='52px';
+  foot.style.right='56px'; foot.style.left='56px'; foot.style.background='rgba(5,11,21,.0)';
+} else { h.style.top='160px'; h.style.fontSize='96px'; ph.style.cssText+='left:50%;transform:translateX(-50%);top:480px;width:520px;height:870px';
+  ul.style.cssText+='left:50%;transform:translateX(-50%);top:1400px;width:820px;align-items:flex-start'; ul.querySelectorAll('li').forEach(l=>l.style.fontSize='40px');
+  foot.style.bottom='120px'; }
+</script>
+</body></html>
