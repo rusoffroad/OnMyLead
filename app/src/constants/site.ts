@@ -128,8 +128,8 @@ export const SHOWCASE_EVENTS_AND_RIDES: boolean = true;
  */
 export const SHOWCASE_PLACES_TO_RIDE: boolean = false;
 /**
- * The Radio Sharing (Meshtastic) lines in the showcase's No Service section. Off until Radio
- * Sharing is tested with real radios and the Admin switch radio_sharing is on (docs/feature-parity.md F140).
+ * The Radio Sharing (Meshtastic) lines in the showcase's No Service section. Off until the app
+ * version with it (4.0) is live in the stores (docs/feature-parity.md F140).
  */
 export const SHOWCASE_RADIO_SHARING: boolean = false;
 /**
