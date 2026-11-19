@@ -74,7 +74,8 @@ export function Scout({ top, start = 'near' }: { top: React.ReactNode; start?: '
   const findHere = () =>
     currentPosition()
       .then(setHere)
-      .catch((e) => setLocError(e instanceof Error ? e.message : t('Could not get your location.')))
+      // Only our own words reach the rider; a phone error (kCLErrorDomain, no fix yet) gets the plain line.
+      .catch((e) => setLocError(e instanceof Error && /^Allow location access/.test(e.message) ? t(e.message) : t('Could not get your location.')))
       .finally(() => setLocating(false));
   const locate = () => {
     setLocating(true);
