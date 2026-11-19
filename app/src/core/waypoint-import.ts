@@ -7,6 +7,7 @@
  *
  * Pure, so it is tested without a phone.
  */
+import { tc } from './i18n';
 import type { WaypointSymbol } from './waypoint-symbols';
 import { WAYPOINT_NAME_MAX, WAYPOINT_NOTE_MAX } from './waypoints';
 
@@ -49,14 +50,34 @@ export function detectFormat(text: string): ImportFormat | null {
   return null;
 }
 
+/** The raw text inside the first <tag>, CDATA unwrapped, line breaks kept. */
+const rawChild = (xml: string, tag: string) => {
+  const m = new RegExp(`<(?:\\w+:)?${tag}\\b[^>]*>([\\s\\S]*?)</(?:\\w+:)?${tag}>`, 'i').exec(xml);
+  return m ? m[1].replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1') : '';
+};
+
+/**
+ * Some apps (onX among them) fill a GPX description with "key=value" lines (name, notes, id, color,
+ * icon) instead of the rider's words. Returns the notes and icon from those lines, or null when
+ * the description is ordinary text.
+ */
+export function keyValueDesc(desc: string): { notes: string; icon: string } | null {
+  if (!/^\s*name=/.test(desc) || !/^notes=/m.test(desc)) return null;
+  const notes = /^notes=([\s\S]*?)(?=^(?:id|color|icon)=|$(?![\s\S]))/m.exec(desc)?.[1] ?? '';
+  const icon = /^icon=(.*)$/m.exec(desc)?.[1] ?? '';
+  return { notes: decode(notes), icon: decode(icon) };
+}
+
 function fromGpx(xml: string): ImportResult {
   const pins: ImportedPin[] = [];
   const re = /<wpt\b([^>]*?)(?:\/>|>([\s\S]*?)<\/wpt>)/gi;
   for (let m = re.exec(xml); m; m = re.exec(xml)) {
     const body = m[2] ?? '';
     const name = child(body, 'name');
-    const note = child(body, 'desc') || child(body, 'cmt');
-    pins.push(pin(attr(m[1], 'lat'), attr(m[1], 'lon'), name, note, child(body, 'sym') || child(body, 'type')));
+    const kv = keyValueDesc(rawChild(body, 'desc'));
+    const note = kv ? kv.notes : child(body, 'desc') || child(body, 'cmt');
+    const hint = [child(body, 'icon'), kv?.icon, child(body, 'sym'), child(body, 'type')].filter(Boolean).join(' ');
+    pins.push(pin(attr(m[1], 'lat'), attr(m[1], 'lon'), name, note, hint));
   }
   const lines = (xml.match(/<trk\b/gi)?.length ?? 0) + (xml.match(/<rte\b/gi)?.length ?? 0);
   return { format: 'gpx', pins: keep(pins), lines };
@@ -188,4 +209,11 @@ function metres(a: { lat: number; lng: number }, b: { lat: number; lng: number }
   const x = (b.lng - a.lng) * r * Math.cos(((a.lat + b.lat) / 2) * r);
   const y = (b.lat - a.lat) * r;
   return Math.sqrt(x * x + y * y) * 6371000;
+}
+
+/** One line under the file's name: "27 waypoints. 2 tracks left out." */
+export function importSummary(pins: number, lines: number): string {
+  const a = pins === 1 ? tc('1 waypoint') : tc('{n} waypoints', { n: pins.toLocaleString('en-US') });
+  if (!lines) return a;
+  return `${a}. ${lines === 1 ? tc('1 track left out') : tc('{n} tracks left out', { n: lines })}.`;
 }

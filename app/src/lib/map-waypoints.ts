@@ -100,6 +100,42 @@ export async function addMapWaypoint(d: MapWaypointDraft): Promise<Waypoint> {
   return w;
 }
 
+/**
+ * Add many at once (Import Waypoints): one save and one backup for the lot. Returns the ones added;
+ * stops at the rider's limit and says so.
+ */
+export async function addMapWaypoints(drafts: MapWaypointDraft[]): Promise<Waypoint[]> {
+  await load();
+  const room = MAP_WAYPOINT_MAX - visibleMapWaypoints(all, viewer).length;
+  if (drafts.length > room) {
+    throw new Error(
+      room > 0
+        ? `You have room for ${room.toLocaleString('en-US')} more waypoints (the limit is ${MAP_WAYPOINT_MAX.toLocaleString('en-US')}). Untick a few and try again.`
+        : `You have ${MAP_WAYPOINT_MAX.toLocaleString('en-US')} waypoints. Remove a few to add more.`,
+    );
+  }
+  const now = Date.now();
+  // Each a millisecond apart, so they keep the file's order in lists.
+  const added = drafts.map((d, i) => newMapWaypoint(d, mapWaypointId(now + i, Math.random()), viewer, now + i));
+  await persist([...all, ...added]);
+  track('waypoints_imported', { count: added.length, where: 'map_mode' });
+  backupSoon();
+  return added;
+}
+
+/** Take several off at once (Undo after an import). */
+export async function removeMapWaypoints(ids: string[]): Promise<void> {
+  await load();
+  const gone = all.filter((x) => ids.includes(x.id));
+  if (!gone.length) return;
+  await persist(all.filter((x) => !ids.includes(x.id)));
+  const tomb = await readTombstones();
+  const now = Date.now();
+  for (const w of gone) tomb[w.id] = Math.max(now, mapWaypointTime(w) + 1);
+  await writeTombstones(tomb);
+  backupSoon();
+}
+
 export async function updateMapWaypoint(id: string, patch: Partial<Pick<MapWaypointDraft, 'name' | 'symbol' | 'note'>>): Promise<Waypoint> {
   await load();
   const w = all.find((x) => x.id === id);

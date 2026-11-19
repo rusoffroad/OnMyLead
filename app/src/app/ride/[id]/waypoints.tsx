@@ -12,6 +12,7 @@ import { TrailMapOverlay } from '@/components/trail-map-overlay';
 import { Button, ErrorText } from '@/components/ui';
 import { WaypointMap } from '@/components/waypoint-map';
 import { WaypointRow } from '@/components/waypoint-row';
+import { ImportDoneBar, ImportWaypointsSheet } from '@/components/import-waypoints';
 import { WaypointSheet, type WaypointSheetTarget } from '@/components/waypoint-sheet';
 import { Colors, font, Glass, Radius, scrollIndicator, Spacing, themedStyles } from '@/constants/theme';
 import { rideLeaderIds } from '@/core/chat';
@@ -25,6 +26,8 @@ import { useLayout } from '@/hooks/use-layout';
 import { usePanelFold } from '@/hooks/use-panel-fold';
 import { useRideWaypoints } from '@/hooks/use-ride-waypoints';
 import { useTrailMap } from '@/hooks/use-trail-map';
+import { useWaypointImport } from '@/hooks/use-waypoint-import';
+import { useMapWaypoints } from '@/lib/map-waypoints';
 import { getMembers, getPrivateDetails, getRide, getRideRoute } from '@/lib/api';
 import { openDirections } from '@/lib/directions';
 import { currentPosition } from '@/lib/location';
@@ -87,6 +90,9 @@ export default function RideWaypoints() {
   const wp = useRideWaypoints(id, !!mine);
   const nameOf = useCallback((userId: string) => members.find((m) => m.user_id === userId)?.profiles?.display_name || 'Rider', [members]);
   const addingStop = stop === '1' && canShare;
+  // Import Waypoints (4.0): pins from a GPX, KML or KMZ file, onto this ride or the rider's own map.
+  const wpImport = useWaypointImport();
+  const mapWaypoints = useMapWaypoints();
 
   const openNew = (at: LatLng) => {
     if (!wp.switchedOn) return setError(WAYPOINTS_NOT_SWITCHED_ON);
@@ -193,6 +199,10 @@ export default function RideWaypoints() {
             ) : null}
             <ErrorText error={error} />
             {mine ? <Button title={t('Add at My Location')} big pro="waypoints" loading={locating} disabled={!wp.switchedOn} onPress={() => requirePro('waypoints') && addHere()} /> : null}
+            <ImportDoneBar done={wpImport.done} onUndone={(d) => d.where === 'ride' && void wp.reload()} onGone={() => wpImport.setDone(null)} />
+            {mine && wpImport.offered && !addingStop ? (
+              <Button title={t('Import Waypoints')} kind="secondary" pro="waypoints" loading={wpImport.busy} disabled={!wp.switchedOn} onPress={wpImport.pick} />
+            ) : null}
             <Text style={styles.privacy}>{t('Waypoints are never public. Shared ones and planned stops show only to riders on this ride.')}</Text>
           </>
         ) : null}
@@ -216,6 +226,18 @@ export default function RideWaypoints() {
           if (w.saved) setFound(null);
         }}
         onClose={() => setTarget(null)}
+      />
+      <ImportWaypointsSheet
+        file={wpImport.file}
+        mapExisting={mapWaypoints}
+        ride={mine && wp.switchedOn ? { id, canShare, live: ride?.status === 'live', existing: wp.waypoints, me } : null}
+        startOnRide
+        onDone={(d) => {
+          wpImport.close();
+          wpImport.setDone(d);
+          if (d.where === 'ride') void wp.reload();
+        }}
+        onClose={wpImport.close}
       />
     </View>
   );
