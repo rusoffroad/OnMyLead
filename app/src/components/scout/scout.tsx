@@ -204,7 +204,7 @@ export function Scout({ top, start = 'near' }: { top: React.ReactNode; start?: '
                 accessibilityRole="checkbox"
                 accessibilityState={{ checked: on }}
                 accessibilityLabel={`${t(k.label)}, ${counts[k.kind]}`}
-                onPress={() => setKinds((ks) => toggleKind(ks, k.kind))}
+                onPress={() => setKinds((ks) => toggleKind(ks, k.kind, SPOT_KINDS.filter((x) => counts[x.kind] > 0).map((x) => x.kind)))}
                 style={({ pressed }) => [styles.kind, on && styles.kindOn, pressed && { opacity: 0.7 }]}>
                 <Icon name={k.icon} size={15} color={on ? Colors.onScout : SPOT_INK[k.kind]} strokeWidth={2.4} />
                 <Text style={[styles.kindText, on && styles.kindTextOn]}>{t(k.label)}</Text>

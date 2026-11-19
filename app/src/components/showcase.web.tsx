@@ -368,6 +368,9 @@ export function Showcase() {
               {SHOWCASE_ACTIVITIES ? (
                 <Feature title="Offroad, Motorcycle, Road Trip and Snowmobile, New in 4.0">One app for every way you ride. Tap the activity button on Home to switch, and OnMyLead changes color so you always know where you are. Each activity gets its own Ride Mode buttons, like Belt Broke and Warming Up on a sled or Food Stop on a road trip, and shows the rides, events and places for it. Your friends and groups come with you, EMERGENCY stays red and reaches everyone nearby, and Pro covers them all.</Feature>
               ) : null}
+              {SHOWCASE_ACTIVITIES ? (
+                <Feature title="A Map for Every Activity, New in 4.0">Switch to Snowmobile and the map shows where there’s snow on the ground today, sled trails, avalanche danger and snow depth stations, with snow falling when it’s snowing. Motorcycle marks the twistiest paved roads around you, and Road Trip shows scenic byways and campgrounds. Places to Ride finds snowmobile areas, scenic drives and campgrounds for your activity.</Feature>
+              ) : null}
               <Feature title="Ride Again">Ran a great ride? One tap copies it, meeting point and route included. Pick the new day and send the invite.</Feature>
               <Feature title="Planned Stops">The leader marks where the whole ride will stop for fuel, lunch or camp, with a time. Everyone on the ride sees them numbered on the map, in order, and nobody else does.</Feature>
               <Feature title="Directions in Apple Maps or Google Maps">Search a street address, a trailhead or a town for the meeting point. One tap opens turn-by-turn on the roads to the meeting point, the destination, a waypoint or along the route.</Feature>
