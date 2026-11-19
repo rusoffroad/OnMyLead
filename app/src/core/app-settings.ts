@@ -40,8 +40,7 @@ export const APP_FLAGS = {
   bluetooth_sharing: { label: 'Bluetooth Sharing', hint: 'Ride Mode passing spots and alerts between nearby riders over Bluetooth when there is no service (app 2.1). Off stops the Bluetooth radio; sharing and alerts over the internet are not affected.' },
   radio_sharing: {
     label: 'Radio Sharing (Meshtastic)',
-    hint: 'Riders who pair their own Meshtastic radio under You also send Bluetooth Sharing spots, alerts and messages over it, for miles of range with no service (app 4.0). Off until it has been tested with real radios. Off drops the radio link; Bluetooth Sharing is not affected.',
-    offUntilSet: true,
+    hint: 'Riders who pair their own Meshtastic radio under You also send Bluetooth Sharing spots, alerts and messages over it, for miles of range with no service (app 4.0). On unless turned off here. Off hides You > Radio Sharing and drops the radio link at once, no app update needed; Bluetooth Sharing is not affected.',
   },
   referrals: { label: 'Refer a Friend', hint: 'Invite Friends and the 50% off Pro Annual reward. Turn on only once the Apple offer codes and the Google Play referral-50 offer exist. Rewards already earned can still be claimed when it is off.' },
   home_feed: { label: 'Home Feed', hint: 'The Feed on the home screen (friends’ rides, badges and trails). Riders’ feed settings are kept.' },
