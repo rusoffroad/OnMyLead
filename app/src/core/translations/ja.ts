@@ -3662,6 +3662,12 @@ const dict: Record<string, string> = {
   "Level 4": "レベル4",
   "Level 5": "レベル5",
   "Unrated": "未評価",
+  "mph": "mph",
+  "Estimated Time": "予想時間",
+  "Enter Your Speed": "速度を入力",
+  "Average speed in miles per hour": "平均速度(マイル毎時)",
+  "Estimated time {v}": "予想時間 {v}",
+  "A rough guess of moving time at that average speed. Terrain, weather, stops and regroups all add time, so plan extra.": "その平均速度で走った場合の走行時間のおおよその目安です。路面、天候、休憩、合流でさらに時間がかかるので、余裕をもって計画してください。",
 };
 
 export default dict;

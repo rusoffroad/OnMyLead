@@ -127,3 +127,9 @@ export const SHOWCASE_EVENTS_AND_RIDES: boolean = true;
  * app version with it (4.0) is live in the stores.
  */
 export const SHOWCASE_PLACES_TO_RIDE: boolean = false;
+/**
+ * The showcase's Create a Ride step mentions the route builder's Estimated Time (type an average
+ * speed, see about how long the route takes). Off until the app version with it (4.0) is live in
+ * the stores.
+ */
+export const SHOWCASE_ROUTE_ETA: boolean = false;

@@ -3662,6 +3662,12 @@ const dict: Record<string, string> = {
   "Level 4": "等级 4",
   "Level 5": "等级 5",
   "Unrated": "未评级",
+  "mph": "英里/时",
+  "Estimated Time": "预计时间",
+  "Enter Your Speed": "输入你的速度",
+  "Average speed in miles per hour": "平均速度(英里/小时)",
+  "Estimated time {v}": "预计时间 {v}",
+  "A rough guess of moving time at that average speed. Terrain, weather, stops and regroups all add time, so plan extra.": "按这个平均速度行驶时间的粗略估计。地形、天气、停车和集合都会增加时间,请预留余量。",
 };
 
 export default dict;
