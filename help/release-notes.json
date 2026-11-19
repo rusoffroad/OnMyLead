@@ -3,7 +3,7 @@
     "version": "3.4",
     "title": "Places to Ride",
     "intro": "OnMyLead 3.4 adds Places to Ride to Home: find off-road parks, national forests and trails near you, see each place's address, phone, hours and rider reviews, open it in Map Mode and save your favorites. Every Home card now fits on one screen.",
-    "whatsNew": "What's new in 3.4:\n\n• Places to Ride: a new Home card to find off-road parks, national forests, OHV areas and trails near you.\n• Each place has a page with its address, phone, hours, fees, trails and rider reviews with photos.\n• Open any place in Map Mode, and save your Favorite Places.\n• Home fits on one screen, and Start a Ride is now Create a Ride.\n• The founder tag now reads App Founder.",
+    "whatsNew": "What's new in 3.4:\n\n\u2022 Places to Ride: a new Home card to find off-road parks, national forests, OHV areas and trails near you.\n\u2022 Each place has a page with its address, phone, hours, fees, trails and rider reviews with photos.\n\u2022 Open any place in Map Mode, and save your Favorite Places.\n\u2022 Route builder: enter your average speed to see an estimated time.\n\u2022 Home fits on one screen, and Start a Ride is now Create a Ride.\n\u2022 The founder tag now reads App Founder.",
     "apple": null,
     "google": null,
     "notes": [
@@ -28,6 +28,10 @@
         "text": "Favorite Places: tap Save on a place, then Favorites in Places to Ride to see them all."
       },
       {
+        "kind": "new",
+        "text": "Estimated Time in the route builder: type the average speed you expect to ride and see about how long the route takes. It's moving time only, so plan extra for stops and terrain."
+      },
+      {
         "kind": "improved",
         "text": "Every Home card now fits on one phone screen without scrolling, and Start a Ride is now Create a Ride, the same size as Events."
       },
@@ -45,7 +49,7 @@
     "version": "3.3",
     "title": "Meet the Founder",
     "intro": "OnMyLead 3.3 makes every rider friends with OnMyLead's founder, with an OnMyLead Founder tag beside the founder's name, and brings everything from 3.2: End Ride for Everyone in Ride Mode, a steadier rider line, and location sharing that stops as soon as the ride ends.",
-    "whatsNew": "What's new in 3.3:\n\n• Every rider is friends with OnMyLead's founder, marked OnMyLead Founder. Remove or block any time.\n• Organizers can end the ride for everyone from Ride Mode: tap Exit, then End Ride for Everyone.\n• Steadier rider line in Ride Mode and on CarPlay.\n• Location sharing stops as soon as the ride ends, even if you left Ride Mode.",
+    "whatsNew": "What's new in 3.3:\n\n\u2022 Every rider is friends with OnMyLead's founder, marked OnMyLead Founder. Remove or block any time.\n\u2022 Organizers can end the ride for everyone from Ride Mode: tap Exit, then End Ride for Everyone.\n\u2022 Steadier rider line in Ride Mode and on CarPlay.\n\u2022 Location sharing stops as soon as the ride ends, even if you left Ride Mode.",
     "apple": "2026-11-18",
     "google": "2026-11-18",
     "notes": [
@@ -59,7 +63,7 @@
       },
       {
         "kind": "new",
-        "text": "End Ride for Everyone in Ride Mode: when the ride is over, the organizer and co-organizers tap ‹ Exit and pick End Ride for Everyone under Ride over?, then confirm. The ride ends for the whole group, everyone's location sharing stops and Ride Mode closes. It needs service. Riders still find Leave Ride in the same place."
+        "text": "End Ride for Everyone in Ride Mode: when the ride is over, the organizer and co-organizers tap \u2039 Exit and pick End Ride for Everyone under Ride over?, then confirm. The ride ends for the whole group, everyone's location sharing stops and Ride Mode closes. It needs service. Riders still find Leave Ride in the same place."
       },
       {
         "kind": "fixed",
@@ -75,13 +79,13 @@
     "version": "3.2",
     "title": "End the Ride from Ride Mode",
     "intro": "OnMyLead 3.2 lets the organizer end a ride for everyone right from Ride Mode's Exit button, next to Leave Ride, and keeps the distances on the rider line steady in Ride Mode and on CarPlay.",
-    "whatsNew": "What's new in 3.2:\n\n• Organizers can end the ride for everyone from Ride Mode: tap Exit, then End Ride for Everyone. Leave Ride is right there too.\n• Steadier rider line: a rider right beside the leader no longer flicks between a few yards and 200 ft, in Ride Mode and on CarPlay.\n• Location sharing stops as soon as the ride ends, even if you left Ride Mode.",
+    "whatsNew": "What's new in 3.2:\n\n\u2022 Organizers can end the ride for everyone from Ride Mode: tap Exit, then End Ride for Everyone. Leave Ride is right there too.\n\u2022 Steadier rider line: a rider right beside the leader no longer flicks between a few yards and 200 ft, in Ride Mode and on CarPlay.\n\u2022 Location sharing stops as soon as the ride ends, even if you left Ride Mode.",
     "apple": null,
     "google": null,
     "notes": [
       {
         "kind": "new",
-        "text": "End Ride for Everyone in Ride Mode: when the ride is over, the organizer and co-organizers tap ‹ Exit and pick End Ride for Everyone under Ride over?, then confirm. The ride ends for the whole group, everyone's location sharing stops and Ride Mode closes. It needs service. Riders still find Leave Ride in the same place."
+        "text": "End Ride for Everyone in Ride Mode: when the ride is over, the organizer and co-organizers tap \u2039 Exit and pick End Ride for Everyone under Ride over?, then confirm. The ride ends for the whole group, everyone's location sharing stops and Ride Mode closes. It needs service. Riders still find Leave Ride in the same place."
       },
       {
         "kind": "fixed",
@@ -97,7 +101,7 @@
     "version": "3.1",
     "title": "The Map on CarPlay",
     "intro": "OnMyLead 3.1 puts the map on your car's CarPlay screen, with turn-by-turn for the trail ahead, shows your trails and roads there with a Layers button to pick them, brings your ride's messages and group chats to the car, adds an Exit button to Map Mode and Ride Mode, makes Leave Ride easy to find, and turns Create a Ride into one short screen that opens already filled in. CarPlay is part of OnMyLead Pro.",
-    "whatsNew": "What's new in 3.1:\n\n• The map on CarPlay: trails, your route, your group and turn-by-turn (Pro).\n• Ride messages and group chats on CarPlay, with one-tap replies (Pro).\n• Create a Ride is one short screen that starts on today, now and where you are.\n• An Exit button in Map Mode and Ride Mode. Exit never leaves the ride.\n• Leave Ride now sits right under the ride's name.\n• Fixed a crash in Ride Mode. Zoom In at Intersections is now off unless you turn it on.",
+    "whatsNew": "What's new in 3.1:\n\n\u2022 The map on CarPlay: trails, your route, your group and turn-by-turn (Pro).\n\u2022 Ride messages and group chats on CarPlay, with one-tap replies (Pro).\n\u2022 Create a Ride is one short screen that starts on today, now and where you are.\n\u2022 An Exit button in Map Mode and Ride Mode. Exit never leaves the ride.\n\u2022 Leave Ride now sits right under the ride's name.\n\u2022 Fixed a crash in Ride Mode. Zoom In at Intersections is now off unless you turn it on.",
     "apple": "2026-11-16",
     "google": "2026-11-16",
     "notes": [
@@ -203,7 +207,7 @@
     "version": "3.0.1",
     "title": "Follow Me Fix for Map Mode",
     "intro": "OnMyLead 3.0.1 is the first store release of 3.0, with everything in 3.0 below, and it fixes Follow Me in Map Mode: the map now moves before your dot slides under the bottom panel.",
-    "whatsNew": "What's new in 3.0.1:\n\n• A new look: Map Mode up front, five tabs, a Home you can customize, and bolder Rides, Events, Social and Ride Mode.\n• Make It a Group Ride, right from Map Mode (Pro).\n• Invite your riding group to an event.\n• Starlink status on Home.\n• Crop photos before they upload.\n• Smoother Zoom In at Intersections.\n• Show Password in every password box.\n• CarPlay works in Map Mode (Pro).\n• Ad Measurement: you choose.\n• Fixed: CarPlay and 3D Terrain crashes, and Follow Me in Map Mode.",
+    "whatsNew": "What's new in 3.0.1:\n\n\u2022 A new look: Map Mode up front, five tabs, a Home you can customize, and bolder Rides, Events, Social and Ride Mode.\n\u2022 Make It a Group Ride, right from Map Mode (Pro).\n\u2022 Invite your riding group to an event.\n\u2022 Starlink status on Home.\n\u2022 Crop photos before they upload.\n\u2022 Smoother Zoom In at Intersections.\n\u2022 Show Password in every password box.\n\u2022 CarPlay works in Map Mode (Pro).\n\u2022 Ad Measurement: you choose.\n\u2022 Fixed: CarPlay and 3D Terrain crashes, and Follow Me in Map Mode.",
     "apple": "2026-11-11",
     "google": "2026-11-11",
     "notes": [
@@ -217,7 +221,7 @@
     "version": "3.0",
     "title": "A New Look, Map Mode Up Front, Invite Your Group to an Event and Show Password",
     "intro": "OnMyLead 3.0 is a new look. Home opens on a satellite map of your area with Map Mode first, because OnMyLead is now your offroad map whether you ride solo or with a group. Join a Ride, Start a Ride and Events sit right under it, and you choose and order the rest. Map Mode tells you when you're riding solo, and Pro riders can turn that ride into a group ride in two taps. Event hosts can now invite a whole riding group in one tap, just like on a ride. It smooths out Zoom In at Intersections: when junctions come close together, like riding through town or a web of trails, the map now stays zoomed in from one to the next instead of zooming out and straight back in. Every password box now has an eye button so you can check what you typed before you tap Sign In. CarPlay now works on solo rides too: open Map Mode and the car screen shows your speed, elevation, heading, trip and the trail you're following. When you're on a Starlink's Wi-Fi, Home now shows its speed, latency and how many devices are connected. Every photo you add, from your profile picture to event and trail photos, now opens on a crop screen so you can frame it first. And it fixes a crash on iPhone when the app opened while your phone was already connected to CarPlay.",
-    "whatsNew": "What's new in 3.0:\n\n• A new look: Map Mode up front, five tabs, a Home you can customize, and bolder Rides, Events, Social and Ride Mode.\n• Make It a Group Ride, right from Map Mode (Pro).\n• Invite your riding group to an event.\n• Starlink status on Home.\n• Crop photos before they upload.\n• Smoother Zoom In at Intersections.\n• Show Password in every password box.\n• CarPlay works in Map Mode (Pro).\n• Ad Measurement: you choose.\n• Fixed: crashes with CarPlay connected and in 3D Terrain on Android.",
+    "whatsNew": "What's new in 3.0:\n\n\u2022 A new look: Map Mode up front, five tabs, a Home you can customize, and bolder Rides, Events, Social and Ride Mode.\n\u2022 Make It a Group Ride, right from Map Mode (Pro).\n\u2022 Invite your riding group to an event.\n\u2022 Starlink status on Home.\n\u2022 Crop photos before they upload.\n\u2022 Smoother Zoom In at Intersections.\n\u2022 Show Password in every password box.\n\u2022 CarPlay works in Map Mode (Pro).\n\u2022 Ad Measurement: you choose.\n\u2022 Fixed: crashes with CarPlay connected and in 3D Terrain on Android.",
     "apple": "2026-11-11",
     "google": "2026-11-11",
     "notes": [
@@ -299,7 +303,7 @@
     "version": "2.1",
     "title": "Bluetooth Sharing With No Service, Every Map on Mapbox, 3D Terrain and the Badge Leaderboard",
     "intro": "OnMyLead 2.1 keeps your group talking where the signal ends: with no cell service, riders on the same ride pass spots, status taps, EMERGENCY alerts and messages to each other over Bluetooth, phone to phone, and every phone passes them along the group (seeing riders and sharing over Bluetooth is part of OnMyLead Pro; on every plan your phone passes alerts along and EMERGENCY goes out, and every rider without Pro gets a fresh 30-day Pro trial with this update). When a rider sends EMERGENCY or their Crash Alert goes out, every other rider's phone now sounds a loud siren until they silence it. The new Leaderboard ranks riders by the badges they earned by riding. 3D Terrain is a new map style for Ride Mode and Map Mode that shows the real shape of the land, so you can see the ridges, canyons and climbs ahead. And every map in the app is now drawn by Mapbox, so Ride Mode, Map Mode, the route builder and Find a Ride look and work the same on your phone, tablet and onmylead.com.",
-    "whatsNew": "What's new in 2.1:\n\n• No service? Bluetooth Sharing keeps your group talking: spots, taps and messages (Pro) and EMERGENCY (every plan) go phone to phone, rider to rider.\n• Emergency Siren when a rider sends SOS.\n• New rider dot; leader blue, tail gunner violet.\n• Leader Trackline.\n• Map zooms in at intersections.\n• Edit Ride Details anytime.\n• Badge Leaderboard.\n• 3D Terrain, offline too.\n• Hold the map to drop a waypoint.\n• Map Settings: style, roads, trails, land.\n• CarPlay (Pro).",
+    "whatsNew": "What's new in 2.1:\n\n\u2022 No service? Bluetooth Sharing keeps your group talking: spots, taps and messages (Pro) and EMERGENCY (every plan) go phone to phone, rider to rider.\n\u2022 Emergency Siren when a rider sends SOS.\n\u2022 New rider dot; leader blue, tail gunner violet.\n\u2022 Leader Trackline.\n\u2022 Map zooms in at intersections.\n\u2022 Edit Ride Details anytime.\n\u2022 Badge Leaderboard.\n\u2022 3D Terrain, offline too.\n\u2022 Hold the map to drop a waypoint.\n\u2022 Map Settings: style, roads, trails, land.\n\u2022 CarPlay (Pro).",
     "apple": "2026-11-06",
     "google": "2026-11-06",
     "notes": [
@@ -453,7 +457,7 @@
     "version": "2.0",
     "title": "A New Home, Social, Events and Map Mode",
     "intro": "OnMyLead 2.0 is the biggest update yet. A new Home screen puts Join a Ride, Create a Ride and Find a Ride up front, with public rides near you, your group, your badges and a Feed of what your friends have been riding. Social lets you like and comment on your friends' rides, badges and trails, post ride reports with a photo and see any rider's profile. Events brings rallies, poker runs and ride weekends to one page with their agenda and group rides. Navigate is now Map Mode, with custom trails, a Track Line of where you've been and named spots like water crossings. A Tilt Meter shows your roll and pitch, and Crash Alert starts an I'm OK countdown after a hard hit or rollover before it alerts your group. Founder and Brand Ambassador badges join the badges, and your trails and settings sync across your devices. You can pick Light or Dark, four themes and a Color Blind Mode, and the app now speaks 12 languages. Ride Mode is cleaner and smoother, with your own typed messages, a Beverage Break quick reply, Follow Me, Full Map and Music Controls. Invite a friend who's new to OnMyLead, and when they finish their first ride you both get Pro Annual at half price for the first year. And there's a notifications inbox, easier Leave Ride, better handling of rough locations, Report a Rider, a Rider Safety Agreement, gold Pro tags, new Free and Pro plans (joining a ride and following the leader stay free and unlimited, and Map Mode is free for 8 hours a month) and ride miles that match the ride, and trails now show width limits so you know your machine fits.",
-    "whatsNew": "What's new in 2.0:\n\n• New Home with a Feed of your friends' rides.\n• Social: like, comment and post.\n• Events: rallies and ride weekends.\n• Map Mode: custom trails, Track Line.\n• Tilt Meter and Crash Alert.\n• Smoother Ride Mode, Full Map, Follow Me.\n• Light mode, 4 themes, Color Blind Mode.\n• 12 languages. Sync across devices.\n• Invite Friends: both save 50%.\n• Founder and Ambassador badges.\n• Trail width limits, waypoint symbols.\n• Notifications bell, Music Controls.\n• New Free and Pro plans.",
+    "whatsNew": "What's new in 2.0:\n\n\u2022 New Home with a Feed of your friends' rides.\n\u2022 Social: like, comment and post.\n\u2022 Events: rallies and ride weekends.\n\u2022 Map Mode: custom trails, Track Line.\n\u2022 Tilt Meter and Crash Alert.\n\u2022 Smoother Ride Mode, Full Map, Follow Me.\n\u2022 Light mode, 4 themes, Color Blind Mode.\n\u2022 12 languages. Sync across devices.\n\u2022 Invite Friends: both save 50%.\n\u2022 Founder and Ambassador badges.\n\u2022 Trail width limits, waypoint symbols.\n\u2022 Notifications bell, Music Controls.\n\u2022 New Free and Pro plans.",
     "apple": "2026-11-04",
     "google": "2026-11-04",
     "notes": [
@@ -635,7 +639,7 @@
     "version": "1.0.3",
     "title": "Navigate Offroad, Exact Rider Dots and Better Maps",
     "intro": "Navigate is a new offroad map for riding on your own: record and share your own trails, rate trails other riders mapped, and measure distances. Rider dots sit on each rider's exact position at every zoom, are easier to see and point the way each rider is heading. Ride Mode's route line shows every rider in running order, Full Map gives you the map with nothing in the way, and a new button brings the map back to you. Roads and trails show from farther out, ride times take a few taps, rides can be planned for 2027 and beyond, sharing can stay on until you turn it off, and any sheet swipes down to close. New badges and ranks reward the rides you lead, join and finish, Out Riding shows which riders are out near you so you can message them, you can add riders as friends, and you can pick your own easy-to-say code for a ride, group or friend link.",
-    "whatsNew": "What's new in 1.0.3:\n\n• Nav Mode: offroad map and your own trails.\n• Badges and ranks for leading, riding and miles.\n• Out Riding + Friends: see who's out and message them.\n• Rider dots stay put and show heading.\n• Full Map; riders in order on the route line.\n• Ride Mode opens on you; Center on Me.\n• Trails show from farther out.\n• Faster time picker; plan rides in 2027+.\n• Share location until you turn it off.\n• Swipe down to close any sheet.\n• Emergency: hold Alert My Group.\n• Update alerts.",
+    "whatsNew": "What's new in 1.0.3:\n\n\u2022 Nav Mode: offroad map and your own trails.\n\u2022 Badges and ranks for leading, riding and miles.\n\u2022 Out Riding + Friends: see who's out and message them.\n\u2022 Rider dots stay put and show heading.\n\u2022 Full Map; riders in order on the route line.\n\u2022 Ride Mode opens on you; Center on Me.\n\u2022 Trails show from farther out.\n\u2022 Faster time picker; plan rides in 2027+.\n\u2022 Share location until you turn it off.\n\u2022 Swipe down to close any sheet.\n\u2022 Emergency: hold Alert My Group.\n\u2022 Update alerts.",
     "apple": null,
     "google": null,
     "notes": [
@@ -746,7 +750,7 @@
     "version": "1.0.1",
     "title": "Android, Battery Saver and Trail Names",
     "intro": "OnMyLead arrives on Android phones and tablets. This update also adds Battery Saver, a ride calendar, Report a Bug, and trails that are easier to read.",
-    "whatsNew": "What's new in 1.0.1:\n\n• Battery Saver: choose how often your phone sends its location while you share.\n• Create a Ride has a calendar: pick any day up to a year out.\n• Trails are bolder, show their names, and closed trails are marked in red.\n• Search for a place on the waypoints map.\n• Report a Bug from the You tab, with a screenshot.\n• Ride Mode tells you when location is turned off for OnMyLead.",
+    "whatsNew": "What's new in 1.0.1:\n\n\u2022 Battery Saver: choose how often your phone sends its location while you share.\n\u2022 Create a Ride has a calendar: pick any day up to a year out.\n\u2022 Trails are bolder, show their names, and closed trails are marked in red.\n\u2022 Search for a place on the waypoints map.\n\u2022 Report a Bug from the You tab, with a screenshot.\n\u2022 Ride Mode tells you when location is turned off for OnMyLead.",
     "apple": null,
     "google": "2026-10-20",
     "notes": [
@@ -785,7 +789,7 @@
     "version": "1.0",
     "title": "First Release",
     "intro": "The first OnMyLead: plan a ride, bring your crew, and keep everyone together on one live map.",
-    "whatsNew": "Welcome to OnMyLead, the group ride app.\n\n• Create a ride with a meeting point, time and route.\n• Invite riders with a link, code or QR code.\n• See your group on one live map in Ride Mode.\n• Share your location only for the ride, and stop anytime.\n• Ride chat, status buttons, polls and Ride Bubble alerts.\n• Draw routes; with Pro, import GPX and save offline maps.\n• Find rides near you and follow leaders.\n• Works on iPhone and iPad.",
+    "whatsNew": "Welcome to OnMyLead, the group ride app.\n\n\u2022 Create a ride with a meeting point, time and route.\n\u2022 Invite riders with a link, code or QR code.\n\u2022 See your group on one live map in Ride Mode.\n\u2022 Share your location only for the ride, and stop anytime.\n\u2022 Ride chat, status buttons, polls and Ride Bubble alerts.\n\u2022 Draw routes; with Pro, import GPX and save offline maps.\n\u2022 Find rides near you and follow leaders.\n\u2022 Works on iPhone and iPad.",
     "apple": "2026-10-28",
     "google": null,
     "notes": [
