@@ -3,7 +3,7 @@ import Head from 'expo-router/head';
 import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from 'react';
 
 import { storeLink } from '@/lib/found-us';
-import { APP_STORE_URL, COMPANY, PLAY_STORE_URL, PRO_PRICES, RUS_URL, SHOWCASE_3D_TERRAIN, SHOWCASE_COMMENT_REPLIES, SHOWCASE_EMERGENCY_SIREN, SHOWCASE_GROUP_PHOTOS, SHOWCASE_INTERSECTION_ZOOM, SHOWCASE_LEADER_TRACKLINE, SHOWCASE_MAP_FEATURES, SHOWCASE_NO_SERVICE, SHOWCASE_PARK_TRAILS, SHOWCASE_PHOTO_CROP, SHOWCASE_REDESIGN_3, SHOWCASE_EASY_LEAVE, SHOWCASE_END_RIDE_IN_MODE, SHOWCASE_FOUNDER_FRIENDS, SHOWCASE_QUICK_CREATE, SHOWCASE_EVENTS_AND_RIDES, SHOWCASE_PLACES_TO_RIDE, SHOWCASE_ACTIVITIES, SHOWCASE_SPREAD_RULER, TRIAL_DAYS } from '@/constants/site';
+import { APP_STORE_URL, COMPANY, PLAY_STORE_URL, PRO_PRICES, RUS_URL, SHOWCASE_3D_TERRAIN, SHOWCASE_COMMENT_REPLIES, SHOWCASE_EMERGENCY_SIREN, SHOWCASE_GROUP_PHOTOS, SHOWCASE_INTERSECTION_ZOOM, SHOWCASE_LEADER_TRACKLINE, SHOWCASE_MAP_FEATURES, SHOWCASE_NO_SERVICE, SHOWCASE_PARK_TRAILS, SHOWCASE_PHOTO_CROP, SHOWCASE_REDESIGN_3, SHOWCASE_EASY_LEAVE, SHOWCASE_END_RIDE_IN_MODE, SHOWCASE_FOUNDER_FRIENDS, SHOWCASE_QUICK_CREATE, SHOWCASE_EVENTS_AND_RIDES, SHOWCASE_PLACES_TO_RIDE, SHOWCASE_ROUTE_ETA, SHOWCASE_ACTIVITIES, SHOWCASE_SPREAD_RULER, TRIAL_DAYS } from '@/constants/site';
 import type { SocialProvider } from '@/core/auth-link';
 import { FREE_MAP_HOURS } from '@/core/pro';
 import { REFERRAL_PRICE, referralsSwitchedOn } from '@/core/referrals';
@@ -144,7 +144,7 @@ export function Showcase() {
               text={SHOWCASE_QUICK_CREATE
                 ? 'One short screen, already filled in: today, the next quarter hour, where you are, and a ride for the friends you invite. Tap Create and share the link, or tap the day, the time or the meeting point to change it. Your last meeting spots are one tap. Pick Mapped and tap along the trail so the route snaps to it, or import a GPX file, or pick Freeride and everyone follows the leader. Under More Options, set which machines are welcome or make it approval-only.'
                 : 'Pick the day on a calendar and tap the meeting time (no typing), set the meeting point, difficulty and which machines are welcome, and choose public, private or approval-only. Then pick Mapped, search the trailhead or area to jump the map there, and tap along the trail so the route snaps to it, or import a GPX file, or pick Freeride and everyone follows the leader.'}
-              points={['Search parks, trailheads, towns or a street address for the meeting spot', 'Route miles checked against every machine’s fuel range', 'Hand the lead to another rider at any point']}
+              points={['Search parks, trailheads, towns or a street address for the meeting spot', 'Route miles checked against every machine’s fuel range', ...(SHOWCASE_ROUTE_ETA ? ['Type your average speed and see about how long the route takes'] : []), 'Hand the lead to another rider at any point']}
             />
             <Step
               n={2}

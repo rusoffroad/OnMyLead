@@ -44,6 +44,7 @@ export const SYNCED_SETTINGS: Record<string, string> = {
   'nav.trackLineOn.v1': 'The Track Line switch (the line itself stays on the device)',
   'nav.measureTrails.v1': 'Map Mode measures along trails',
   'route.followTrails.v1': 'Route Builder snaps to trails',
+  'route.etaSpeed.v1': 'Route Builder speed for the estimated time',
   'nav.customTrailIntro.v1': 'The custom trail intro was seen',
   'directions.app.v1': 'Directions app: Apple Maps, Google Maps or Ask Each Time',
   // Ride Mode

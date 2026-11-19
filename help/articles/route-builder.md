@@ -4,7 +4,7 @@ summary: Tap the map to lay down your ride's route. It snaps to trails for you, 
 category: routes-maps
 order: 10
 release: "1.0"
-updated: 2026-11-17
+updated: 2026-11-19
 sources:
   - app/src/app/ride/[id]/route.tsx
   - app/src/app/r/[code].tsx
@@ -16,6 +16,8 @@ sources:
   - app/src/components/trail-map-overlay.tsx
   - app/src/hooks/use-route-draft.ts
   - app/src/hooks/use-remembered-toggle.ts
+  - app/src/hooks/use-remembered-text.ts
+  - app/src/core/route-eta.ts
   - app/src/core/route.ts
   - app/src/core/route-legs.ts
   - app/src/core/trail-router.ts
@@ -25,7 +27,7 @@ sources:
   - app/src/lib/trail-tiles.ts
   - app/src/lib/trail-tiles.web.ts
 related: [navigation-mode, import-gpx, waypoints-and-planned-stops, map-layers, create-a-ride, ride-mode, place-search]
-keywords: [route builder, draw route, map a route, trail snapping, follow trails, straight line, undo, route miles, mapped ride, edit route]
+keywords: [eta, estimated time, average speed, how long, route builder, draw route, map a route, trail snapping, follow trails, straight line, undo, route miles, mapped ride, edit route]
 ---
 
 A route is the line your group will follow. Once it's saved, every rider on the ride sees it on the ride page and in Ride Mode, with everyone placed along it. You draw it by tapping points on a satellite map, and OnMyLead follows the trails between your taps for you.
@@ -106,6 +108,16 @@ To see more of the map, swipe the panel down or tap its handle. It folds down to
 
 :::release 2.0
 For the whole screen, tap **Full Map** on the panel's grab bar. The top bar, layers button and panel tuck away, and a slim bar keeps the miles and **Undo**. Keep tapping the map to add points, and tap **Controls** (or swipe the bar up) to bring everything back. See [Full Map](/help/full-map).
+:::
+
+:::release 4.0
+## Estimate Your Time
+
+Under the tools, type the average speed you expect to ride in **Average Speed** (in mph). **Estimated Time** shows about how long the route takes at that speed, and it updates as you add, move or undo points. It works for imported GPX routes and your own trails too.
+
+The estimate is moving time only, a rough guess for planning. It doesn't know about terrain, weather, stops, regroups or fuel, so plan extra time. Nothing is saved with the route; the app remembers your speed for next time, on all your devices.
+
+On a phone the panel moves up above the keyboard while you type the speed. The panel needs to be open: when it's folded or in Full Map, only the miles show.
 :::
 
 ## Search for a Place
