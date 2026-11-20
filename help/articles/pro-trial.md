@@ -4,7 +4,7 @@ summary: Every new account gets 30 days of OnMyLead Pro with no payment, and it 
 category: pro
 order: 20
 release: "1.0"
-updated: 2026-11-19
+updated: 2026-11-20
 sources:
   - supabase/migrations/20261105090000_pro_bluetooth_dot_photos.sql
   - app/src/components/app-notices.tsx
@@ -63,7 +63,13 @@ Your account moves to Free. Nothing you made during the trial is deleted:
 
 - Your rides, routes, groups and downloaded maps stay yours.
 - New Pro actions, like downloading another map area or importing a GPX file, need Pro again.
+:::until 4.0
 - Free accounts create one ride a month. Rides you created earlier in the same month, during the trial, count toward that month.
+:::
+
+:::release 4.0
+- Creating rides needs Pro. Accounts made before 4.0 keep creating one free ride a month through February 1, 2027. Rides you already created keep working.
+:::
 
 See [Free and Pro](/help/free-vs-pro) for exactly what changes.
 

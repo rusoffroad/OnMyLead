@@ -3,7 +3,7 @@
   "bundleId": "com.rusoffroad.onmylead.app",
   "appleId": "6822352321",
   "country": "us",
-  "live": "3.3",
+  "live": "4.0",
   "prelaunch": {
     "version": "1.0",
     "notice": "OnMyLead 1.0 for iPhone, iPad and Android is with Apple and Google for store review. These guides describe that first release."
@@ -72,6 +72,16 @@
       "submitted": "2026-11-18",
       "notes": "Founder friends and the OnMyLead Founder tag, plus everything planned for 3.2 (End Ride for Everyone in the Ride Mode Exit sheet, the steady rider line in Ride Mode and on CarPlay, location sharing that stops as soon as the ride ends). 3.2 (iOS 23/24, Android versionCode 17/18) never reached riders on the App Store; its App Store draft became 3.3. iOS build 25 submitted with automatic release and Android versionCode 19 sent to Play production as a full rollout 2026-11-18 ~04:20Z. Live on the App Store and Google Play 2026-11-18.",
       "released": "2026-11-18"
+    },
+    {
+      "version": "4.0",
+      "build": "20",
+      "iosBuild": "34",
+      "commit": "0a41348",
+      "status": "live",
+      "submitted": "2026-11-19",
+      "notes": "Activities (Offroad, Motorcycle, Road Trip, Snowmobile) with their own looks, map features and places, Places to Ride, Weather Radar and Forecast Where You Are, Import Waypoints, route Estimated Time, the Welcome Tour, the App Founder tag, the Admin Features page and the 4.0 Free and Pro plan (switched on at go-live). Radio Sharing ships switched off. iOS build 34 and Android versionCode 20. Live on Google Play and the App Store 2026-11-19.",
+      "released": "2026-11-19"
     }
   ],
   "unreleased": [

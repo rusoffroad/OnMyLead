@@ -126,7 +126,7 @@ export const SHOWCASE_EVENTS_AND_RIDES: boolean = true;
  * with address, phone, hours and rider reviews, Favorite Places, Open in Map Mode). Off until the
  * app version with it (4.0) is live in the stores.
  */
-export const SHOWCASE_PLACES_TO_RIDE: boolean = false;
+export const SHOWCASE_PLACES_TO_RIDE: boolean = true;
 /**
  * The Radio Sharing (Meshtastic) lines in the showcase's No Service section. Off until the app
  * version with it (4.0) is live in the stores (docs/feature-parity.md F140).
@@ -137,29 +137,29 @@ export const SHOWCASE_RADIO_SHARING: boolean = false;
  * speed, see about how long the route takes). Off until the app version with it (4.0) is live in
  * the stores.
  */
-export const SHOWCASE_ROUTE_ETA: boolean = false;
+export const SHOWCASE_ROUTE_ETA: boolean = true;
 /**
  * Import Waypoints (Pro): pins from a GPX, KML or KMZ file exported from another map app, into Map
  * Mode or onto a ride. Off until the app version with it (4.0) is live in the stores.
  */
-export const SHOWCASE_IMPORT_WAYPOINTS: boolean = false;
+export const SHOWCASE_IMPORT_WAYPOINTS: boolean = true;
 /**
  * The 4.0 Free and Pro plan (Chris, 2026-11-19) in the homepage's Free vs Pro table: Free joins,
  * follows and talks to the group with 5 Map Mode hours a month; creating rides and the rest is Pro.
  * Off until 4.0 is live in both stores, flipped in the same go-live pull request that turns on the
  * pro_plan_4 server switch, so the table always matches what riders get (core/pro.ts COMPARISON_4).
  */
-export const SHOWCASE_PRO_PLAN_4: boolean = false;
+export const SHOWCASE_PRO_PLAN_4: boolean = true;
 /**
  * Weather on the map: Weather Radar (Pro) over Ride Mode and Map Mode and the free Forecast Where
  * You Are button (NOAA and the National Weather Service). Off until the app version with it (4.0)
  * is live in the stores.
  */
-export const SHOWCASE_WEATHER: boolean = false;
+export const SHOWCASE_WEATHER: boolean = true;
 
 /**
  * Activities (Offroad, Motorcycle, Road Trip, Snowmobile, each with its own colours, Ride Mode
  * buttons, rides, events and places). Off until the app version with it (4.0) is live in the
  * stores and the activities flag is switched on.
  */
-export const SHOWCASE_ACTIVITIES: boolean = false;
+export const SHOWCASE_ACTIVITIES: boolean = true;
