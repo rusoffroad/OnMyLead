@@ -2,7 +2,9 @@ import { chromium } from '/opt/node22/lib/node_modules/playwright/index.mjs';
 // Store screenshots: serves the web export (build.sh) and answers Supabase calls from fixtures/.
 // Each target is "name|path|width|height|signedOut|scrollTo|clickAt|clickText|language|appearanceJSON|clicks|flags"
 // (clicks: text to click, @label to click by label, ^text to click and hand the file picker a photo;
-// flags: localStorage keys set before the page loads, comma separated, such as shots.nearby; see build.sh).
+// flags: localStorage keys set before the page loads, comma separated, such as shots.nearby, or
+// key=value such as onmylead.activity=snowmobile; see build.sh. ~text clicks and hands the file
+// picker the GPX; >text scrolls that text to the middle in fixtures/import. The National Weather Service answers from fixtures/weather).
 // Run everything with shots.sh.
 import http from 'node:http'; import fs from 'node:fs'; import path from 'node:path';
 // FIXTURES=spread: ten riders strung out along a longer route (fixtures/store/spread.mjs).
@@ -40,7 +42,14 @@ for (const t of targets) {
   if (!signedOut) await ctx.addInitScript((s) => localStorage.setItem('sb-mock-auth-token', JSON.stringify(s)), session());
   await ctx.addInitScript((t) => localStorage.setItem('nav.trails.v1', JSON.stringify(t)), localTrails);
   // The language to shoot in (as if picked in You > Language); none = Match Phone (the browser is en-US).
-  for (const k of (flags || '').split(',').filter(Boolean)) await ctx.addInitScript((key) => localStorage.setItem(key, '1'), k);
+  for (const k of (flags || '').split(',').filter(Boolean)) await ctx.addInitScript(([key, v]) => localStorage.setItem(key, v ?? '1'), k.split('='));
+  await ctx.route('https://api.weather.gov/**', (route) => {
+    const u = route.request().url();
+    if (u.includes('/points/')) return route.fulfill({ json: { properties: { forecast: 'https://api.weather.gov/gridpoints/GJT/48,105/forecast', forecastHourly: 'https://api.weather.gov/gridpoints/GJT/48,105/forecast/hourly', relativeLocation: { properties: { city: 'Moab', state: 'UT' } } } } });
+    if (u.includes('/alerts')) return route.fulfill({ json: { features: [] } });
+    const f = u.endsWith('/forecast/hourly') ? 'hourly' : u.endsWith('/forecast') ? 'forecast' : null;
+    return f ? route.fulfill({ path: new URL(`./fixtures/weather/${f}.json`, import.meta.url).pathname, contentType: 'application/json' }) : route.fulfill({ status: 404, json: {} });
+  });
   if (theme) await ctx.addInitScript((t) => localStorage.setItem('onmylead.appearance', t), theme);
   await ctx.addInitScript(() => { const g = navigator.geolocation; const wrap = (cb) => (p) => cb({ timestamp: p.timestamp, coords: { latitude: p.coords.latitude, longitude: p.coords.longitude, accuracy: 5, altitude: 1395, altitudeAccuracy: 5, heading: 62, speed: 11 } }); const w = g.watchPosition.bind(g), c = g.getCurrentPosition.bind(g); g.watchPosition = (a, b, o) => w(wrap(a), b, o); g.getCurrentPosition = (a, b, o) => c(wrap(a), b, o); localStorage.setItem('nav.trip.v1', JSON.stringify({ distanceM: 37200, movingS: 5580 })); localStorage.setItem('nav.panelOpen.v1', 'true'); });
   await ctx.addInitScript(() => { localStorage.setItem('tilt.calibration', JSON.stringify({ gravity: { x: 0, y: -1, z: 0 } })); });
@@ -73,7 +82,7 @@ for (const t of targets) {
   await page.goto('http://localhost:8099' + url);
   await page.waitForTimeout(+(process.env.WAIT || 5000));
   if (scrollTo) { await page.getByText(scrollTo, { exact: false }).first().scrollIntoViewIfNeeded(); await page.evaluate(() => new Promise(r => setTimeout(r, 300))); const el = page.getByText(scrollTo).first(); await el.evaluate((e) => e.scrollIntoView({ block: 'start' })); await page.waitForTimeout(800); }
-  for (const c of (clicks || '').split(',').filter(Boolean)) { if (c.startsWith('^')) { const [fc] = await Promise.all([page.waitForEvent('filechooser'), page.getByText(c.slice(1), { exact: false }).first().click()]); await fc.setFiles(new URL('../../../app/public/showcase/photos/hero.webp', import.meta.url).pathname); } else if (c.startsWith('@')) await page.getByLabel(c.slice(1), { exact: false }).first().click(); else await page.getByText(c, { exact: false }).first().click(); await page.waitForTimeout(1200); }
+  for (const c of (clicks || '').split(',').filter(Boolean)) { if (c.startsWith('>')) { await page.getByText(c.slice(1), { exact: false }).first().evaluate((e) => e.scrollIntoView({ block: 'center' })); await page.waitForTimeout(700); } else if (c.startsWith('~')) { const [fc] = await Promise.all([page.waitForEvent('filechooser'), page.getByText(c.slice(1), { exact: true }).first().click()]); await fc.setFiles(new URL('./fixtures/import/trail-markups.gpx', import.meta.url).pathname); await page.waitForTimeout(800); } else if (c.startsWith('^')) { const [fc] = await Promise.all([page.waitForEvent('filechooser'), page.getByText(c.slice(1), { exact: false }).first().click()]); await fc.setFiles(new URL('../../../app/public/showcase/photos/hero.webp', import.meta.url).pathname); } else if (c.startsWith('@')) await page.getByLabel(c.slice(1), { exact: false }).first().click(); else await page.getByText(c, { exact: false }).first().click(); await page.waitForTimeout(1200); }
   if (clickAt) { const [cx, cy] = clickAt.split(',').map(Number); await page.mouse.click(cx, cy); await page.waitForTimeout(1500); }
   if (clickText) { await page.getByText(clickText, { exact: true }).first().click(); await page.waitForTimeout(800); if (scrollTo) await page.getByText(scrollTo).first().evaluate((e) => e.scrollIntoView({ block: 'start' })); await page.waitForTimeout(500); }
   if (process.env.DBG) console.log(await page.evaluate(() => [...document.querySelectorAll('img')].map((i) => i.src.slice(0, 120)).join('\n')));

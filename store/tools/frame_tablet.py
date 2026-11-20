@@ -25,15 +25,15 @@ EDGE = (40, 56, 80)
 
 CAPTIONS = {
     '01': 'Everyone on One Live Map',
-    '02': 'Your Whole Ride Starts at Home',
-    '03': 'Map Mode for Any Trail',
-    '04': 'One Tap Tells the Whole Group',
-    '05': 'No Service? Share Over Bluetooth',
-    '06': 'A Loud Siren When a Rider Needs Help',
-    '07': 'Find Rides Near You',
-    '08': 'Rallies, Runs and Ride Weekends',
-    '09': 'Your Riding Groups and Friends',
-    '10': 'Make Home Your Own',
+    '02': 'One App for Every Way You Ride',
+    '03': 'No Service? Share Over Bluetooth',
+    '04': 'Weather Radar Right on Your Map',
+    '05': 'Sled Trails, Snow and Avalanche Danger',
+    '06': 'Find Places to Ride',
+    '07': 'Bring Your Waypoints Along',
+    '08': 'One Tap Tells the Whole Group',
+    '09': 'A Loud Siren When a Rider Needs Help',
+    '10': 'Rallies, Runs and Ride Weekends',
 }
 
 
