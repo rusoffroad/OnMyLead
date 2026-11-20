@@ -48,16 +48,24 @@ new = ("  { const mpp = 78271.517 / 2 ** zoom, R = 6378137, x = at.lng * Math.PI
 open(p, 'w').write(s.replace(old, new))
 PY
 grep -q arcgisonline "$H" || { echo "static map shot patch missed" >&2; exit 1; }
-# Map Mode's corner buttons sit just above the panel, however tall it is (the 3.0 fix, which is not
-# on main yet, measures the panel the same way; drop these lines once it is).
-N="src/app/nav/index.tsx"
-sed -i "s/  const open = fold.open;/  const open = fold.open; const [shotPanelH, setShotPanelH] = useState(0);/" "$N"
-sed -i "s/{ right: 12, bottom: open ? 340 : 180 }/{ right: 12, bottom: Math.max(open ? 340 : 180, shotPanelH + 12) }/" "$N"
-sed -i "s/bottom={wide ? 12 : open ? 330 : 170}/bottom={wide ? 12 : Math.max(open ? 330 : 170, shotPanelH + 2)}/" "$N"
-sed -i "s/\[120, 60, open ? 360 : 200, 60\]/[120, 60, Math.max(open ? 360 : 200, shotPanelH + 20), 60]/" "$N"
-sed -i "s/        {...fold.panHandlers}/        {...fold.panHandlers} onLayout={(e) => { if (!wide \&\& !floating) setShotPanelH(e.nativeEvent.layout.height); }}/" "$N"
-[ "$(grep -c -i shotPanelH "$N")" -ge 5 ] || { echo "Map Mode offset shot patch missed" >&2; exit 1; }
 [ "$(grep -c shotBT "$L")" -ge 3 ] || { echo "live.tsx shot patch missed" >&2; exit 1; }
 grep -q shots.siren src/components/emergency-siren.tsx || { echo "siren shot patch missed" >&2; exit 1; }
+# 4.0 shots. Weather Radar: the flat map draws a saved NOAA radar picture (fixtures/weather/radar.png,
+# Utah and Colorado on 2026-11-20) the way the Mapbox map draws the live one, and shows its key.
+# shots.radar switches it on per shot (shoot.mjs).
+W="src/lib/web-map.ts"
+python3 - "$W" <<'PY'
+import sys
+p = sys.argv[1]; s = open(p).read()
+old = "  m.attributionControl.setPrefix(false);\n  return m;"
+new = ("  m.attributionControl.setPrefix(false);\n"
+       "  if (typeof localStorage !== 'undefined' && localStorage.getItem('shots.radar')) L.imageOverlay('/shot-radar.png', [[36.5, -113.5], [41, -105.5]], { opacity: 0.62 }).addTo(m);\n"
+       "  return m;")
+open(p, 'w').write(s.replace(old, new, 1))
+PY
+grep -q shot-radar "$W" || { echo "radar shot patch missed" >&2; exit 1; }
+sed -i "s/trail.weather.radar \&\& trail.mapbox/trail.weather.radar/; s/{w.radar \&\& trail.mapbox ? (/{w.radar ? (/" src/components/map-weather.tsx
+[ "$(grep -c 'trail.mapbox' src/components/map-weather.tsx)" -eq 0 ] || { echo "radar key shot patch missed" >&2; exit 1; }
 EXPO_OFFLINE=1 EXPO_PUBLIC_SUPABASE_URL=https://mock.supabase.co EXPO_PUBLIC_SUPABASE_ANON_KEY=mock \
   npx expo export --platform web --output-dir "$OUT/dist"
+cp "$HERE/fixtures/weather/radar.png" "$OUT/dist/shot-radar.png"

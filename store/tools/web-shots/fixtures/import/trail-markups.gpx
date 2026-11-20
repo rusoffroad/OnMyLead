@@ -1,0 +1,37 @@
+<gpx xmlns:onx="https://wwww.onxmaps.com/" xmlns="http://www.topografix.com/GPX/1/1" version="1.1" creator="sample"><metadata/><wpt lat="38.612" lon="-109.52"><name>Upper Camp</name><desc>name=Upper Camp
+notes=Flat, room for 4 rigs
+id=00000000-0000-4000-8000-000000000000
+color=rgba(132, 212, 0, 1)
+icon=Campsite</desc><extensions><onx:color>rgba(132, 212, 0, 1)</onx:color><onx:icon>Campsite</onx:icon></extensions></wpt><wpt lat="38.573" lon="-109.551"><name>Gas - Moab Shell</name><desc>name=Gas - Moab Shell
+notes=
+id=00000000-0000-4000-8000-000000000001
+color=rgba(132, 212, 0, 1)
+icon=Fuel</desc><extensions><onx:color>rgba(132, 212, 0, 1)</onx:color><onx:icon>Fuel</onx:icon></extensions></wpt><wpt lat="38.64" lon="-109.47"><name>Washout, go slow</name><desc>name=Washout, go slow
+notes=Left line is better
+id=00000000-0000-4000-8000-000000000002
+color=rgba(132, 212, 0, 1)
+icon=Hazard</desc><extensions><onx:color>rgba(132, 212, 0, 1)</onx:color><onx:icon>Hazard</onx:icon></extensions></wpt><wpt lat="38.66" lon="-109.49"><name>Overlook</name><desc>name=Overlook
+notes=
+id=00000000-0000-4000-8000-000000000003
+color=rgba(132, 212, 0, 1)
+icon=Photo</desc><extensions><onx:color>rgba(132, 212, 0, 1)</onx:color><onx:icon>Photo</onx:icon></extensions></wpt><wpt lat="38.59" lon="-109.56"><name>Trailhead lot</name><desc>name=Trailhead lot
+notes=
+id=00000000-0000-4000-8000-000000000004
+color=rgba(132, 212, 0, 1)
+icon=Parking</desc><extensions><onx:color>rgba(132, 212, 0, 1)</onx:color><onx:icon>Parking</onx:icon></extensions></wpt><wpt lat="38.63" lon="-109.5"><name>Cattle gate</name><desc>name=Cattle gate
+notes=Close it behind you
+id=00000000-0000-4000-8000-000000000005
+color=rgba(132, 212, 0, 1)
+icon=Gate</desc><extensions><onx:color>rgba(132, 212, 0, 1)</onx:color><onx:icon>Gate</onx:icon></extensions></wpt><wpt lat="38.65" lon="-109.455"><name>Creek crossing</name><desc>name=Creek crossing
+notes=
+id=00000000-0000-4000-8000-000000000006
+color=rgba(132, 212, 0, 1)
+icon=Location</desc><extensions><onx:color>rgba(132, 212, 0, 1)</onx:color><onx:icon>Location</onx:icon></extensions></wpt><wpt lat="38.67" lon="-109.44"><name>Lunch spot</name><desc>name=Lunch spot
+notes=
+id=00000000-0000-4000-8000-000000000007
+color=rgba(132, 212, 0, 1)
+icon=Location</desc><extensions><onx:color>rgba(132, 212, 0, 1)</onx:color><onx:icon>Location</onx:icon></extensions></wpt><wpt lat="38.68" lon="-109.43"><name>Spring</name><desc>name=Spring
+notes=
+id=00000000-0000-4000-8000-000000000008
+color=rgba(132, 212, 0, 1)
+icon=Water Source</desc><extensions><onx:color>rgba(132, 212, 0, 1)</onx:color><onx:icon>Water Source</onx:icon></extensions></wpt><trk><name>Loop</name><trkseg><trkpt lat="38.6" lon="-109.5"/><trkpt lat="38.61" lon="-109.51"/></trkseg></trk></gpx>
