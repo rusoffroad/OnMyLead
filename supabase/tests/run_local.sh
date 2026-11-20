@@ -8,6 +8,7 @@ createdb "$db"
 trap 'dropdb "$db"' EXIT
 psql -q -v ON_ERROR_STOP=1 -d "$db" -f "$here/auth_stub.sql" "${@}" \
   $(for f in "$here"/../migrations/*.sql; do echo -f "$f"; done) \
+  -f "$here/pro_plan_4_live_reset.sql" \
   -f "$here/privacy_test.sql" \
   -f "$here/approval_test.sql" \
   -f "$here/groups_test.sql" \
