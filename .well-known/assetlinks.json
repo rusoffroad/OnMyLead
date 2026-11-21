@@ -1,0 +1,15 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.rusoffroad.onmylead.app",
+      "sha256_cert_fingerprints": [
+        "1F:5A:24:CF:30:69:B9:41:66:B8:9D:D6:E8:BF:47:D2:82:FD:A2:2B:CD:3F:23:3A:32:3D:34:07:38:0B:9C:A0",
+        "6D:79:C8:3A:FB:B7:95:7C:67:28:A3:B8:3B:F5:88:7C:E8:C2:CC:29:7A:07:4C:D4:99:5B:A6:50:0A:77:BD:37"
+      ]
+    }
+  }
+]
