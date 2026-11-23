@@ -167,3 +167,21 @@ ${facts.map(([k, v]) => `<tr><td style="padding:3px 16px 3px 0;color:#5F7190;whi
 </div></body></html>`;
   return { subject, text, html };
 }
+
+/** The JSON a push webhook gets: a title and body ready to show, plus the facts. No rider email. */
+export function proAlertPush(a: ProAlert, rider: AlertRider, title: string) {
+  return {
+    event: a.kind === 'paid' ? 'pro_paid' : 'pro_trial',
+    title,
+    body: [`Pro ${planName(a.productId)}`, a.store === 'apple' ? 'App Store' : 'Google Play', priceText(a), isBlackFriday(a.offerId) ? 'Black Friday price' : null]
+      .filter(Boolean).join(' · '),
+    rider: rider.name?.trim() || null,
+    plan: planName(a.productId),
+    store: a.store,
+    kind: a.kind,
+    price: priceText(a),
+    offer: a.offerId,
+    sandbox: a.sandbox,
+    url: rider.userId ? `https://onmylead.com/admin/users/${rider.userId}` : 'https://onmylead.com/admin/subscriptions',
+  };
+}

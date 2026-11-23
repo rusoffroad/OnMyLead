@@ -11,9 +11,12 @@
 //          PRO_ALERTS_TO       where the emails go (comma separated); without it, CONTACT_TO
 //          EMAIL_FROM          optional sender, default "OnMyLead <rides@onmylead.com>"
 //          PRO_ALERTS_SANDBOX  "on" to also email store test purchases (Sandbox, Play license testers)
+//          PRO_ALERTS_WEBHOOK  optional https URL that also gets each alert as JSON (POST), for a push
+//                              notification from another app; PRO_ALERTS_WEBHOOK_TOKEN is sent as
+//                              its Bearer token when set. The email still goes out either way.
 import type { SupabaseClient } from 'npm:@supabase/supabase-js@2';
 
-import { proAlertEmail, type AlertRider, type ProAlert } from './pro-alert.ts';
+import { proAlertEmail, proAlertPush, type AlertRider, type ProAlert } from './pro-alert.ts';
 
 const env = (k: string) => Deno.env.get(k) ?? '';
 
@@ -36,7 +39,8 @@ export async function sendProAlert(db: SupabaseClient, alert: ProAlert | null): 
     if (alert.sandbox && env('PRO_ALERTS_SANDBOX').toLowerCase() !== 'on') return;
     const key = env('RESEND_API_KEY');
     const to = (env('PRO_ALERTS_TO') || env('CONTACT_TO')).split(',').map((s) => s.trim()).filter(Boolean);
-    if (!key || !to.length) return;
+    const hook = env('PRO_ALERTS_WEBHOOK');
+    if ((!key || !to.length) && !hook.startsWith('https://')) return;
 
     const claim = { store: alert.store, subscription_id: alert.subscriptionId, kind: alert.kind };
     const { data: claimed, error } = await db.from('pro_signup_alerts')
@@ -46,14 +50,29 @@ export async function sendProAlert(db: SupabaseClient, alert: ProAlert | null): 
     if (error || !claimed?.length) return;
 
     const who = await rider(db, alert);
-    const res = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: { authorization: `Bearer ${key}`, 'content-type': 'application/json' },
-      body: JSON.stringify({ from: env('EMAIL_FROM') || 'OnMyLead <rides@onmylead.com>', to, ...proAlertEmail(alert, who, new Date()) }),
-      signal: AbortSignal.timeout(10_000),
-    }).catch(() => null);
-    if (!res?.ok) {
-      console.error('Pro alert email failed', res?.status ?? 'no answer');
+    const mail = proAlertEmail(alert, who, new Date());
+    const sends: Promise<boolean>[] = [];
+    if (key && to.length) {
+      sends.push(fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: { authorization: `Bearer ${key}`, 'content-type': 'application/json' },
+        body: JSON.stringify({ from: env('EMAIL_FROM') || 'OnMyLead <rides@onmylead.com>', to, ...mail }),
+        signal: AbortSignal.timeout(10_000),
+      }).then((r) => r.ok, () => false));
+    }
+    if (hook.startsWith('https://')) {
+      const token = env('PRO_ALERTS_WEBHOOK_TOKEN');
+      sends.push(fetch(hook, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', ...(token ? { authorization: `Bearer ${token}` } : {}) },
+        body: JSON.stringify(proAlertPush(alert, who, mail.subject)),
+        signal: AbortSignal.timeout(10_000),
+      }).then((r) => r.ok, () => false));
+    }
+    const sent = await Promise.all(sends);
+    // Nothing reached Chris: give the claim back so the store's next update tries again.
+    if (!sent.some(Boolean)) {
+      console.error('Pro alert not delivered');
       await db.from('pro_signup_alerts').delete().match(claim);
     }
   } catch (e) {

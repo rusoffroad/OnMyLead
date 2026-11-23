@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { appleAlert, isBlackFriday, planName, playAlert, priceText, proAlertEmail } from '../../../../supabase/functions/_shared/pro-alert';
+import { appleAlert, isBlackFriday, planName, playAlert, priceText, proAlertEmail, proAlertPush } from '../../../../supabase/functions/_shared/pro-alert';
 
 const MONTHLY = 'com.rusoffroad.onmylead.pro.monthly';
 const ANNUAL = 'com.rusoffroad.onmylead.pro.annual';
@@ -102,5 +102,14 @@ describe('the email', () => {
     const e = proAlertEmail(a, { userId: 'u', name: 'Tess', email: null }, new Date());
     expect(e.subject.startsWith('Test purchase: ')).toBe(true);
     expect(e.text).toContain('No real money');
+  });
+});
+
+describe('the push webhook', () => {
+  it('carries a ready title and body without the rider email', () => {
+    const a = appleAlert({ originalTransactionId: '1', productId: 'com.rusoffroad.onmylead.pro.annual', price: 14990, currency: 'USD', offerType: 3, offerIdentifier: 'black-friday', environment: 'Production' }, 'active')!;
+    const p = proAlertPush(a, { userId: 'u-1', name: 'Rex', email: 'rex@example.com' }, 'Rex paid for Pro Annual (iPhone)');
+    expect(p).toMatchObject({ event: 'pro_paid', title: 'Rex paid for Pro Annual (iPhone)', body: 'Pro Annual · App Store · $14.99 a year · Black Friday price', url: 'https://onmylead.com/admin/users/u-1' });
+    expect(JSON.stringify(p)).not.toContain('rex@example.com');
   });
 });
