@@ -12,6 +12,8 @@
 // Secrets: see ../_shared/apple.ts
 import { PRO_PRODUCT_IDS, peekJws, subscriptionRow, type AppleRenewalInfo } from '../_shared/appstore-status.ts';
 import { db, saveSubscription, verifierFor, type AppleNotification } from '../_shared/apple.ts';
+import { appleAlert } from '../_shared/pro-alert.ts';
+import { sendProAlert } from '../_shared/pro-alert-send.ts';
 
 Deno.serve(async (req) => {
   if (req.method !== 'POST') return new Response('method not allowed', { status: 405 });
@@ -73,6 +75,7 @@ Deno.serve(async (req) => {
         // The notification's own signing time orders it against everything else stored.
         if (note.signedDate) row.last_signed_at = new Date(note.signedDate).toISOString();
         await saveSubscription(row, { accountToken: transaction.appAccountToken });
+        await sendProAlert(db, appleAlert(transaction, row.status));
       }
     }
   } catch (e) {

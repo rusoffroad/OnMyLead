@@ -19,6 +19,8 @@
 // Deploy:  supabase functions deploy play-notifications --no-verify-jwt
 // Secrets: see ../_shared/google-play.ts
 import { accountUserId, parseRtdn, playOrder, playRow, proLineItem } from '../_shared/play-status.ts';
+import { playAlert } from '../_shared/pro-alert.ts';
+import { sendProAlert } from '../_shared/pro-alert-send.ts';
 import { acknowledge, db, getSubscription, PACKAGE_NAME, PLAY_ENVIRONMENTS, PlayNotFound, savePlay } from '../_shared/google-play.ts';
 
 const expected = Deno.env.get('PLAY_RTDN_TOKEN') ?? '';
@@ -65,6 +67,7 @@ Deno.serve(async (req) => {
         event.payload = { ...event.payload, status: row.status, environment: row.environment, product_id: row.product_id };
         if (PLAY_ENVIRONMENTS.has(row.environment)) {
           await savePlay(row, accountUserId(sub), false, playOrder(sub, now));
+          await sendProAlert(db, playAlert(note.purchaseToken, sub, row));
           if (!row.acknowledged && row.status !== 'pending') await acknowledge(row.product_id, note.purchaseToken);
         }
       }

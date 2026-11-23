@@ -19,6 +19,8 @@
 // Deploy:  supabase functions deploy play-verify
 // Secrets: see ../_shared/google-play.ts
 import { playOrder, playRow, proLineItem } from '../_shared/play-status.ts';
+import { playAlert } from '../_shared/pro-alert.ts';
+import { sendProAlert } from '../_shared/pro-alert-send.ts';
 import { acknowledge, asUser, db, getSubscription, PLAY_ENVIRONMENTS, PlayNotFound, playConfigured, savePlay } from '../_shared/google-play.ts';
 
 const json = (body: unknown, status = 200) => Response.json(body, { status });
@@ -54,6 +56,7 @@ Deno.serve(async (req) => {
 
   try {
     await savePlay(row, user.id, true, playOrder(sub, now));
+    await sendProAlert(db, playAlert(token, sub, row));
     if (!row.acknowledged && row.status !== 'pending') {
       await acknowledge(row.product_id, token).catch((e) => console.error('acknowledge failed', e instanceof Error ? e.message : e));
     }
