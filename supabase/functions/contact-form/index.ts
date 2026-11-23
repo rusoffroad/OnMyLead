@@ -9,7 +9,10 @@
 //   * a hidden field people never see (bots fill it in; we answer "sent" and drop it),
 //   * a form that was open for under three seconds is refused,
 //   * contact_submit() rate limits by a keyed hash of the IP address, by email and by account,
-//   * signed-out messages with lots of links are refused.
+//   * signed-out messages with lots of links are refused,
+//   * signed-out sales pitches (booking links, "worth 30 minutes?") and messages posted straight at
+//     this function instead of from the form are saved but not emailed: they are filed as Closed on
+//     the Admin Contact page with the reasons (../_shared/contact-spam.ts). The sender sees "sent".
 //
 // Body: {"source":"website"|"app","topic":"problem",...,"name":"...","email":"...","message":"...",
 //        "platform":"iOS 27.0","app_version":"1.0.0","elapsed_ms":12345,"website":""}
@@ -26,6 +29,8 @@
 //          CONTACT_ORIGINS   optional, comma-separated extra website origins allowed to call it
 // SUPABASE_URL, SUPABASE_ANON_KEY and SUPABASE_SERVICE_ROLE_KEY are provided by Supabase.
 import { createClient } from 'npm:@supabase/supabase-js@2';
+
+import { contactSpam, heldNote } from '../_shared/contact-spam.ts';
 
 const env = (k: string) => Deno.env.get(k) ?? '';
 const service = createClient(env('SUPABASE_URL'), env('SUPABASE_SERVICE_ROLE_KEY'), { auth: { persistSession: false } });
@@ -55,7 +60,8 @@ function cors(origin: string | null): Record<string, string> {
 const clip = (v: unknown, max: number) => (typeof v === 'string' ? v.trim().slice(0, max) : '');
 
 Deno.serve(async (req) => {
-  const headers = cors(req.headers.get('origin'));
+  const origin = req.headers.get('origin');
+  const headers = cors(origin);
   const reply = (body: unknown, status = 200) => Response.json(body, { status, headers });
   if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers });
   // The form asks first, so it only offers screenshots once this version is deployed (older ones say 405).
@@ -98,6 +104,12 @@ Deno.serve(async (req) => {
   const platform = clip(input?.platform, 40) || null;
   const appVersion = clip(input?.app_version, 40) || null;
 
+  const spam = contactSpam({
+    source, signedIn: !!userId, email, message,
+    elapsedMs: Number.isFinite(elapsed) ? elapsed : null,
+    fromOurSite: !!origin && ORIGINS.has(origin),
+  });
+
   const { data: id, error } = await service.rpc('contact_submit', {
     p_source: source, p_topic: topic, p_name: name || null, p_email: email, p_message: message,
     p_user: userId, p_platform: platform, p_app_version: appVersion, p_ip_hash: ipHash,
@@ -105,6 +117,13 @@ Deno.serve(async (req) => {
   if (error) {
     if (/rate_limited/.test(error.message)) return reply({ error: 'You’ve sent a few messages already. Try again in an hour.' }, 429);
     return reply({ error: 'We couldn’t send that. Try again in a minute.' }, 500);
+  }
+
+  if (spam.hold) {
+    // Saved (and counted by the rate limit) but not emailed, and filed as Closed so the New list stays clean.
+    await service.rpc('contact_mark_emailed', { p_id: id, p_ok: false, p_note: heldNote(spam) });
+    await service.from('contact_messages').update({ status: 'closed', handled_at: new Date().toISOString() }).eq('id', id);
+    return reply({ ok: true });
   }
 
   const details = await saveDetails(id, input);
