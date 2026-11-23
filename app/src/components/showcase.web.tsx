@@ -3,7 +3,7 @@ import Head from 'expo-router/head';
 import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from 'react';
 
 import { storeLink } from '@/lib/found-us';
-import { APP_STORE_URL, COMPANY, PLAY_STORE_URL, PRO_PRICES, RUS_URL, SHOWCASE_3D_TERRAIN, SHOWCASE_COMMENT_REPLIES, SHOWCASE_EMERGENCY_SIREN, SHOWCASE_GROUP_PHOTOS, SHOWCASE_IMPORT_WAYPOINTS, SHOWCASE_INTERSECTION_ZOOM, SHOWCASE_LEADER_TRACKLINE, SHOWCASE_MAP_FEATURES, SHOWCASE_NO_SERVICE, SHOWCASE_PARK_TRAILS, SHOWCASE_PHOTO_CROP, SHOWCASE_REDESIGN_3, SHOWCASE_EASY_LEAVE, SHOWCASE_END_RIDE_IN_MODE, SHOWCASE_FOUNDER_FRIENDS, SHOWCASE_QUICK_CREATE, SHOWCASE_EVENTS_AND_RIDES, SHOWCASE_PLACES_TO_RIDE, SHOWCASE_RADIO_SHARING, SHOWCASE_ROUTE_ETA, SHOWCASE_PRO_PLAN_4, SHOWCASE_WEATHER, SHOWCASE_ACTIVITIES, SHOWCASE_SPREAD_RULER, TRIAL_DAYS } from '@/constants/site';
+import { APP_STORE_URL, COMPANY, PLAY_STORE_URL, PRO_DEAL, PRO_PRICES, proDealLive, RUS_URL, SHOWCASE_3D_TERRAIN, SHOWCASE_COMMENT_REPLIES, SHOWCASE_EMERGENCY_SIREN, SHOWCASE_GROUP_PHOTOS, SHOWCASE_IMPORT_WAYPOINTS, SHOWCASE_INTERSECTION_ZOOM, SHOWCASE_LEADER_TRACKLINE, SHOWCASE_MAP_FEATURES, SHOWCASE_NO_SERVICE, SHOWCASE_PARK_TRAILS, SHOWCASE_PHOTO_CROP, SHOWCASE_REDESIGN_3, SHOWCASE_EASY_LEAVE, SHOWCASE_END_RIDE_IN_MODE, SHOWCASE_FOUNDER_FRIENDS, SHOWCASE_QUICK_CREATE, SHOWCASE_EVENTS_AND_RIDES, SHOWCASE_PLACES_TO_RIDE, SHOWCASE_RADIO_SHARING, SHOWCASE_ROUTE_ETA, SHOWCASE_PRO_PLAN_4, SHOWCASE_WEATHER, SHOWCASE_ACTIVITIES, SHOWCASE_SPREAD_RULER, TRIAL_DAYS } from '@/constants/site';
 import type { SocialProvider } from '@/core/auth-link';
 import { FREE_MAP_HOURS, FREE_MAP_HOURS_4 } from '@/core/pro';
 import { REFERRAL_PRICE, referralsSwitchedOn } from '@/core/referrals';
@@ -101,6 +101,7 @@ export function Showcase() {
             <p className="hero-note">
               Free to download and ride. Pro is {PRO_PRICES.monthly} a month or {PRO_PRICES.annual} a year, and every
               new account gets {TRIAL_DAYS} days of Pro with no card.
+              {proDealLive() ? <> <b>{PRO_DEAL.name}: Pro Annual is {PRO_DEAL.annual} for your first year, through {PRO_DEAL.endsText}.</b></> : null}
             </p>
             {SHOWCASE_REDESIGN_3 ? (
               <a className="hero-new" href="#new" onClick={jump('new')}>
@@ -891,6 +892,8 @@ const PRO = SHOWCASE_PRO_PLAN_4 ? PRO_4 : PRO_BEFORE_4;
 
 function Pricing() {
   const [annual, setAnnual] = useState(true);
+  // Black Friday 2026: the yearly card shows the first-year price until the deal ends.
+  const deal = annual && proDealLive();
   return (
     <section id="pricing" className="pricing" aria-labelledby="pricing-title">
       <div className="pricing-inner">
@@ -916,14 +919,17 @@ function Pricing() {
           <article className="plan plan-pro" aria-labelledby="plan-pro">
             <div className="plan-head">
               <h3 id="plan-pro">Pro</h3>
-              {annual ? <span className="badge">Best Value</span> : null}
+              {deal ? <span className="badge badge-deal">{PRO_DEAL.name}</span> : annual ? <span className="badge">Best Value</span> : null}
             </div>
             <p className="price">
-              <span className="amount">{annual ? PRO_PRICES.annual : PRO_PRICES.monthly}</span>{' '}
-              <span className="per">{annual ? 'a year' : 'a month'}</span>
+              <span className="amount">{deal ? PRO_DEAL.annual : annual ? PRO_PRICES.annual : PRO_PRICES.monthly}</span>{' '}
+              {deal ? <><s className="was">{PRO_PRICES.annual}</s>{' '}</> : null}
+              <span className="per">{deal ? 'your first year' : annual ? 'a year' : 'a month'}</span>
             </p>
             <p className="plan-note">
-              {annual
+              {deal
+                ? `${PRO_DEAL.name}: half off your first year of Pro Annual for new Pro subscribers, through ${PRO_DEAL.endsText}. Get it in the app.`
+                : annual
                 ? `That’s ${PRO_PRICES.annualPerMonth} a month, billed once a year.`
                 : `Or ${PRO_PRICES.annual} a year and ${PRO_PRICES.annualSavings.toLowerCase()}.`}
             </p>
@@ -1433,6 +1439,8 @@ const CSS = `
 .plan h3 { font-size: 40px; line-height: 1; }
 .plan-head { display: flex; align-items: center; gap: 14px; }
 .badge { font-family: ${body7}; font-size: 14px; color: #fff; background: var(--blue); padding: 5px 10px; border-radius: 9px; }
+.badge-deal { background: var(--red); }
+.was { color: var(--dust); font-size: 26px; text-decoration-color: var(--red); text-decoration-thickness: 3px; }
 .plan-pro { background: linear-gradient(180deg, rgba(27, 47, 76, 0.92) 0%, rgba(18, 34, 58, 0.88) 60%); border: 2px solid var(--red); box-shadow: 0 40px 80px -40px rgba(229, 38, 46, 0.45); }
 .price { margin-top: 18px; display: flex; align-items: baseline; gap: 10px; }
 .amount { font-family: ${display}; font-size: 76px; line-height: 1; }

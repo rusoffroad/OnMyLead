@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { appleAlert, isBlackFriday, planName, playAlert, priceText, proAlertEmail, proAlertPush } from '../../../../supabase/functions/_shared/pro-alert';
+import { appleAlert, blackFridayPrice, isBlackFriday, planName, playAlert, priceText, proAlertEmail, proAlertPush } from '../../../../supabase/functions/_shared/pro-alert';
 
 const MONTHLY = 'com.rusoffroad.onmylead.pro.monthly';
 const ANNUAL = 'com.rusoffroad.onmylead.pro.annual';
@@ -111,5 +111,21 @@ describe('the push webhook', () => {
     const p = proAlertPush(a, { userId: 'u-1', name: 'Rex', email: 'rex@example.com' }, 'Rex paid for Pro Annual (iPhone)');
     expect(p).toMatchObject({ event: 'pro_paid', title: 'Rex paid for Pro Annual (iPhone)', body: 'Pro Annual · App Store · $14.99 a year · Black Friday price', url: 'https://onmylead.com/admin/users/u-1' });
     expect(JSON.stringify(p)).not.toContain('rex@example.com');
+  });
+});
+
+describe('Black Friday 2026 price', () => {
+  const ANNUAL_ID = 'com.rusoffroad.onmylead.pro.annual';
+  const deal = { offerId: null, productId: ANNUAL_ID, priceMilli: 14990, currency: 'USD' };
+  it('is $14.99 Annual between Nov 23 and the end of Dec 1 Central, with no offer id', () => {
+    expect(blackFridayPrice(deal, new Date('2026-11-27T15:00:00Z'))).toBe(true);
+    expect(blackFridayPrice(deal, new Date('2026-12-02T06:00:00Z'))).toBe(false);
+    expect(blackFridayPrice({ ...deal, priceMilli: 29990 }, new Date('2026-11-27T15:00:00Z'))).toBe(false);
+    expect(blackFridayPrice({ ...deal, productId: MONTHLY }, new Date('2026-11-27T15:00:00Z'))).toBe(false);
+  });
+  it('shows in the email for an Android base-plan purchase during the deal', () => {
+    const a = playAlert('tok', { lineItems: [{ productId: ANNUAL_ID, offerPhase: { basePrice: {} } }] },
+      { product_id: ANNUAL_ID, status: 'active', price_milli: 14990, currency: 'USD', offer_id: null, offer_type: null })!;
+    expect(proAlertEmail(a, { userId: 'u', name: 'Gina', email: null }, new Date('2026-11-27T15:00:00Z')).text).toContain('Offer: Black Friday price');
   });
 });

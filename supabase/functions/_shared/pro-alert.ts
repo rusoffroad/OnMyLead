@@ -126,10 +126,25 @@ export function priceText(a: Pick<ProAlert, 'priceMilli' | 'currency' | 'product
 /** Offer ids that look like a Black Friday sale (named by whoever set the offer up in the store). */
 export const isBlackFriday = (offerId: string | null) => !!offerId && /black|friday|(^|[^a-z])bf([^a-z]|$)/i.test(offerId);
 
-function offerText(a: ProAlert): string {
-  if (!a.offerId && !a.offerKind) return 'None (full price)';
+/**
+ * Black Friday 2026 (same dates as PRO_DEAL in app/src/constants/site.ts): Pro Annual at $14.99.
+ * Apple runs it as an introductory offer with no offer id, Google Play as a lower base-plan price,
+ * so the price and date tell it apart rather than an offer name.
+ */
+export const BLACK_FRIDAY_2026 = { starts: Date.parse('2026-11-23T06:00:00Z'), ends: Date.parse('2026-12-02T06:00:00Z'), annualMilli: 14990 };
+
+export function blackFridayPrice(a: Pick<ProAlert, 'offerId' | 'productId' | 'priceMilli' | 'currency'>, at: Date): boolean {
+  if (isBlackFriday(a.offerId)) return true;
+  const t = at.getTime();
+  return planName(a.productId) === 'Annual' && a.priceMilli === BLACK_FRIDAY_2026.annualMilli && (a.currency ?? 'USD') === 'USD'
+    && t >= BLACK_FRIDAY_2026.starts && t < BLACK_FRIDAY_2026.ends;
+}
+
+function offerText(a: ProAlert, at: Date): string {
+  const bf = blackFridayPrice(a, at);
+  if (!a.offerId && !a.offerKind) return bf ? 'Black Friday price' : 'None (full price)';
   const what = a.offerKind === 'code' ? 'Offer code' : a.offerKind === 'promo' ? 'Promotional offer' : 'Introductory offer';
-  return `${isBlackFriday(a.offerId) ? 'Black Friday price: ' : ''}${what}${a.offerId ? ` "${a.offerId}"` : ''}`;
+  return `${bf ? 'Black Friday price: ' : ''}${what}${a.offerId ? ` "${a.offerId}"` : ''}`;
 }
 
 const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
@@ -150,7 +165,7 @@ export function proAlertEmail(a: ProAlert, rider: AlertRider, at: Date): { subje
     ['Store', a.store === 'apple' ? 'App Store (iPhone or iPad)' : 'Google Play (Android)'],
     ['Type', a.kind === 'paid' ? 'Paid' : 'Free trial (the store charges when it ends)'],
     [a.kind === 'paid' ? 'Price' : 'Price after trial', price ?? 'Not given by the store'],
-    ['Offer', offerText(a)],
+    ['Offer', offerText(a, at)],
     ['When', at.toISOString().replace('T', ' ').slice(0, 16) + ' UTC'],
     ...(a.sandbox ? [['Note', 'Store test account (Sandbox). No real money.'] as [string, string]] : []),
   ];
@@ -169,11 +184,11 @@ ${facts.map(([k, v]) => `<tr><td style="padding:3px 16px 3px 0;color:#5F7190;whi
 }
 
 /** The JSON a push webhook gets: a title and body ready to show, plus the facts. No rider email. */
-export function proAlertPush(a: ProAlert, rider: AlertRider, title: string) {
+export function proAlertPush(a: ProAlert, rider: AlertRider, title: string, at: Date = new Date()) {
   return {
     event: a.kind === 'paid' ? 'pro_paid' : 'pro_trial',
     title,
-    body: [`Pro ${planName(a.productId)}`, a.store === 'apple' ? 'App Store' : 'Google Play', priceText(a), isBlackFriday(a.offerId) ? 'Black Friday price' : null]
+    body: [`Pro ${planName(a.productId)}`, a.store === 'apple' ? 'App Store' : 'Google Play', priceText(a), blackFridayPrice(a, at) ? 'Black Friday price' : null]
       .filter(Boolean).join(' · '),
     rider: rider.name?.trim() || null,
     plan: planName(a.productId),
