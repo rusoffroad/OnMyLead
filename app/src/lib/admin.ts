@@ -36,7 +36,7 @@ export async function adminRpc<T>(fn: string, args?: Record<string, unknown>): P
 }
 
 /** Calls an admin edge function with the session's token. */
-export async function adminFn<T>(fn: 'admin-api' | 'admin-integrations' | 'store-downloads' | 'store-reviews' | 'store-releases' | 'rider-email', action: string, body: Record<string, unknown> = {}): Promise<T> {
+export async function adminFn<T>(fn: 'admin-api' | 'admin-integrations' | 'store-downloads' | 'store-reviews' | 'store-releases' | 'rider-email' | 'rider-push', action: string, body: Record<string, unknown> = {}): Promise<T> {
   const { data, error } = await supabase.functions.invoke(fn, { body: { action, ...body } });
   if (error) {
     // FunctionsHttpError carries the response; our functions answer { error: "..." }.
@@ -313,6 +313,20 @@ export type EmailResult = { ok: boolean; recipients: number; sent: number; from?
 export const emailOverview = () => adminRpc<EmailOverview>('admin_email_overview');
 export const sendTestEmail = (subject: string, body: string) => adminFn<EmailResult>('rider-email', 'test', { subject, body });
 export const sendEmailToAll = (subject: string, body: string, expect: number) => adminFn<EmailResult>('rider-email', 'send', { subject, body, expect });
+// Push Riders (migration 20261123200000_push_riders, edge function rider-push).
+export type PushAudience = 'not_subscribed' | 'everyone';
+export type PushSend = {
+  id: string; title: string; body: string; audience: PushAudience; test: boolean; recipients: number; sent: number;
+  status: 'sending' | 'sent' | 'failed'; note: string | null; created_at: string; finished_at: string | null;
+};
+export type PushOverview = {
+  not_subscribed: number; not_subscribed_devices: number; everyone: number; everyone_devices: number; with_phones: number; sends: PushSend[];
+};
+export type PushResult = { ok: boolean; recipients: number; sent: number; removed: number; note: string | null };
+export const pushOverview = () => adminRpc<PushOverview>('admin_push_overview');
+export const sendTestPush = (title: string, body: string) => adminFn<PushResult>('rider-push', 'test', { title, body });
+export const sendPushToRiders = (title: string, body: string, audience: PushAudience, expect: number) =>
+  adminFn<PushResult>('rider-push', 'send', { title, body, audience, expect });
 export const removeReferralCodes = (batch: string) => adminRpc<number>('admin_remove_referral_codes', { p_batch: batch });
 
 // Badges OnMyLead gives: Brand Ambassador and OnMyLead Founder (20261103700000, 20261103900000).
