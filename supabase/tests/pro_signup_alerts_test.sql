@@ -1,4 +1,4 @@
--- New Pro rider emails (migration 20261123100000_pro_signup_alerts.sql). Runs after
+-- New Pro rider emails (migration 20261123300000_pro_signup_alerts.sql). Runs after
 -- play_billing_test.sql. Each block raises an exception if a rule is broken.
 
 -- A1. Row level security is on with no policy, so only the service role (the edge functions) sees it.
