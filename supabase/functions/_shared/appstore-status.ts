@@ -21,6 +21,7 @@ export type AppleTransaction = {
   revocationReason?: number;
   offerType?: number;
   offerIdentifier?: string;
+  offerDiscountType?: string; // FREE_TRIAL, PAY_AS_YOU_GO or PAY_UP_FRONT
   price?: number; // milliunits, e.g. 4990 for 4.99
   currency?: string;
   environment?: string;

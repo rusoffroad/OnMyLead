@@ -22,6 +22,8 @@ import {
   type AppleTransaction,
 } from '../_shared/appstore-status.ts';
 import { asUser, db, liveStatus, saveSubscription, verifierFor } from '../_shared/apple.ts';
+import { appleAlert } from '../_shared/pro-alert.ts';
+import { sendProAlert } from '../_shared/pro-alert-send.ts';
 
 const json = (body: unknown, status = 200) => Response.json(body, { status });
 
@@ -66,6 +68,7 @@ Deno.serve(async (req) => {
       original_transaction_id: row.original_transaction_id,
       payload: { user_id: user.id, transaction_id: transaction.transactionId, status: row.status, environment },
     });
+    await sendProAlert(db, appleAlert(live?.transaction ?? transaction, row.status));
   } catch (e) {
     console.error('could not save subscription', e instanceof Error ? e.message : e);
     return json({ error: 'retry' }, 503);
