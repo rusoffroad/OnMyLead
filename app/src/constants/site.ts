@@ -27,6 +27,25 @@ export const PRO_PRICES = {
   annualSavings: 'Save 50%',
 } as const;
 
+/**
+ * Black Friday 2026 (Chris, 2026-11-23): Pro Annual $14.99 for the first year for new Pro
+ * subscribers, through Tuesday December 1 (US Central). Apple runs it as an introductory offer that
+ * ends on its own; Google Play as a temporary US price on the annual base plan. The website shows it
+ * only between these times, so it hides itself when the deal ends.
+ */
+export const PRO_DEAL = {
+  name: 'Black Friday',
+  annual: '$14.99',
+  starts: '2026-11-23T06:00:00Z',
+  ends: '2026-12-02T06:00:00Z',
+  endsText: 'December 1',
+} as const;
+
+/** True while PRO_DEAL runs. */
+export function proDealLive(now: number = Date.now()): boolean {
+  return now >= Date.parse(PRO_DEAL.starts) && now < Date.parse(PRO_DEAL.ends);
+}
+
 /** Days of Pro every new account gets automatically, with no card. */
 export const TRIAL_DAYS = 30;
 
