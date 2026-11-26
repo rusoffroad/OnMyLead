@@ -4,7 +4,7 @@ summary: Tap the map to lay down your ride's route. It snaps to trails for you, 
 category: routes-maps
 order: 10
 release: "1.0"
-updated: 2026-11-19
+updated: 2026-11-26
 sources:
   - app/src/app/ride/[id]/route.tsx
   - app/src/app/r/[code].tsx
@@ -21,6 +21,7 @@ sources:
   - app/src/core/route.ts
   - app/src/core/route-legs.ts
   - app/src/core/trail-router.ts
+  - app/src/core/leg-router.ts
   - app/src/core/osm-trails.ts
   - app/src/core/pro.ts
   - app/src/lib/api.ts
@@ -92,7 +93,22 @@ Two choices in the panel decide how the next points are joined:
 
 You can switch between them as you go. Points you already placed keep the way they were drawn. The app remembers your choice for next time.
 
-If no mapped trail joins two points, that part is drawn as a straight line and the app tells you so. Add a point on the trail, or zoom in and try again. Points very far apart are also joined with a straight line, so tap more often on long stretches.
+If no mapped trail joins two points, that part is drawn as a straight line and the app tells you so. Add a point on the trail, or zoom in and try again.
+
+:::until 4.0.2
+Points very far apart are also joined with a straight line, so tap more often on long stretches.
+:::
+
+:::release 4.0.2
+Points far apart still follow the roads and trails between them, even from one town to the next. A long stretch can take a few seconds to work out, and you'll see **Finding the trail…** meanwhile.
+
+The line follows the roads your activity uses (see [Activities](/help/activities)):
+
+- **Motorcycle** and **Road Trip**: paved roads and highways, staying on the road you tapped. Dirt and gravel are used only where no paved road goes.
+- **Offroad** and **Snowmobile**: dirt roads and trails first. Highways are used only where nothing else goes.
+
+A ride's route follows the ride's activity, whichever activity you're in when you draw it.
+:::
 
 :::tip
 Trails come from OpenStreetMap, so snapping works best where riders have mapped the trails. Zooming in before you tap helps each point land on the trail you meant.

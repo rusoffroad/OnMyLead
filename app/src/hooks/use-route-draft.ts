@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+import type { ActivityId } from '@/core/activities';
 import type { LatLng } from '@/core/geo';
+import { findLeg, routeProfileFor } from '@/core/leg-router';
 import { joinLegs, legsFromRoute, straightLeg, type Leg, type LegMode } from '@/core/route-legs';
-import { routeAlongTrails, snapToTrails, tilesAround, tilesForLeg } from '@/core/trail-router';
+import { snapToTrails, tilesAround } from '@/core/trail-router';
 import type { RideRoute } from '@/core/route';
 import { loadRoadLines } from '@/lib/trail-tiles';
 
@@ -14,16 +16,20 @@ const EMPTY: Draft = { taps: [], legs: [] };
 /**
  * The route builder's drawing: taps, and the legs between them, snapped to trails when
  * `follow` is on. A tap shows straight away; snapping it onto the trail and working out the
- * leg's line happen right after, on the phone, from the trail squares (see core/trail-router).
+ * leg's line happen right after, on the phone, from the trail squares (see core/leg-router).
+ * `activity` picks which lines a leg prefers: Motorcycle and Road Trip keep to paved roads,
+ * Offroad and Snowmobile to dirt and trails.
  */
-export function useRouteDraft(follow: boolean, offline: boolean) {
+export function useRouteDraft(follow: boolean, offline: boolean, activity?: ActivityId | null) {
   const [draft, setDraft] = useState<Draft>(EMPTY);
   const ref = useRef<Draft>(EMPTY);
   const nextId = useRef(1);
   const offlineRef = useRef(offline);
+  const profileRef = useRef(routeProfileFor(activity));
   useEffect(() => {
     offlineRef.current = offline;
-  }, [offline]);
+    profileRef.current = routeProfileFor(activity);
+  }, [offline, activity]);
 
   const commit = useCallback((next: Draft) => {
     ref.current = next;
@@ -40,9 +46,8 @@ export function useRouteDraft(follow: boolean, offline: boolean) {
         commit({ ...d, legs: d.legs.map((l, j) => (j === i ? straightLeg(a.p, b.p) : l)) });
         return;
       }
-      const tiles = tilesForLeg(a.p, b.p);
-      const lines = tiles ? await loadRoadLines(tiles, offlineRef.current).catch(() => []) : [];
-      const found = lines.length ? routeAlongTrails(lines, a.p, b.p, Math.max(a.r, b.r)) : null;
+      const load = (tiles: Parameters<typeof loadRoadLines>[0]) => loadRoadLines(tiles, offlineRef.current).catch(() => []);
+      const found = await findLeg(a.p, b.p, Math.max(a.r, b.r), load, profileRef.current).catch(() => null);
       const now = ref.current;
       const j = now.taps.findIndex((t) => t.id === a.id);
       if (j < 0 || now.taps[j].rev !== a.rev || now.taps[j + 1]?.id !== b.id || now.taps[j + 1].rev !== b.rev) return;

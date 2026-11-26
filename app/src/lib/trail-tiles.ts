@@ -144,27 +144,38 @@ export async function loadOsmView(region: ViewRegion, mapZoom: number, offline: 
 
 /** Roads and trails decoded for snapping (core/trail-router), kept apart from the drawn tracks. */
 const roadMemory = new Map<string, RoadLine[]>();
-const ROAD_MEMORY_MAX = 64;
+/** Room for a long leg's squares (core/leg-router reads up to 160 along the way). */
+const ROAD_MEMORY_MAX = 200;
+/** Squares fetched at once for snapping, so a long leg doesn't fire off a hundred requests together. */
+const ROAD_FETCHES = 6;
 
 /**
  * Every road and trail in these squares, for snapping a drawn route to them. Squares a rider
  * has looked at or downloaded are read from the phone, so snapping works with no signal there.
  */
 export async function loadRoadLines(tiles: Tile[], offline: boolean): Promise<RoadLine[]> {
-  const parts = await Promise.all(
-    tiles.map(async (t) => {
-      const key = `${t.z}/${t.x}/${t.y}`;
-      const hit = roadMemory.get(key);
-      if (hit) return hit;
-      const data = await osmTileBytes(t, offline).catch(() => null);
-      if (!data) return [];
-      const lines = decodeRoadLines(data, t);
-      roadMemory.delete(key);
-      roadMemory.set(key, lines);
-      while (roadMemory.size > ROAD_MEMORY_MAX) roadMemory.delete(roadMemory.keys().next().value!);
-      return lines;
-    }),
-  );
+  const one = async (t: Tile): Promise<RoadLine[]> => {
+    const key = `${t.z}/${t.x}/${t.y}`;
+    const hit = roadMemory.get(key);
+    if (hit) return hit;
+    // One more try for a square that didn't come (a dropped request leaves a gap the route can't cross).
+    const data = (await osmTileBytes(t, offline).catch(() => null)) ?? (offline ? null : await osmTileBytes(t, offline).catch(() => null));
+    if (!data) return [];
+    const lines = decodeRoadLines(data, t);
+    roadMemory.delete(key);
+    roadMemory.set(key, lines);
+    while (roadMemory.size > ROAD_MEMORY_MAX) roadMemory.delete(roadMemory.keys().next().value!);
+    return lines;
+  };
+  const parts: RoadLine[][] = new Array(tiles.length);
+  let next = 0;
+  const worker = async () => {
+    while (next < tiles.length) {
+      const i = next++;
+      parts[i] = await one(tiles[i]);
+    }
+  };
+  await Promise.all(Array.from({ length: Math.min(ROAD_FETCHES, tiles.length) }, worker));
   return parts.flat();
 }
 

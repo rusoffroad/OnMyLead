@@ -17,6 +17,7 @@ import { Button, ErrorText } from '@/components/ui';
 import { TextBox } from '@/components/keyboard';
 import Svg, { Path } from 'react-native-svg';
 import { Colors, font, Glass, Radius, Spacing, themedStyles } from '@/constants/theme';
+import { activityOf } from '@/core/activities';
 import { fullMapPadding } from '@/core/full-map';
 import type { LatLng } from '@/core/geo';
 import { OSM_ATTRIBUTION } from '@/core/osm-trails';
@@ -33,6 +34,7 @@ import { useRememberedText } from '@/hooks/use-remembered-text';
 import { useLayout } from '@/hooks/use-layout';
 import { usePanelFold } from '@/hooks/use-panel-fold';
 import { useRouteDraft } from '@/hooks/use-route-draft';
+import { useActivity } from '@/lib/activity';
 import { useTrailMap } from '@/hooks/use-trail-map';
 import { getPrivateDetails, getRide, getRideRoute, saveRideRoute } from '@/lib/api';
 import { useFlag } from '@/lib/app-settings';
@@ -77,7 +79,9 @@ export default function RouteBuilder() {
   const looking = useRef<LatLng | null>(null);
   const trail = useTrailMap();
   const [follow, , setFollow] = useRememberedToggle('route.followTrails.v1', true);
-  const draft = useRouteDraft(follow, trail.offline);
+  // Legs follow the roads or the trails the ride's activity uses (Motorcycle: paved roads).
+  const { activity, on: activitiesOn } = useActivity();
+  const draft = useRouteDraft(follow, trail.offline, activitiesOn ? (ride ? activityOf(ride) : activity) : null);
   // A Free rider's Import GPX carries the Pro tag, so it gets more of the row.
   const canGpx = useEntitlements().can('import_gpx');
   const { load: loadDraft, undo: undoDraft } = draft;

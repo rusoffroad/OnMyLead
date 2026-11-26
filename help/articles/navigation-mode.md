@@ -4,8 +4,9 @@ summary: Use Map Mode (called Navigate before 2.0) as your offroad map, map your
 category: routes-maps
 order: 15
 release: "1.0.3"
-updated: 2026-11-19
+updated: 2026-11-26
 sources:
+  - app/src/core/leg-router.ts
   - app/src/core/mode-exit.ts
   - app/src/components/exit-mode.tsx
   - app/src/core/nav-solo.ts
@@ -257,6 +258,10 @@ The first time you open it, **How Custom Trails Work** explains how custom trail
 4. Keep tapping to add points. **Undo** removes the last one, **Clear** starts over. The panel shows the length.
 5. To name a spot, tap **Mark a Spot**, then tap the spot on the map. Pick a kind, type a name and tap **Add to Trail**. Tap a spot's name on the map to rename or remove it.
 6. Tap **Save Trail** to keep it in My Trails as a custom trail, so you can follow it, share it or plan a ride on it.
+
+:::release 4.0.2
+**Follow Trails** keeps to the roads your activity uses: paved roads in **Motorcycle** and **Road Trip**, dirt roads and trails in **Offroad** and **Snowmobile**. Points far apart follow the roads too, as in [Draw a Route](/help/route-builder).
+:::
 :::
 
 ## My Trails
