@@ -4,7 +4,7 @@ summary: What to check when riders don't show on the map, alerts don't arrive, a
 category: troubleshooting
 order: 10
 release: "1.0"
-updated: 2026-11-19
+updated: 2026-11-26
 sources:
   - app/src/components/rider-puck.tsx
   - app/src/core/freshness.ts
@@ -102,7 +102,13 @@ Your phone may only have its small standard voice. Open **You** > **Voice** to h
 
 ## Part of My Route Is a Straight Line
 
+:::until 4.0.2
 The route builder follows mapped trails. It draws a straight line when no mapped trail joins two points, when the points are very far apart, or when you had no signal and that trail data wasn't saved on your phone. Add a point on the trail or zoom in, or use **Straight Line** for unmapped ground. See [Draw a Route](/help/route-builder).
+:::
+
+:::release 4.0.2
+The route builder follows mapped roads and trails, even between points far apart. It draws a straight line when no mapped road or trail joins two points, or when you had no signal and that map data wasn't saved on your phone. Add a point on the road or trail or zoom in, or use **Straight Line** for unmapped ground. In **Motorcycle** and **Road Trip** it keeps to paved roads, so a dirt-only stretch may take a longer paved way round. See [Draw a Route](/help/route-builder).
+:::
 
 ## I Turned On Trails but See No Lines
 
