@@ -28,7 +28,26 @@ export const MAX_SNAP_M = 250;
 export const snapRadiusM = (metersPerPoint: number) => Math.min(MAX_SNAP_M, Math.max(15, metersPerPoint * 24));
 
 /** One line of the network: its OpenMapTiles class and how much slower than a dirt track it counts. */
-export type RoadLine = { cost: number; pts: LatLng[]; /** A bridge or tunnel: lines crossing it aren't joined to it. */ over?: boolean };
+export type RoadLine = {
+  /** How much slower than a dirt track it counts on the trails profile (CLASS_COST). */
+  cost: number;
+  pts: LatLng[];
+  /** A bridge or tunnel: lines crossing it aren't joined to it. */
+  over?: boolean;
+  /** Its OpenMapTiles class (track, minor, primary...), for weighing it on the roads profile. */
+  cls?: string;
+  /** Mapped as dirt or gravel (OpenStreetMap surface=unpaved). */
+  unpaved?: boolean;
+  /** A path made for walkers or bikes (footway, pedestrian, cycleway). */
+  foot?: boolean;
+};
+
+/**
+ * Which lines a leg prefers. Offroad and Snowmobile follow `trails`: dirt and back roads first,
+ * highways only when nothing else goes there. Motorcycle and Road Trip follow `roads`: paved
+ * roads of every size, highways included, with tracks and dirt only when no road goes there.
+ */
+export type RouteProfile = 'trails' | 'roads';
 
 /**
  * How each kind of line is weighed: the shortest way wins, but a highway counts as several times
@@ -47,9 +66,41 @@ const CLASS_COST: Record<string, number> = {
   trunk: 2.5,
   motorway: 6,
 };
+/**
+ * The roads profile: every paved road counts about the same, so the route stays on the road the
+ * rider tapped (a highway too) instead of cutting across on a dirt track a little shorter.
+ * Never below 1, so the straight-line guess that steers the search never overshoots.
+ */
+const ROAD_COST: Record<string, number> = {
+  motorway: 1.1,
+  trunk: 1,
+  primary: 1,
+  secondary: 1,
+  tertiary: 1,
+  minor: 1.05,
+  raceway: 3,
+  service: 1.5,
+  track: 3,
+  path: 6,
+};
+/** Dirt and gravel cost this much more on the roads profile. */
+const UNPAVED_ROAD_COST = 1.6;
+/** Walking and bike paths on the roads profile: only to close a tiny gap. */
+const FOOT_ROAD_COST = 20;
+
+/** How much a line costs per meter on a profile. */
+export function lineCost(l: RoadLine, profile: RouteProfile = 'trails'): number {
+  if (profile === 'trails' || !l.cls) return l.cost;
+  if (l.foot) return FOOT_ROAD_COST;
+  const base = ROAD_COST[l.cls] ?? l.cost;
+  return l.unpaved ? base * UNPAVED_ROAD_COST : base;
+}
+
 /** Paths made for walkers and bikes are only followed when nothing else goes there. */
 const FOOT_PATHS = new Set(['footway', 'pedestrian', 'cycleway']);
 const NEVER_PATHS = new Set(['steps', 'corridor', 'platform', 'elevator']);
+/** Lanes inside a car park or a drive-through: never part of a ride, and thousands of them in a city. */
+const NEVER_SERVICE = new Set(['parking_aisle', 'drive-through', 'drive_through']);
 
 /** A point inside a square (0..extent) to lat/lng. */
 function toLatLng(t: Tile, extent: number, px: number, py: number): LatLng {
@@ -76,23 +127,39 @@ export function decodeRoadLines(data: Uint8Array, t: Tile): RoadLine[] {
     const cls = String(f.properties.class ?? '');
     let cost = CLASS_COST[cls];
     if (!cost) continue;
+    if (cls === 'service' && NEVER_SERVICE.has(String(f.properties.service ?? ''))) continue;
+    let foot = false;
     if (cls === 'path') {
       const sub = String(f.properties.subclass ?? '');
       if (NEVER_PATHS.has(sub)) continue;
-      if (FOOT_PATHS.has(sub)) cost = 3;
+      if (FOOT_PATHS.has(sub)) {
+        cost = 3;
+        foot = true;
+      }
     }
+    const unpaved = f.properties.surface === 'unpaved';
+    const over = f.properties.brunnel === 'bridge' || f.properties.brunnel === 'tunnel';
     for (const ring of f.loadGeometry()) {
       if (ring.length < 2) continue;
-      const over = f.properties.brunnel === 'bridge' || f.properties.brunnel === 'tunnel';
-      out.push({ cost, pts: ring.map((p) => toLatLng(t, layer.extent, p.x, p.y)), ...(over ? { over } : {}) });
+      out.push({
+        cost,
+        cls,
+        pts: ring.map((p) => toLatLng(t, layer.extent, p.x, p.y)),
+        ...(over ? { over } : {}),
+        ...(unpaved ? { unpaved } : {}),
+        ...(foot ? { foot } : {}),
+      });
     }
   }
   return out;
 }
 
-/** The squares a leg from a to b needs, with room around it for a trail that bends away; null when too many. */
-export function tilesForLeg(a: LatLng, b: LatLng, z = ROUTE_Z, cap = ROUTE_MAX_TILES): Tile[] | null {
-  const padM = Math.max(400, distanceM(a, b) * 0.3);
+/**
+ * The squares a leg from a to b needs, with room around it for a trail that bends away (`pad`
+ * times the leg's length, at least `minPadM`); null when that's more than `cap` squares.
+ */
+export function tilesForLeg(a: LatLng, b: LatLng, z = ROUTE_Z, cap = ROUTE_MAX_TILES, pad = 0.3, minPadM = 400): Tile[] | null {
+  const padM = Math.max(minPadM, distanceM(a, b) * pad);
   const dLat = padM / 111_320;
   const dLng = padM / (111_320 * Math.max(0.1, Math.cos((((a.lat + b.lat) / 2) * Math.PI) / 180)));
   const tiles = tilesInBox(
@@ -126,12 +193,15 @@ const SEG_CELL = 40;
 
 type Edge = { a: number; b: number; cost: number };
 
+/** One number for grid cell cx,cy (any cell within about 2,000 km of the reference point). */
+const cellKey = (cx: number, cy: number) => (cx + 1_048_576) * 2_097_152 + (cy + 1_048_576);
+
 class Network {
   xs: number[] = [];
   ys: number[] = [];
   adj: { to: number; w: number }[][] = [];
   edges: Edge[] = [];
-  private cells = new Map<string, number[]>();
+  private cells = new Map<number, number[]>();
 
   constructor(readonly proj: Proj) {}
 
@@ -151,7 +221,7 @@ class Network {
     const cy = Math.floor(y / (MERGE_M * 2));
     for (let i = -1; i <= 1; i++) {
       for (let j = -1; j <= 1; j++) {
-        for (const n of this.cells.get(`${cx + i},${cy + j}`) ?? []) {
+        for (const n of this.cells.get(cellKey(cx + i, cy + j)) ?? []) {
           if (Math.hypot(this.xs[n] - x, this.ys[n] - y) <= MERGE_M) return n;
         }
       }
@@ -160,7 +230,7 @@ class Network {
     this.xs.push(x);
     this.ys.push(y);
     this.adj.push([]);
-    const key = `${cx},${cy}`;
+    const key = cellKey(cx, cy);
     const cell = this.cells.get(key);
     if (cell) cell.push(n);
     else this.cells.set(key, [n]);
@@ -199,12 +269,13 @@ function onSeg(x: number, y: number, ax: number, ay: number, bx: number, by: num
   return { t, px, py, d: Math.hypot(x - px, y - py) };
 }
 
-export function buildNetwork(lines: RoadLine[], ref: LatLng): Network {
+export function buildNetwork(lines: RoadLine[], ref: LatLng, profile: RouteProfile = 'trails'): Network {
   const net = new Network(projFor(ref));
+  const costs = lines.map((l) => lineCost(l, profile));
   const xy = lines.map((l) => l.pts.map((p) => [net.x(p), net.y(p)] as const));
 
   const segs: Seg[] = [];
-  const grid = new Map<string, number[]>();
+  const grid = new Map<number, number[]>();
   xy.forEach((pts, line) => {
     for (let i = 1; i < pts.length; i++) {
       const s: Seg = { line, i: i - 1, ax: pts[i - 1][0], ay: pts[i - 1][1], bx: pts[i][0], by: pts[i][1] };
@@ -213,7 +284,7 @@ export function buildNetwork(lines: RoadLine[], ref: LatLng): Network {
       const y0 = Math.floor((Math.min(s.ay, s.by) - JOIN_M) / SEG_CELL), y1 = Math.floor((Math.max(s.ay, s.by) + JOIN_M) / SEG_CELL);
       for (let cx = x0; cx <= x1; cx++) {
         for (let cy = y0; cy <= y1; cy++) {
-          const key = `${cx},${cy}`;
+          const key = cellKey(cx, cy);
           const cell = grid.get(key);
           if (cell) cell.push(id);
           else grid.set(key, [id]);
@@ -230,25 +301,37 @@ export function buildNetwork(lines: RoadLine[], ref: LatLng): Network {
     else splits.set(seg, [[t, n]]);
   };
 
-  const seen = new Set<string>();
-  for (const cell of grid.values()) {
+  // Two segments that share several cells are tried in each, but only the cell holding the
+  // crossing point keeps it, so every crossing is counted once.
+  for (const [key, cell] of grid) {
     for (let i = 0; i < cell.length; i++) {
+      const p = segs[cell[i]];
+      const pminx = Math.min(p.ax, p.bx), pmaxx = Math.max(p.ax, p.bx);
+      const pminy = Math.min(p.ay, p.by), pmaxy = Math.max(p.ay, p.by);
       for (let j = i + 1; j < cell.length; j++) {
-        const p = segs[cell[i]], q = segs[cell[j]];
+        const q = segs[cell[j]];
+        if (Math.max(q.ax, q.bx) < pminx || Math.min(q.ax, q.bx) > pmaxx || Math.max(q.ay, q.by) < pminy || Math.min(q.ay, q.by) > pmaxy) continue;
         if (p.line === q.line && Math.abs(p.i - q.i) <= 1) continue;
         // A bridge passes over the road under it; they only meet at the bridge's ends.
         if (lines[p.line].over !== lines[q.line].over) continue;
-        const key = cell[i] < cell[j] ? `${cell[i]}:${cell[j]}` : `${cell[j]}:${cell[i]}`;
-        if (seen.has(key)) continue;
-        seen.add(key);
         const hit = crossing(p, q);
         if (!hit) continue;
-        const n = net.node(p.ax + hit[0] * (p.bx - p.ax), p.ay + hit[0] * (p.by - p.ay));
+        const cx = p.ax + hit[0] * (p.bx - p.ax), cy = p.ay + hit[0] * (p.by - p.ay);
+        if (cellKey(Math.floor(cx / SEG_CELL), Math.floor(cy / SEG_CELL)) !== key) continue;
+        const n = net.node(cx, cy);
         split(cell[i], hit[0], n);
         split(cell[j], hit[1], n);
       }
     }
   }
+
+  // Each line's own points, looked up once.
+  const vnodes = xy.map((pts) => new Array<number>(pts.length).fill(-1));
+  const vnode = (line: number, i: number) => {
+    const v = vnodes[line];
+    if (v[i] < 0) v[i] = net.node(xy[line][i][0], xy[line][i][1]);
+    return v[i];
+  };
 
   // A line that stops beside another is joined to it with a short link.
   const joins: [number, number, number][] = [];
@@ -257,7 +340,7 @@ export function buildNetwork(lines: RoadLine[], ref: LatLng): Network {
       const [x, y] = pts[end];
       const own = end === 0 ? 0 : pts.length - 2;
       let best: { seg: number; t: number; px: number; py: number; d: number } | null = null;
-      const cell = grid.get(`${Math.floor(x / SEG_CELL)},${Math.floor(y / SEG_CELL)}`) ?? [];
+      const cell = grid.get(cellKey(Math.floor(x / SEG_CELL), Math.floor(y / SEG_CELL))) ?? [];
       for (const id of cell) {
         const s = segs[id];
         if (s.line === line && Math.abs(s.i - own) <= 1) continue;
@@ -267,13 +350,19 @@ export function buildNetwork(lines: RoadLine[], ref: LatLng): Network {
       if (!best) continue;
       const at = net.node(best.px, best.py);
       split(best.seg, best.t, at);
-      joins.push([net.node(x, y), at, lines[line].cost]);
+      joins.push([vnode(line, end), at, costs[line]]);
     }
   });
 
   segs.forEach((s, id) => {
-    const cost = lines[s.line].cost;
-    const along: [number, number][] = [[0, net.node(s.ax, s.ay)], ...(splits.get(id) ?? []), [1, net.node(s.bx, s.by)]];
+    const cost = costs[s.line];
+    const extra = splits.get(id);
+    const a = vnode(s.line, s.i), b = vnode(s.line, s.i + 1);
+    if (!extra) {
+      net.link(a, b, cost);
+      return;
+    }
+    const along: [number, number][] = [[0, a], ...extra, [1, b]];
     along.sort((p, q) => p[0] - q[0]);
     for (let k = 1; k < along.length; k++) net.link(along[k - 1][1], along[k][1], cost);
   });
@@ -339,17 +428,29 @@ export type TrailLeg = {
   to: LatLng;
 };
 
-/** A trail route this much longer than the straight line is a detour nobody meant. */
-const MAX_DETOUR = 5;
+/**
+ * A route this much longer than the straight line is a detour nobody meant (taps on two tracks
+ * that only meet far away). Mountain roads double back on themselves, so it's generous.
+ */
+const MAX_DETOUR = 8;
+/** Below this the detour rule doesn't apply: a switchback road between two close taps is fine. */
+const MIN_DETOUR_M = 1500;
 
 /**
  * The way along the trails from a to b, or null when either tap is too far from a line, the
  * lines don't connect, or the only way round is a long detour.
  */
-export function routeAlongTrails(lines: RoadLine[], a: LatLng, b: LatLng, radiusM: number): TrailLeg | null {
+export function routeAlongTrails(
+  lines: RoadLine[],
+  a: LatLng,
+  b: LatLng,
+  radiusM: number,
+  profile: RouteProfile = 'trails',
+  maxSnapM = MAX_SNAP_M,
+): TrailLeg | null {
   if (!lines.length) return null;
-  const r = Math.min(MAX_SNAP_M, radiusM);
-  const net = buildNetwork(lines, a);
+  const r = Math.min(maxSnapM, radiusM);
+  const net = buildNetwork(lines, a, profile);
   const sa = snapOnto(net, a, r);
   const sb = snapOnto(net, b, r);
   if (!sa || !sb) return null;
@@ -396,7 +497,7 @@ export function routeAlongTrails(lines: RoadLine[], a: LatLng, b: LatLng, radius
   const points = path.map((n) => net.latLng(n));
   let len = 0;
   for (let i = 1; i < points.length; i++) len += distanceM(points[i - 1], points[i]);
-  if (len > Math.max(MAX_DETOUR * distanceM(from, to), 600)) return null;
+  if (len > Math.max(MAX_DETOUR * distanceM(from, to), MIN_DETOUR_M)) return null;
   return { points, from, to };
 }
 

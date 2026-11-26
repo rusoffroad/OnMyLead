@@ -52,6 +52,7 @@ import { useMapModeRide } from '@/hooks/use-map-mode-ride';
 import { usePanelFold } from '@/hooks/use-panel-fold';
 import { useRememberedToggle } from '@/hooks/use-remembered-toggle';
 import { useRouteDraft } from '@/hooks/use-route-draft';
+import { useActivity } from '@/lib/activity';
 import { useTilt } from '@/hooks/use-tilt';
 import { useTrailMap } from '@/hooks/use-trail-map';
 import { useWaypointImport } from '@/hooks/use-waypoint-import';
@@ -464,7 +465,8 @@ export default function NavMode() {
 
   // --- Measuring ------------------------------------------------------------------
   const [follows, , setFollows] = useRememberedToggle('nav.measureTrails.v1', true);
-  const draft = useRouteDraft(follows, trail.offline);
+  const { activity } = useActivity();
+  const draft = useRouteDraft(follows, trail.offline, activity);
   const measureLen = useMemo(() => lineLengthM(draft.points), [draft.points]);
   const lastTap = draft.taps[draft.taps.length - 1];
 
