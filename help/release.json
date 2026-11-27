@@ -100,7 +100,7 @@
       "commit": "5d3591f",
       "status": "submitted",
       "submitted": "2026-11-27",
-      "notes": "Route snapping fix (PR #383): legs whose road bends out of the first box, points far apart (town to town) and per-activity roads (Motorcycle and Road Trip paved, Offroad and Snowmobile dirt and trails). Submitted from the Mac thread after Chris's typed OK 2026-11-27 01:59Z: iOS build 36 Waiting for Review with automatic release; Android versionCode 21 to production as a full rollout."
+      "notes": "Route snapping fix (PR #383): legs whose road bends out of the first box, points far apart (town to town) and per-activity roads (Motorcycle and Road Trip paved, Offroad and Snowmobile dirt and trails). Submitted from the Mac thread after Chris's typed OK 2026-11-27 01:59Z: iOS build 36 Waiting for Review with automatic release; Android versionCode 21 to production as a full rollout. Live on Google Play 2026-11-27 (Play page shows 4.0.2); App Store still in review."
     }
   ],
   "unreleased": [
