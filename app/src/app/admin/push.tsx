@@ -11,6 +11,7 @@ import * as admin from '@/lib/admin';
 
 const AUDIENCE_NAMES: Record<admin.PushAudience, string> = {
   not_subscribed: 'Riders Not Paying for Pro',
+  complimentary: 'Riders With Complimentary Pro',
   everyone: 'Every Rider',
 };
 
@@ -31,8 +32,8 @@ export default function PushRiders() {
   const [busy, setBusy] = useState<'test' | 'send' | null>(null);
   const d = data.data;
   const ready = title.trim().length >= 3 && body.trim().length >= 5;
-  const riders = d ? (audience === 'everyone' ? d.everyone : d.not_subscribed) : 0;
-  const phones = d ? (audience === 'everyone' ? d.everyone_devices : d.not_subscribed_devices) : 0;
+  const riders = !d ? 0 : audience === 'everyone' ? d.everyone : audience === 'complimentary' ? (d.complimentary ?? 0) : d.not_subscribed;
+  const phones = !d ? 0 : audience === 'everyone' ? d.everyone_devices : audience === 'complimentary' ? (d.complimentary_devices ?? 0) : d.not_subscribed_devices;
 
   const test = async () => {
     setBusy('test');
@@ -82,6 +83,7 @@ export default function PushRiders() {
         <>
           <StatGrid>
             <StatTile label="Not Paying for Pro" value={fmtInt(d.not_subscribed)} tone="ok" hint={`${fmtInt(d.not_subscribed_devices)} phones`} />
+            <StatTile label="Complimentary Pro" value={fmtInt(d.complimentary ?? 0)} hint={`${fmtInt(d.complimentary_devices ?? 0)} phones`} />
             <StatTile label="Every Rider" value={fmtInt(d.everyone)} hint={`${fmtInt(d.everyone_devices)} phones`} />
             <StatTile label="Riders With Phones" value={fmtInt(d.with_phones)} hint="before notification settings" />
           </StatGrid>
@@ -113,7 +115,7 @@ export default function PushRiders() {
             </Panel>
             <Panel title="Who Gets It">
               <Text style={styles.body}>
-                Riders Not Paying for Pro: Free riders and riders on a Pro trial, but not App Store or Google Play subscribers or complimentary Pro. Left out every time: suspended accounts, riders who turned off account notifications, and riders in their quiet hours right now.
+                Riders Not Paying for Pro: Free riders and riders on a Pro trial, but not App Store or Google Play subscribers or complimentary Pro. Riders With Complimentary Pro: riders you gave free Pro, but not store subscribers or admins. Left out every time: suspended accounts, riders who turned off account notifications, and riders in their quiet hours right now.
               </Text>
             </Panel>
           </Columns>

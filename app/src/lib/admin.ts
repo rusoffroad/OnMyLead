@@ -314,13 +314,16 @@ export const emailOverview = () => adminRpc<EmailOverview>('admin_email_overview
 export const sendTestEmail = (subject: string, body: string) => adminFn<EmailResult>('rider-email', 'test', { subject, body });
 export const sendEmailToAll = (subject: string, body: string, expect: number) => adminFn<EmailResult>('rider-email', 'send', { subject, body, expect });
 // Push Riders (migration 20261123200000_push_riders, edge function rider-push).
-export type PushAudience = 'not_subscribed' | 'everyone';
+export type PushAudience = 'not_subscribed' | 'complimentary' | 'everyone';
 export type PushSend = {
   id: string; title: string; body: string; audience: PushAudience; test: boolean; recipients: number; sent: number;
   status: 'sending' | 'sent' | 'failed'; note: string | null; created_at: string; finished_at: string | null;
 };
 export type PushOverview = {
-  not_subscribed: number; not_subscribed_devices: number; everyone: number; everyone_devices: number; with_phones: number; sends: PushSend[];
+  not_subscribed: number; not_subscribed_devices: number;
+  /** Missing until migration 20261127000000_push_complimentary is live. */
+  complimentary?: number; complimentary_devices?: number;
+  everyone: number; everyone_devices: number; with_phones: number; sends: PushSend[];
 };
 export type PushResult = { ok: boolean; recipients: number; sent: number; removed: number; note: string | null };
 export const pushOverview = () => adminRpc<PushOverview>('admin_push_overview');

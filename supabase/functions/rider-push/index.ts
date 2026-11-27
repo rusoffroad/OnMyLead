@@ -3,8 +3,8 @@
 // POST from the dashboard (the caller must be an admin signed in with an authenticator code; the
 // function asks the database with the caller's own token, like rider-email):
 //   {"action":"test","title":"...","body":"..."}   to the admin's own phones only
-//   {"action":"send","title":"...","body":"...","audience":"not_subscribed"|"everyone","expect":123}
-//       every phone in push_audience() (migration 20261123200000_push_riders). "expect" is the
+//   {"action":"send","title":"...","body":"...","audience":"not_subscribed"|"complimentary"|"everyone","expect":123}
+//       every phone in push_audience() (migrations 20261123200000_push_riders, 20261127000000_push_complimentary). "expect" is the
 //       phone count the admin saw; if it changed, nothing is sent and the new count comes back.
 //       The same title can't go to the same audience twice within a day.
 // A tap opens the app (data type "promo", url /pro; app builds that don't know it just open).
@@ -22,7 +22,7 @@ const env = (k: string) => Deno.env.get(k) ?? '';
 const service = createClient(env('SUPABASE_URL'), env('SUPABASE_SERVICE_ROLE_KEY'), { auth: { persistSession: false } });
 const ORIGINS = new Set(['https://onmylead.com', 'https://www.onmylead.com', ...env('ADMIN_ORIGINS').split(',').map((s) => s.trim()).filter(Boolean)]);
 const APNS_HOSTS = ['https://api.push.apple.com', 'https://api.sandbox.push.apple.com'];
-const AUDIENCES = new Set(['not_subscribed', 'everyone']);
+const AUDIENCES = new Set(['not_subscribed', 'complimentary', 'everyone']);
 
 type Phone = { user_id: string; token: string; platform: 'ios' | 'android' };
 type Outcome = 'ok' | 'gone' | 'failed';

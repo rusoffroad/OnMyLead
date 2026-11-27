@@ -1,4 +1,4 @@
--- Admin > Push Riders (20261123200000_push_riders.sql). Runs after privacy_test.sql (as_user),
+-- Admin > Push Riders (20261123200000_push_riders.sql, 20261127000000_push_complimentary.sql). Runs after privacy_test.sql (as_user),
 -- pro_test.sql (expect_error) and admin_growth_test.sql (as_session).
 -- Each block raises an exception if a rule is broken.
 
@@ -30,7 +30,9 @@ do $$
 declare
   free_t text[] := (select array_agg(token) from push_audience('not_subscribed') where token like 'tok-pr-%');
   all_t text[] := (select array_agg(token) from push_audience('everyone') where token like 'tok-pr-%');
+  comp_t text[] := (select array_agg(token) from push_audience('complimentary') where token like 'tok-pr-%');
 begin
+  if comp_t is distinct from array['tok-pr-comp-ios-000000000'] then raise exception 'FAIL: complimentary audience %', comp_t; end if;
   if not free_t @> array['tok-pr-free-ios-000000000', 'tok-pr-free-and-000000000'] or cardinality(free_t) <> 2
     then raise exception 'FAIL: not_subscribed audience %', free_t; end if;
   if not all_t @> array['tok-pr-free-ios-000000000', 'tok-pr-free-and-000000000', 'tok-pr-comp-ios-000000000'] or cardinality(all_t) <> 3
@@ -58,6 +60,7 @@ declare o jsonb := admin_push_overview();
 begin
   if (o ->> 'not_subscribed')::int < 1 or (o ->> 'not_subscribed_devices')::int < 2 then raise exception 'FAIL: overview counts %', o; end if;
   if (o ->> 'everyone')::int < (o ->> 'not_subscribed')::int then raise exception 'FAIL: everyone smaller %', o; end if;
+  if (o ->> 'complimentary')::int < 1 or (o ->> 'complimentary_devices')::int < 1 then raise exception 'FAIL: complimentary counts %', o; end if;
   if jsonb_typeof(o -> 'sends') <> 'array' then raise exception 'FAIL: overview sends %', o; end if;
 end $$;
 reset role;
