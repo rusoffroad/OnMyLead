@@ -4,7 +4,7 @@ summary: Bluetooth Sharing with no service, the Emergency Siren, Map Settings, 3
 category: getting-started
 order: 10
 release: "2.1"
-updated: 2026-11-20
+updated: 2026-11-27
 sources:
   - help/release-notes.json
 related: [bluetooth-sharing, emergency-siren, map-layers, 3d-terrain, badge-leaderboard, free-vs-pro]
